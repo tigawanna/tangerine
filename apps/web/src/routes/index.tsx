@@ -1,4 +1,3 @@
-import { LandingAudience } from "@/routes/-components/landing/LandingAudience";
 import { LandingClosingCta } from "@/routes/-components/landing/LandingClosingCta";
 import { LandingFeatures } from "@/routes/-components/landing/LandingFeatures";
 import { LandingFooter } from "@/routes/-components/landing/LandingFooter";
@@ -24,7 +23,6 @@ function LandingPage() {
       <LandingNav />
       <main>
         <LandingHero />
-        <LandingAudience />
         <LandingFeatures />
         <LandingClosingCta />
       </main>

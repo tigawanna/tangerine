@@ -1,27 +1,31 @@
 import { Link } from "@tanstack/react-router";
-import { GitFork, LayoutDashboard, Star } from "lucide-react";
+import { LandingShotPlaceholder } from "./LandingShotPlaceholder";
 
 const features = [
   {
-    icon: GitFork,
     title: "Repositories",
-    body: "Pinned highlights and recently updated repos in a clean grid — jump straight into what you are shipping.",
+    body: "Pinned and recent repos in a clean grid. Jump straight into what you are shipping.",
     href: "/repos" as const,
-    cta: "Open repos",
+    shot: "Repos grid UI",
   },
   {
-    icon: Star,
     title: "Stars",
-    body: "Keep favorites close. Browse starred projects beside your own work without tab chaos.",
+    body: "Your starred projects beside your own work. No more tab hopping.",
     href: "/stars" as const,
-    cta: "Browse stars",
+    shot: "Stars list UI",
   },
   {
-    icon: LayoutDashboard,
-    title: "Focused shell",
-    body: "Collapsible sidebar, breadcrumbs, and theme control so the workspace stays out of your way.",
+    title: "Local-first speed",
+    body: "Built for fast navigation on your machine. Less waiting on GitHub chrome.",
     href: "/repos" as const,
-    cta: "Enter dashboard",
+    shot: "Fast local navigation",
+  },
+  {
+    title: "Desktop embeddings",
+    body: "Coming later: index repos and stars for smarter search. Same idea, deeper reach.",
+    href: "/repos" as const,
+    shot: "Desktop search placeholder",
+    badge: "Soon",
   },
 ] as const;
 
@@ -29,34 +33,43 @@ export function LandingFeatures() {
   return (
     <section
       id="features"
-      className="bg-landing-surface-alt text-landing-fg px-4 py-20 sm:px-6 md:py-28"
+      className="bg-landing-surface text-landing-fg px-4 py-20 sm:px-6 md:py-28"
       data-test="landing-features"
     >
       <div className="landing-scroll-reveal mx-auto max-w-6xl">
         <div className="max-w-2xl">
-          <h2 className="landing-section-heading">Built for the browsing loop</h2>
-          <p className="landing-section-lead !mx-0 text-left">
-            Same job as GitHub&apos;s lists — fewer distractions. Start in repos, peek at stars, stay in
-            flow.
+          <h2 className="landing-section-heading">Made for developers who live in repos</h2>
+          <p className="landing-section-lead mx-0! text-left">
+            A quieter shell for browsing GitHub. Local-first so it feels instant.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <div className="mt-12 grid gap-5 md:grid-cols-2">
           {features.map((feature) => (
-            <article key={feature.title} className="landing-feature-tile landing-scroll-reveal-fade">
-              <div className="bg-landing-amber/15 text-landing-amber mb-5 inline-flex size-11 items-center justify-center rounded-2xl">
-                <feature.icon className="size-5" aria-hidden />
+            <article
+              key={feature.title}
+              className="landing-feature-tile landing-scroll-reveal-fade flex flex-col"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="landing-display text-landing-fg text-xl font-bold tracking-tight">
+                  {feature.title}
+                </h3>
+                {"badge" in feature && feature.badge ? (
+                  <span className="bg-landing-surface-alt text-landing-fg-muted shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase">
+                    {feature.badge}
+                  </span>
+                ) : null}
               </div>
-              <h3 className="landing-display text-landing-fg text-xl font-bold tracking-tight">
-                {feature.title}
-              </h3>
-              <p className="text-landing-fg-muted mt-3 text-sm leading-7">{feature.body}</p>
+              <p className="text-landing-fg-muted mt-3 flex-1 text-sm leading-7">{feature.body}</p>
+              <div className="mt-6 overflow-hidden rounded-xl">
+                <LandingShotPlaceholder label={feature.shot} aspect="wide" className="min-h-35" />
+              </div>
               <Link
                 to={feature.href}
-                className="text-landing-ember mt-6 inline-flex text-sm font-semibold hover:underline"
-                data-test={`landing-feature-${feature.title.toLowerCase()}`}
+                className="text-landing-fg mt-5 inline-flex text-sm font-semibold hover:underline"
+                data-test={`landing-feature-${feature.title.toLowerCase().replace(/\s+/g, "-")}`}
               >
-                {feature.cta}
+                Open {feature.title === "Desktop embeddings" ? "repos" : feature.title.toLowerCase()}
               </Link>
             </article>
           ))}

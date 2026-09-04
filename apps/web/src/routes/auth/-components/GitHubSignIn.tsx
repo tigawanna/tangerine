@@ -25,7 +25,7 @@ export function GitHubSignIn({ callbackURL }: GitHubSignInProps) {
       return result.data;
     },
     onSuccess: () => {
-      router.navigate({ to: "/" });
+      void router.navigate({ to: "/" });
     },
     onError: (error) => {
       console.error(error);
@@ -33,18 +33,17 @@ export function GitHubSignIn({ callbackURL }: GitHubSignInProps) {
     },
   });
   return (
-    <div className="space-y-3">
-      <button
-        type="button"
-        className="btn btn-primary w-full"
-        data-test="auth-github-sign-in"
-        disabled={isPending}
-        onClick={() => {
-          void handleSignIn();
-        }}>
-        <Github className="size-4" aria-hidden />
-        {isPending ? "Redirecting…" : "Continue with GitHub"}
-      </button>
-    </div>
+    <button
+      type="button"
+      className="landing-cta-primary w-full disabled:pointer-events-none disabled:opacity-60"
+      data-test="auth-github-sign-in"
+      disabled={isPending}
+      onClick={() => {
+         handleSignIn();
+      }}
+    >
+      <Github className="size-4" aria-hidden />
+      {isPending ? "Redirecting…" : "Sign in with GitHub"}
+    </button>
   );
 }

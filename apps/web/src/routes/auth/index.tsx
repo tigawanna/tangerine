@@ -1,5 +1,5 @@
 import { getSession } from "@/data-access-layer/auth/auth.functions";
-import { GitHubSignIn } from "@/routes/auth/-components/GitHubSignIn";
+import { AuthSignInScreen } from "@/routes/auth/-components/AuthSignInScreen";
 import { AppConfig } from "@/utils/system";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
@@ -19,30 +19,17 @@ export const Route = createFileRoute("/auth/")({
   component: AuthPage,
   head: () => ({
     meta: [{ title: `Sign in | ${AppConfig.name}` }],
+    links: [
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Figtree:wght@400;500;600;700&display=swap",
+      },
+    ],
   }),
 });
 
 function AuthPage() {
   const { returnTo } = Route.useSearch();
-  const Icon = AppConfig.icon;
 
-  return (
-    <div className="bg-base-100 text-base-content flex min-h-svh items-center justify-center px-4">
-      <main
-        className="border-base-300 bg-base-200/40 w-full max-w-md rounded-2xl border p-8"
-        data-test="auth-page"
-      >
-        <div className="bg-primary/10 text-primary mb-6 flex size-12 items-center justify-center rounded-xl">
-          <Icon className="size-6" aria-hidden />
-        </div>
-        <h1 className="text-2xl font-bold tracking-tight">Sign in</h1>
-        <p className="text-base-content/70 mt-2 text-sm leading-6">
-          Continue with GitHub to browse your repositories and stars.
-        </p>
-        <div className="mt-8">
-          <GitHubSignIn callbackURL={returnTo} />
-        </div>
-      </main>
-    </div>
-  );
+  return <AuthSignInScreen returnTo={returnTo} />;
 }

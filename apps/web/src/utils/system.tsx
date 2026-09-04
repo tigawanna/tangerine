@@ -1,19 +1,20 @@
+import { AppBrandIcon } from "@/components/icon/AppBrandIcon";
 import { clientEnv } from "@/lib/envs/client-env";
-import { Github } from "lucide-react";
 
-const appName = "GitHub Dashboard";
-const appBrief = "Browse repos & stars";
+const appName = "Tangerine";
+const appBrief = "Local-first GitHub browsing";
 const appDescription =
-  "An ergonomic dashboard for browsing GitHub repositories and starred projects.";
+  "Tangerine is a local-first dashboard for faster navigation through your GitHub repositories and stars.";
 const seoKeywords =
-  "github, repositories, stars, dashboard, tigawanna, open source";
+  "tangerine, github, repositories, stars, dashboard, local-first, tigawanna, open source";
 
 const assets = {
   favicon: "/favicon.ico",
   appleTouchIcon: "/apple-touch-icon.png",
   icon: "/icon.png",
+  iconSvg: "/icon.svg",
   ogImage: "/opengraph-image.jpg",
-  ogImageAlt: "tigawanna GitHub dashboard preview",
+  ogImageAlt: "Tangerine app preview",
 } as const;
 
 const links = {
@@ -34,24 +35,22 @@ export const AppConfig = {
   name: appName,
   brief: appBrief,
   description: appDescription,
-  icon: Github,
+  icon: AppBrandIcon,
   logo: {
     src: assets.ogImage,
     alt: assets.ogImageAlt,
     href: "/",
   },
-  themeStorageKey: "tigawanna.github.theme",
+  themeStorageKey: "tigawanna.tangerine.theme",
   links,
   navItems: [
-    { label: "Product", href: "#product" },
-    { label: "Features", href: "#features" },
     { label: "Repos", href: "/repos" },
     { label: "Stars", href: "/stars" },
   ],
   assets,
   absoluteAsset,
   seo: {
-    title: `${appName} | tigawanna`,
+    title: `${appName} | local-first GitHub browsing`,
     description: appDescription,
     keywords: seoKeywords,
     ogImageAlt: assets.ogImageAlt,
