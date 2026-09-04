@@ -9,7 +9,6 @@ type GitHubSignInProps = {
 };
 
 export function GitHubSignIn({ callbackURL }: GitHubSignInProps) {
-  const router = useRouter();
   const {
     mutate: handleSignIn,
     isPending
@@ -24,9 +23,9 @@ export function GitHubSignIn({ callbackURL }: GitHubSignInProps) {
       }
       return result.data;
     },
-    onSuccess: () => {
-      void router.navigate({ to: "/" });
-    },
+    // onSuccess: () => {
+    //   void router.navigate({ to: "/" });
+    // },
     onError: (error) => {
       console.error(error);
       toast.error(error.message);
