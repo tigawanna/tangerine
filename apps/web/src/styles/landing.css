@@ -1,0 +1,383 @@
+/* Workspace packages resolve under node_modules and are ignored by Tailwind by default */
+@source "../../../../packages/ui/src";
+
+@theme {
+  /* Brand accents — warm brown / amber (less ominous than blood-red) */
+  --color-landing-burgundy: #5c3d24;
+  --color-landing-amber: #f7b538;
+  --color-landing-orange: #db7c26;
+  --color-landing-ember: #c45c1a;
+  --color-landing-flame: #a86b2f;
+
+  /* Semantic surfaces — overridden per theme below; dark-first defaults */
+  --color-landing-surface: #1a140f;
+  --color-landing-surface-alt: #221a13;
+  --color-landing-surface-raised: #2c2118;
+  --color-landing-fg: #f4ebe2;
+  --color-landing-fg-muted: #cbb5a0;
+  --color-landing-border: color-mix(in oklch, #f4ebe2 14%, transparent);
+  --color-landing-emphasis: #4a3220;
+  --color-landing-emphasis-fg: #f4ebe2;
+
+  /* Legacy aliases used by older utilities — keep in sync with semantic tokens */
+  --color-landing-void: #2a1e14;
+  --color-landing-deep: #16100c;
+  --color-landing-ink: #f4ebe2;
+  --color-landing-paper: #1a140f;
+  --color-landing-paper-warm: #221a13;
+  --color-landing-muted: #cbb5a0;
+  --color-landing-sage: #f4ebe2;
+  --color-landing-sage-light: #faf6f2;
+  --color-landing-cream: #f7b538;
+  --color-landing-cream-warm: #f4ebe2;
+  --color-landing-cream-highlight: #f7b538;
+  --color-landing-olive: #db7c26;
+  --color-landing-sage-bg: #c45c1a;
+  --color-landing-panel: #2c2118;
+  --color-landing-panel-alt: #3a2a1c;
+  --color-landing-panel-mid: #4a3220;
+  --color-landing-dark-mid: #2a1e14;
+  --color-landing-cream-bg: #221a13;
+  --color-landing-cream-dark: #16100c;
+  --color-landing-footer: #16100c;
+  --color-landing-word-start: #cbb5a0;
+  --color-landing-face-1: #2a1e14;
+  --color-landing-face-2: #5c3d24;
+  --color-landing-face-3: #a86b2f;
+  --color-landing-face-4: #c45c1a;
+
+  --font-landing-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-landing-body: "Figtree", ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+  Theme flips for landing semantics.
+  ThemeProvider toggles html.dark / html.light (+ data-theme).
+*/
+.dark {
+  --color-landing-surface: #1a140f;
+  --color-landing-surface-alt: #221a13;
+  --color-landing-surface-raised: #2c2118;
+  --color-landing-fg: #f4ebe2;
+  --color-landing-fg-muted: #cbb5a0;
+  --color-landing-border: color-mix(in oklch, #f4ebe2 14%, transparent);
+  --color-landing-emphasis: #4a3220;
+  --color-landing-emphasis-fg: #f4ebe2;
+
+  --color-landing-paper: #1a140f;
+  --color-landing-paper-warm: #221a13;
+  --color-landing-ink: #f4ebe2;
+  --color-landing-muted: #cbb5a0;
+  --color-landing-sage: #f4ebe2;
+  --color-landing-panel: #2c2118;
+  --color-landing-panel-alt: #3a2a1c;
+  --color-landing-void: #2a1e14;
+  --color-landing-deep: #16100c;
+  --color-landing-footer: #16100c;
+}
+
+.light {
+  --color-landing-surface: #faf6f2;
+  --color-landing-surface-alt: #f3ebe4;
+  --color-landing-surface-raised: #ffffff;
+  --color-landing-fg: #4a3220;
+  --color-landing-fg-muted: #6b4e38;
+  --color-landing-border: color-mix(in oklch, #4a3220 12%, transparent);
+  --color-landing-emphasis: #5c3d24;
+  --color-landing-emphasis-fg: #f4ebe2;
+
+  --color-landing-paper: #faf6f2;
+  --color-landing-paper-warm: #f3ebe4;
+  --color-landing-ink: #4a3220;
+  --color-landing-muted: #6b4e38;
+  --color-landing-sage: #4a3220;
+  --color-landing-panel: #ffffff;
+  --color-landing-panel-alt: #f3ebe4;
+  --color-landing-void: #faf6f2;
+  --color-landing-deep: #16100c;
+  --color-landing-footer: #f3ebe4;
+}
+
+@utility landing-card {
+  @apply relative rounded-2xl border border-landing-amber/15 bg-landing-panel shadow-xl shadow-black/30;
+}
+
+@utility landing-section-heading {
+  @apply text-balance font-[family-name:var(--font-landing-display)] text-4xl leading-[1.05] font-bold tracking-[-0.03em] text-landing-fg md:text-5xl lg:text-6xl;
+}
+
+@utility landing-section-lead {
+  @apply mx-auto mt-5 max-w-2xl text-lg leading-8 text-landing-fg-muted;
+}
+
+@utility landing-void-surface {
+  @apply bg-landing-void text-landing-sage;
+}
+
+.landing-page {
+  font-family: var(--font-landing-body);
+  color: var(--color-landing-fg);
+  background: var(--color-landing-surface);
+}
+
+.landing-page h1,
+.landing-page h2,
+.landing-page h3,
+.landing-page .landing-display {
+  font-family: var(--font-landing-display);
+  text-wrap: balance;
+}
+
+.landing-page p {
+  text-wrap: pretty;
+}
+
+.landing-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.landing-cta:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+}
+
+.landing-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--color-landing-amber);
+  color: #16100c;
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.landing-cta-primary:hover {
+  transform: translateY(-2px);
+  background: #ffc24a;
+}
+
+.landing-cta-primary.landing-cta-compact {
+  padding: 0.5rem 1rem;
+}
+
+.landing-cta-primary:focus-visible {
+  outline: 2px solid var(--color-landing-amber);
+  outline-offset: 2px;
+}
+
+.landing-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-landing-border);
+  background: transparent;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-landing-fg);
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.landing-cta-secondary:hover {
+  border-color: color-mix(in oklch, var(--color-landing-fg) 30%, transparent);
+  background: color-mix(in oklch, var(--color-landing-fg) 6%, transparent);
+}
+
+.landing-cta-secondary:focus-visible {
+  outline: 2px solid var(--color-landing-fg);
+  outline-offset: 2px;
+}
+
+.landing-cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-landing-border);
+  background: transparent;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-landing-fg);
+  transition:
+    background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.landing-cta-ghost:hover {
+  border-color: color-mix(in oklch, var(--color-landing-fg) 30%, transparent);
+  background: color-mix(in oklch, var(--color-landing-fg) 6%, transparent);
+}
+
+.landing-cta-ghost:focus-visible {
+  outline: 2px solid var(--color-landing-fg);
+  outline-offset: 2px;
+}
+
+.landing-proof-shell {
+  background: var(--color-landing-surface-raised);
+  box-shadow: none;
+  border: 1px solid var(--color-landing-border);
+}
+
+.landing-feature-tile {
+  border-radius: 1rem;
+  border: 1px solid var(--color-landing-border);
+  background: var(--color-landing-surface-raised);
+  padding: 1.5rem;
+  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.landing-feature-tile:hover {
+  transform: translateY(-4px);
+}
+
+.landing-audience-card {
+  border-radius: 1.5rem;
+  padding: 2.5rem 2rem;
+}
+
+.landing-audience-card-emphasis {
+  background: var(--color-landing-emphasis);
+  color: var(--color-landing-emphasis-fg);
+}
+
+.landing-audience-card-raised {
+  background: var(--color-landing-surface-raised);
+  color: var(--color-landing-fg);
+  border: 1px solid var(--color-landing-border);
+}
+
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes landing-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-hero-enter {
+  animation: landing-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.landing-hero-enter-delay-1 {
+  animation-delay: 80ms;
+}
+
+.landing-hero-enter-delay-2 {
+  animation-delay: 160ms;
+}
+
+.landing-hero-enter-delay-3 {
+  animation-delay: 240ms;
+}
+
+.landing-proof-float {
+  animation: landing-float 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-enter,
+  .landing-proof-float,
+  .landing-feature-tile {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .landing-cta-primary:hover,
+  .landing-feature-tile:hover {
+    transform: none;
+  }
+}
+
+@keyframes landing-reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(48px) scale(0.97);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes landing-reveal-fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-scroll-reveal {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .landing-scroll-reveal {
+      animation: landing-reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 34%;
+    }
+
+    .landing-scroll-reveal-fade {
+      animation-name: landing-reveal-fade;
+    }
+
+    .landing-scroll-reveal-delay-short {
+      animation-range: entry 18% cover 40%;
+    }
+
+    .landing-scroll-reveal-delay-medium {
+      animation-range: entry 26% cover 46%;
+    }
+
+    .landing-scroll-reveal-delay-long {
+      animation-range: entry 34% cover 52%;
+    }
+  }
+}

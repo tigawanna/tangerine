@@ -1,0 +1,30 @@
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+count.txt
+.env
+local.db
+*.db
+.nitro
+.tanstack
+.workflow-data
+.workflow-vitest
+.wrangler
+.output
+.vinxi
+todos.json
+/.swc
+
+# Lighthouse audit artifacts (local only)
+lighthouse-reports/
+lighthouse-reports-desktop/
+**/lighthouse-reports/
+**/lighthouse-reports-desktop/
+**/*lighthouse*.trace.json*
+**/*lighthouse*.json.gz
+
+
+# Cloudflare Wrangler local secrets (never commit)
+.dev.vars

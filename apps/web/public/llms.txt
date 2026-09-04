@@ -1,0 +1,51 @@
+# Dennis Waweru
+
+> Full-stack TypeScript developer based in Nairobi, Kenya. Portfolio, projects, articles, and contact.
+
+## About
+
+Dennis Waweru (Dennis Kinuthia) is a full-stack TypeScript developer who owns work from architecture through deployment. He works full-time, as a contractor, or as a freelancer across remote US teams, hybrid setups, and in-person engagements, including forward-deployed roles embedded inside client organizations.
+
+## Site sections
+
+- [Home](https://tigawanna-portfolio.vercel.app/): Portfolio landing page
+- [About / How I work](https://tigawanna-portfolio.vercel.app/#about): Ownership, architecture, teams, engagement models, open source
+- [Skills](https://tigawanna-portfolio.vercel.app/#skills): Technology choices and rationale
+- [Projects](https://tigawanna-portfolio.vercel.app/#projects): Open source GitHub projects with topic filters and search
+- [Articles](https://tigawanna-portfolio.vercel.app/#articles): Dev.to writing
+- [Infodiet](https://tigawanna-portfolio.vercel.app/#infodiet): Podcasts and blogs followed
+- [Journal](https://tigawanna-portfolio.vercel.app/#journal): Learning notes and milestones
+- [Contact](https://tigawanna-portfolio.vercel.app/#contact): Contact form and email
+
+## Stack
+
+- Web: React, Next.js, TanStack, Tailwind CSS, TypeScript
+- Mobile: React Native, Expo, Capacitor, PWA, TypeScript
+- AI: RAG, Chatbots, Workflows, Agents
+- Backend: Node.js, Docker, AWS, GCP, Cloudflare, Linux Servers, Supabase
+
+Primary tools: TypeScript, Zod, React, Next.js, TanStack, Tailwind CSS, Node.js, Drizzle ORM, Vitest, Expo.
+
+## How I work
+
+- End-to-end project ownership from architecture through deployment and post-launch work
+- System design, data modeling, stack decisions, and architecture reviews
+- Team multiplier across product, design, and engineering
+- Any team shape, any model: full-time, contract, freelance, remote, hybrid, in-person, forward-deployed
+- Maintainable, performance-minded code, open source contributions, and builder tooling
+
+## Contact
+
+- Email: denniskinuthiawaweru@gmail.com
+- GitHub: https://github.com/tigawanna
+- LinkedIn: https://linkedin.com/in/dennis-kinuthia-waweru
+- Dev.to: https://dev.to/tigawanna
+- Twitter: https://twitter.com/tigawanna
+
+## Agent tools (WebMCP)
+
+When supported by the browser, this site exposes WebMCP tools:
+
+- `get_about_me`: compact profile, stack, how I work, and contact links
+- `get_in_touch`: send a contact message (same as the contact form)
+- `find_relevant_projects`: match projects by tags and text; semantic grouping planned later

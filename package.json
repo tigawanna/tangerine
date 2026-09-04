@@ -1,0 +1,46 @@
+{
+  "name": "tigawanna",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build --filter=web",
+    "dev": "turbo run dev --filter=web",
+    "lint": "vp lint .",
+    "lint:fix": "vp lint --fix .",
+    "format": "vp fmt .",
+    "format:fix": "vp fmt .",
+    "check-types": "turbo run check-types",
+    "quality": "vp fmt && vp lint --fix"
+  },
+  "dependencies": {
+    "turbo": "^2.10.3"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.27.0",
+  "pnpm": {
+    "overrides": {
+      "@types/react": "^19.2.14",
+      "@types/react-dom": "^19.2.3",
+      "better-auth": "1.7.2",
+      "@better-auth/core": "1.7.2",
+      "vite": "catalog:",
+      "vitest": "catalog:",
+      "@voidzero-dev/vite-plus-core": "0.3.0"
+    },
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "core-js",
+      "es5-ext",
+      "esbuild",
+      "futurescript",
+      "protobufjs",
+      "sharp",
+      "workerd"
+    ]
+  }
+}

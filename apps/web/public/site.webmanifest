@@ -1,0 +1,26 @@
+{
+  "name": "Dennis Waweru",
+  "short_name": "Tigawanna",
+  "description": "I own projects from architecture through deployment, designing systems teams can live with and shipping maintainable, performance-minded code. Full-time, contract, or freelance, remote, hybrid, or in-person. Stack: React, Next.js, TanStack, TypeScript, React Native, Expo, Node.js, Drizzle, AWS, GCP, Cloudflare, and Supabase. Forward-deployed integrations and upgrades. Based in Nairobi, Kenya.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#151811",
+  "theme_color": "#151811",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

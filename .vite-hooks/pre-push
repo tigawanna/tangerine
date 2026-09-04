@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+# Vite+ has no vite.config `prePush` block — hooks live here (.vite-hooks/<hook-name>).
+# Run web Playwright e2e when pushing commits to main. Do not skip — fix failures.
+
+run_e2e=0
+
+while read -r _local_ref local_sha remote_ref _remote_sha; do
+  case "$remote_ref" in
+  refs/heads/main)
+    # Ignore branch deletes (all-zero local SHA).
+    if [ "$local_sha" != "0000000000000000000000000000000000000000" ]; then
+      run_e2e=1
+    fi
+    ;;
+  esac
+done
+
+if [ "$run_e2e" -eq 0 ]; then
+  exit 0
+fi
+
+echo "VITE+ - pushing to main: building web (next build)..."
+pnpm --filter web build
+
+echo "VITE+ - pushing to main: running web e2e against next start preview..."
+pnpm --filter web test:e2e
