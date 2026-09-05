@@ -40,7 +40,7 @@ export function RepoCard({ repo }: RepoCardProps) {
 
   return (
     <article
-      className="border-base-300 bg-base-100 group relative flex h-full flex-col overflow-hidden rounded-xl border transition-[border-color,transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:border-base-content/20 hover:shadow-lg hover:shadow-base-content/5"
+      className="border-base-300 bg-base-100 group relative flex h-full flex-col overflow-hidden rounded-xl border transition-colors duration-200 ease-out hover:border-base-content/20"
       data-test={`repo-card-${repo.name}`}
     >
       <div className="bg-base-300 relative aspect-video overflow-hidden">
@@ -96,7 +96,7 @@ export function RepoCard({ repo }: RepoCardProps) {
               to="/$user/repos/$repo"
               params={detailParams}
               preload="intent"
-              className="hover:text-primary min-w-0 flex-1 truncate text-base font-semibold tracking-tight transition-colors"
+              className="group-hover:text-primary min-w-0 flex-1 truncate text-base font-semibold tracking-tight transition-colors"
             >
               {repo.name}
             </Link>
