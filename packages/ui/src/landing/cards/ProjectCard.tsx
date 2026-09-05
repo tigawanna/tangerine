@@ -41,7 +41,7 @@ export function PrivateProjectCard({ repo, className }: ProjectCardProps) {
       </div>
       <div className="flex items-center gap-1 text-xs text-landing-sage/40">
         <span>Updated</span>
-        <TimeCompponent time={repo.pushedAt} relative className="p-0 text-xs font-normal" />
+        <TimeCompponent time={repo.pushedAt ?? ""} relative className="p-0 text-xs font-normal" />
       </div>
     </article>
   );
@@ -81,7 +81,7 @@ export function ProjectCard({ repo, className }: ProjectCardProps) {
         <div className="flex flex-wrap items-start justify-between gap-2">
           <h3 className="font-serif text-xl leading-snug text-landing-cream">{repo.name}</h3>
           <TimeCompponent
-            time={repo.pushedAt}
+            time={repo.pushedAt ?? ""}
             relative
             className="p-0 text-xs font-normal text-landing-sage/45"
           />
@@ -93,7 +93,10 @@ export function ProjectCard({ repo, className }: ProjectCardProps) {
 
         {repo.repositoryTopics?.nodes?.length ? (
           <ul className="mt-auto flex flex-wrap gap-1.5 pt-1">
-            {repo.repositoryTopics.nodes.slice(0, 4).map((topic) => (
+            {repo.repositoryTopics.nodes
+              .filter((topic): topic is NonNullable<typeof topic> => topic != null)
+              .slice(0, 4)
+              .map((topic) => (
               <li key={topic.topic.name} className="landing-card-tag">
                 {topic.topic.name}
               </li>

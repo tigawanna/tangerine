@@ -20,7 +20,7 @@ function collectTopics(repos: GithubRepoNode[]) {
   const topics = new Set<string>();
   for (const repo of repos) {
     for (const node of repo?.repositoryTopics?.nodes ?? []) {
-      if (node.topic.name) {
+      if (node?.topic.name) {
         topics.add(node.topic.name);
       }
     }

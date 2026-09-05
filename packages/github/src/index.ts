@@ -1,5 +1,43 @@
 export { createGitHubClient, GitHubClient, RequestError } from "./client";
 export {
+  ViewerQuery,
+  VIEWER_QUERY,
+  type ViewerQueryResult,
+} from "./queries/user";
+export {
+  RecentReposQuery,
+  PinnedReposQuery,
+  EnrichmentRecentReposQuery,
+  RECENT_REPOS_QUERY,
+  PINNED_REPOS_QUERY,
+  ENRICHMENT_RECENT_REPOS_QUERY,
+  type RecentReposQueryResult,
+  type PinnedReposQueryResult,
+  type EnrichmentRecentReposQueryResult,
+  type GithubRepoNode,
+  type RepositoryTopic,
+  type GithubGraphqlRateLimit,
+  type GithubRepoOrderField,
+  type GithubOrderDirection,
+  type ViewerPinnedRepoData,
+  type ViewerPinnedRepo,
+  type ViewerPinnedRepoError,
+  type PinnedViewerReposResponse,
+  type FetchRecentReposOptions,
+  type FetchRecentReposResult,
+} from "./queries/repo-list";
+export {
+  OneRepoQuery,
+  RepoByNameQuery,
+  ONE_REPO_QUERY,
+  REPO_BY_NAME_QUERY,
+  type OneRepoQueryResult,
+  type RepoByNameQueryResult,
+  type GithubRepoDetail,
+} from "./queries/repo-info";
+export { graphql, readFragment } from "./graphql";
+export type { FragmentOf, ResultOf, VariablesOf } from "./graphql";
+export {
   fetchRepoAnalysis,
   fetchRepoExtraction,
   getRootPackageJson,
@@ -35,24 +73,12 @@ export type {
   SpelunkPayload,
 } from "./spelunk/index";
 export type {
-  FetchRecentReposOptions,
-  FetchRecentReposResult,
   GithubGraphqlError,
-  GithubGraphqlRateLimit,
-  GithubRepoDetail,
-  GithubRepoNode,
   GithubRepoSnapshot,
-  GithubRepoOrderField,
-  GithubOrderDirection,
   PackageJsonChunk,
-  PinnedViewerReposResponse,
   RepoAnalysis,
   RepoExtraction,
   GitTreeEntry,
-  RepositoryTopic,
-  ViewerPinnedRepo,
-  ViewerPinnedRepoData,
-  ViewerPinnedRepoError,
 } from "./types";
 export {
   buildRepoSearchText,

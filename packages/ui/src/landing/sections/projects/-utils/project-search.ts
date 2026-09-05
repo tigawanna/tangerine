@@ -2,7 +2,11 @@ import type { GithubRepoNode } from "../../../types/github";
 import { matchesProjectRelevance } from "../../../modules/find-relevant-projects";
 
 function repoSearchText(repo: GithubRepoNode) {
-  const tags = repo.repositoryTopics?.nodes?.map((node) => node.topic.name).join(" ") ?? "";
+  const tags =
+    repo.repositoryTopics?.nodes
+      ?.filter((node): node is NonNullable<typeof node> => node != null)
+      .map((node) => node.topic.name)
+      .join(" ") ?? "";
 
   return [repo.name, repo.nameWithOwner, repo.description ?? "", tags].join(" ").toLowerCase();
 }
@@ -25,6 +29,8 @@ export function filterReposByTopic(repos: GithubRepoNode[], topic: string) {
   const normalizedTopic = topic.toLowerCase();
 
   return repos.filter((repo) =>
-    repo.repositoryTopics?.nodes?.some((node) => node.topic.name.toLowerCase() === normalizedTopic),
+    repo.repositoryTopics?.nodes?.some(
+      (node) => node != null && node.topic.name.toLowerCase() === normalizedTopic,
+    ),
   );
 }

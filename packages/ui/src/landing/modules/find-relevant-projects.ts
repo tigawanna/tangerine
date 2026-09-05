@@ -3,9 +3,9 @@ import type { GithubRepoNode } from "../types/github";
 export type RelevantProject = {
   name: string;
   nameWithOwner: string;
-  description: string | undefined;
+  description: string | null;
   url: string;
-  homepageUrl: string;
+  homepageUrl: string | null;
   tags: string[];
   matchScore: number;
   matchedTags: string[];
@@ -33,7 +33,9 @@ export function parseProjectQueryTerms(query: string) {
 }
 
 function getRepoTags(repo: GithubRepoNode) {
-  return (repo.repositoryTopics?.nodes ?? []).map((node) => node.topic.name.toLowerCase());
+  return (repo.repositoryTopics?.nodes ?? [])
+    .filter((node): node is NonNullable<typeof node> => node != null)
+    .map((node) => node.topic.name.toLowerCase());
 }
 
 function scoreTagMatch(tag: string, term: string) {

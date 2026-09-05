@@ -43,11 +43,10 @@ vi.mock("octokit", () => {
 import { createGitHubClient, RequestError } from "./client";
 import {
   ENRICHMENT_RECENT_REPOS_QUERY,
-  ONE_REPO_QUERY,
   PINNED_REPOS_QUERY,
   RECENT_REPOS_QUERY,
-  REPO_BY_NAME_QUERY,
-} from "./graphql/queries";
+} from "./queries/repo-list";
+import { ONE_REPO_QUERY, REPO_BY_NAME_QUERY } from "./queries/repo-info";
 
 function createRequestError(status: number, message: string) {
   return new RequestError(message, status, {

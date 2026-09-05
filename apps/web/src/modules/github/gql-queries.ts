@@ -1,15 +1,14 @@
-import { RECENT_REPOS_QUERY } from "@repo/github/graphql/queries";
-import type { RecentReposGraphqlResponse } from "@repo/github/graphql/response-types";
-import type {
-  FetchRecentReposOptions,
-  FetchRecentReposResult,
-  GithubGraphqlError,
-  GithubRepoNode,
-} from "@repo/github";
+import {
+  RECENT_REPOS_QUERY,
+  type FetchRecentReposOptions,
+  type FetchRecentReposResult,
+  type RecentReposQueryResult,
+} from "@repo/github/queries/repo-list";
+import type { GithubGraphqlError } from "@repo/github";
 import { getGithubToken } from "@/lib/github-token.server";
 
 type RecentReposGraphqlBody = {
-  data?: RecentReposGraphqlResponse;
+  data?: RecentReposQueryResult;
   errors?: GithubGraphqlError[];
 };
 
@@ -26,6 +25,7 @@ export async function fetchRecentReposGraphql(
 
   const {
     first = 100,
+    firstTopics = 10,
     isFork = false,
     orderField = "PUSHED_AT",
     orderDirection = "DESC",
@@ -41,7 +41,7 @@ export async function fetchRecentReposGraphql(
     cache,
     body: JSON.stringify({
       query: RECENT_REPOS_QUERY,
-      variables: { first, isFork, orderField, orderDirection },
+      variables: { first, firstTopics, isFork, orderField, orderDirection },
     }),
   });
 
@@ -62,7 +62,7 @@ export async function fetchRecentReposGraphql(
 
   const body = (await res.json()) as RecentReposGraphqlBody;
   const nodes = (body.data?.viewer.repositories.nodes ?? []).filter(
-    (node): node is GithubRepoNode => node != null,
+    (node): node is NonNullable<typeof node> => node != null,
   );
 
   return {

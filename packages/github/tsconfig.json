@@ -5,7 +5,14 @@
     "rootDir": "src",
     // Source-exported package consumed by Next/Vite bundlers — not NodeNext runtime.
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "plugins": [
+      {
+        "name": "gql.tada/ts-plugin",
+        "schema": "./schema.graphql",
+        "tadaOutputLocation": "./src/graphql-env.d.ts"
+      }
+    ]
   },
   "include": ["src"],
   "exclude": ["node_modules"]

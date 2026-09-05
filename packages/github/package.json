@@ -5,18 +5,24 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./graphql/queries": "./src/graphql/queries.ts",
-    "./graphql/response-types": "./src/graphql/response-types.ts",
+    "./graphql": "./src/graphql.ts",
+    "./queries/user": "./src/queries/user.ts",
+    "./queries/repo-list": "./src/queries/repo-list.ts",
+    "./queries/repo-info": "./src/queries/repo-info.ts",
     "./*": "./src/*.ts"
   },
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
     "check-types": "tsc --noEmit",
+    "gql:generate": "gql-tada generate-output",
+    "gql:check": "gql-tada check",
     "test": "vp test run",
     "test:watch": "vp test"
   },
   "dependencies": {
+    "gql.tada": "^1.11.3",
+    "graphql": "^17.0.2",
     "octokit": "^5.0.5"
   },
   "devDependencies": {

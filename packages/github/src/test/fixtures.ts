@@ -1,4 +1,5 @@
-import type { GitTreeEntry, GithubRepoNode, GithubRepoSnapshot } from "../types";
+import type { GitTreeEntry, GithubRepoSnapshot } from "../types";
+import type { GithubRepoNode } from "../queries/repo-list";
 
 export function createRepoNode(
   overrides: Partial<GithubRepoNode> & Pick<GithubRepoNode, "name" | "nameWithOwner">,
@@ -6,10 +7,16 @@ export function createRepoNode(
   return {
     url: `https://github.com/${overrides.nameWithOwner}`,
     openGraphImageUrl: "https://opengraph.githubassets.com/1/repo.png",
+    description: null,
     descriptionHTML: "<p>Description</p>",
     homepageUrl: "https://example.com",
     pushedAt: "2026-01-01T00:00:00Z",
     isPrivate: false,
+    isFork: false,
+    isArchived: false,
+    stargazerCount: 0,
+    forkCount: 0,
+    defaultBranchRef: { name: "main" },
     repositoryTopics: { nodes: [] },
     ...overrides,
   };

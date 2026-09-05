@@ -1,4 +1,13 @@
-import type { GithubRepoNode, GithubRepoSnapshot } from "../types";
+import type { GithubRepoSnapshot } from "../types";
+
+type RepoWithTopics = {
+  name: string;
+  nameWithOwner: string;
+  description?: string | null;
+  repositoryTopics?: {
+    nodes?: ({ topic: { name: string } } | null)[] | null;
+  } | null;
+};
 
 /**
  * Splits a `owner/repo` full name into its parts.
@@ -16,8 +25,9 @@ export function splitRepoFullName(fullName: string) {
 /**
  * Extracts topic names from a GitHub repository GraphQL node.
  */
-export function extractRepoTags(repo: GithubRepoNode) {
+export function extractRepoTags(repo: RepoWithTopics) {
   return (repo.repositoryTopics?.nodes ?? [])
+    .filter((node): node is { topic: { name: string } } => node != null)
     .map((node) => node.topic.name)
     .filter((tag) => tag.length > 0);
 }
@@ -25,7 +35,7 @@ export function extractRepoTags(repo: GithubRepoNode) {
 /**
  * Builds a compact text block for embedding/search from a repository node.
  */
-export function buildRepoSearchText(repo: GithubRepoNode) {
+export function buildRepoSearchText(repo: RepoWithTopics) {
   const tags = extractRepoTags(repo);
   const parts = [
     `Repository: ${repo.name}`,
