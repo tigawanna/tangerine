@@ -6,7 +6,7 @@ import { graphql, useFragment, usePaginationFragment } from "react-relay";
 import type { UserFollowersFragment$key } from "./__generated__/UserFollowersFragment.graphql";
 import type { UserCard_user$key } from "./__generated__/UserCard_user.graphql";
 
-const userRoute = getRouteApi("/_dashboard/$user");
+const userRoute = getRouteApi("/_dashboard/$user/");
 
 interface UserFollowersListProps {
   followersKey: UserFollowersFragment$key;

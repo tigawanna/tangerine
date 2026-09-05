@@ -9,11 +9,11 @@ import { AppConfig } from "@/utils/system";
 import { Link } from "@tanstack/react-router";
 
 interface DashboardSidebarHeaderProps {
-  /** Active dashboard user login — home links to their profile. */
-  user?: string;
+  /** Signed-in GitHub login — home always opens *their* profile. */
+  githubLogin?: string;
 }
 
-export function DashboardSidebarHeader({ user }: DashboardSidebarHeaderProps) {
+export function DashboardSidebarHeader({ githubLogin }: DashboardSidebarHeaderProps) {
   const { state, setOpenMobile, isMobile } = useSidebar();
 
   return (
@@ -25,10 +25,10 @@ export function DashboardSidebarHeader({ user }: DashboardSidebarHeaderProps) {
           onClick={() => setOpenMobile(false)}
           data-test="dashboard-sidebar-home"
         >
-          {user ? (
+          {githubLogin ? (
             <Link
               to="/$user"
-              params={{ user }}
+              params={{ user: githubLogin }}
               search={defaultUserSearch}
               className="hover:bg-primary/10 flex w-full justify-center"
             >

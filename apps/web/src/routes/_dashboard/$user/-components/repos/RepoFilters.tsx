@@ -15,7 +15,7 @@ import {
 import { getRouteApi } from "@tanstack/react-router";
 import { type ReactNode, startTransition } from "react";
 
-const userRoute = getRouteApi("/_dashboard/$user");
+const userRoute = getRouteApi("/_dashboard/$user/");
 
 /**
  * Shared sticky chrome for tab filters (stays outside list Suspense).

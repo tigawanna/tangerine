@@ -1,6 +1,5 @@
 import type { GithubRepoNode } from "@/types/github";
 import { getRelativeTimeString } from "@/utils/date-helpers";
-import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
 import { Link } from "@tanstack/react-router";
 import { graphql, useFragment } from "react-relay";
 import { Copy, Github, Lock, Star } from "lucide-react";
@@ -146,7 +145,6 @@ function RepoCardSurface({ view }: { view: RepoCardView }) {
         <Link
           to="/$user/repos/$repo"
           params={detailParams}
-          search={defaultUserSearch}
           className="absolute inset-0"
           aria-label={`Open ${view.name} details`}
           preload="intent"
@@ -182,7 +180,6 @@ function RepoCardSurface({ view }: { view: RepoCardView }) {
             <Link
               to="/$user/repos/$repo"
               params={detailParams}
-              search={defaultUserSearch}
               preload="intent"
               className="group-hover:text-primary min-w-0 flex-1 truncate text-base font-semibold tracking-tight transition-colors"
             >

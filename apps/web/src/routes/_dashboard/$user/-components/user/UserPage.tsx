@@ -1,4 +1,5 @@
 import { UserInfo } from "./UserInfo";
+import { OwnerCard } from "./OwnerCard";
 import { UserRepos } from "../repos/UserRepos";
 import {
   PeopleSearchInput,
@@ -18,31 +19,56 @@ import { getRouteApi } from "@tanstack/react-router";
 import { Activity, Suspense, startTransition } from "react";
 import { usePreloadedQuery } from "react-relay";
 
-const userRoute = getRouteApi("/_dashboard/$user");
+const userRoute = getRouteApi("/_dashboard/$user/");
+
+type ProfileTab = (typeof userTabOptions)[number];
 
 /**
- * Profile hub — UserInfo + tabs for repos / starred / followers / following.
- * Panels use React `Activity` so switching tabs keeps state / Relay data warm.
- * Tab filters stay outside list Suspense so they remain usable while lists reload.
+ * Profile hub for Users and Organizations.
+ * Orgs use `repositoryOwner` (no `organization {}` — that needs `read:org`).
  */
 export function UserPage() {
   const navigate = userRoute.useNavigate();
   const { tab } = userRoute.useSearch();
+  const query = useOwnerQuery();
+  const user = query.user;
+  const owner = query.repositoryOwner;
+  const isOrg = owner?.__typename === "Organization";
+
+  const tabs = (user
+    ? (["repos", "starred", "followers", "following"] as const)
+    : (["repos"] as const)) satisfies readonly ProfileTab[];
+
+  const activeTab: ProfileTab = (tabs as readonly string[]).includes(tab) ? tab : "repos";
+
+  if (!user && !owner) {
+    return (
+      <div
+        className="border-error/30 bg-error/10 text-base-content mx-auto max-w-6xl rounded-xl border p-4"
+        data-test="owner-not-found"
+      >
+        <p className="font-medium">Profile not found</p>
+        <p className="text-base-content/70 mt-1 text-sm">
+          GitHub returned no user or organization for this login.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-8" data-test="user-page">
       <Suspense fallback={<HeaderFallback />}>
-        <UserHeader />
+        {user ? <UserInfo user={user} /> : owner ? <OwnerCard owner={owner} /> : null}
       </Suspense>
 
       <Tabs
-        value={tab}
+        value={activeTab}
         onValueChange={(next) => {
           startTransition(() => {
             void navigate({
               search: (prev) => ({
                 ...prev,
-                tab: next as (typeof userTabOptions)[number],
+                tab: next as ProfileTab,
               }),
               replace: true,
             });
@@ -55,131 +81,84 @@ export function UserPage() {
           className="border-base-300 mb-6 grid h-auto w-full grid-cols-2 gap-0 border-b bg-transparent p-0 lg:grid-cols-4"
           data-test="user-tabs"
         >
-          <TabsTrigger
-            value="repos"
-            className="rounded-none px-3 py-2.5"
-            data-test="user-tab-repos"
-          >
-            Repos
-          </TabsTrigger>
-          <TabsTrigger
-            value="starred"
-            className="rounded-none px-3 py-2.5"
-            data-test="user-tab-starred"
-          >
-            Starred
-          </TabsTrigger>
-          <TabsTrigger
-            value="followers"
-            className="rounded-none px-3 py-2.5"
-            data-test="user-tab-followers"
-          >
-            Followers
-          </TabsTrigger>
-          <TabsTrigger
-            value="following"
-            className="rounded-none px-3 py-2.5"
-            data-test="user-tab-following"
-          >
-            Following
-          </TabsTrigger>
+          {tabs.map((value) => (
+            <TabsTrigger
+              key={value}
+              value={value}
+              className="rounded-none px-3 py-2.5 capitalize"
+              data-test={`user-tab-${value}`}
+            >
+              {value}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <Activity mode={tab === "repos" ? "visible" : "hidden"}>
-          <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-repos">
-            <TabFilterBar testId="repo-filters">
-              <RepoOrderSelect />
-              <RepoIsForkSwitch />
-            </TabFilterBar>
-            <Suspense fallback={<TabFallback label="repos" />}>
-              <ReposTab />
-            </Suspense>
-          </div>
-        </Activity>
+        {owner ? (
+          <Activity mode={activeTab === "repos" ? "visible" : "hidden"}>
+            <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-repos">
+              <TabFilterBar testId="repo-filters">
+                <RepoOrderSelect />
+                <RepoIsForkSwitch />
+              </TabFilterBar>
+              <Suspense fallback={<TabFallback label="repos" />}>
+                <UserRepos userReposKey={owner} />
+              </Suspense>
+            </div>
+          </Activity>
+        ) : null}
 
-        <Activity mode={tab === "starred" ? "visible" : "hidden"}>
-          <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-starred">
-            <TabFilterBar testId="starred-filters">
-              <StarOrderSelect />
-              <StarOwnedByViewerSwitch />
-            </TabFilterBar>
-            <Suspense fallback={<TabFallback label="starred repos" />}>
-              <StarredTab />
-            </Suspense>
-          </div>
-        </Activity>
+        {user ? (
+          <>
+            <Activity mode={activeTab === "starred" ? "visible" : "hidden"}>
+              <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-starred">
+                <TabFilterBar testId="starred-filters">
+                  <StarOrderSelect />
+                  <StarOwnedByViewerSwitch />
+                </TabFilterBar>
+                <Suspense fallback={<TabFallback label="starred repos" />}>
+                  <UserStarredRepos starredReposKey={user} />
+                </Suspense>
+              </div>
+            </Activity>
 
-        <Activity mode={tab === "followers" ? "visible" : "hidden"}>
-          <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-followers">
-            <TabFilterBar testId="followers-filters">
-              <PeopleSearchInput placeholder="Filter by name or login…" />
-            </TabFilterBar>
-            <Suspense fallback={<TabFallback label="followers" />}>
-              <FollowersTab />
-            </Suspense>
-          </div>
-        </Activity>
+            <Activity mode={activeTab === "followers" ? "visible" : "hidden"}>
+              <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-followers">
+                <TabFilterBar testId="followers-filters">
+                  <PeopleSearchInput placeholder="Filter by name or login…" />
+                </TabFilterBar>
+                <Suspense fallback={<TabFallback label="followers" />}>
+                  <UserFollowersList followersKey={user} />
+                </Suspense>
+              </div>
+            </Activity>
 
-        <Activity mode={tab === "following" ? "visible" : "hidden"}>
-          <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-following">
-            <TabFilterBar testId="following-filters">
-              <PeopleSearchInput placeholder="Filter by name or login…" />
-            </TabFilterBar>
-            <Suspense fallback={<TabFallback label="following" />}>
-              <FollowingTab />
-            </Suspense>
-          </div>
-        </Activity>
+            <Activity mode={activeTab === "following" ? "visible" : "hidden"}>
+              <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-following">
+                <TabFilterBar testId="following-filters">
+                  <PeopleSearchInput placeholder="Filter by name or login…" />
+                </TabFilterBar>
+                <Suspense fallback={<TabFallback label="following" />}>
+                  <UserFollowingList followingKey={user} />
+                </Suspense>
+              </div>
+            </Activity>
+          </>
+        ) : null}
+
+        {isOrg ? (
+          <p className="text-base-content/45 text-center text-xs" data-test="org-scope-hint">
+            Org members need the <code className="font-mono">read:org</code> GitHub scope — sign out
+            and back in after it is enabled.
+          </p>
+        ) : null}
       </Tabs>
     </div>
   );
 }
 
-function useUserQuery() {
+function useOwnerQuery() {
   const queryRef = userRoute.useLoaderData();
   return usePreloadedQuery<layoutUserPageLoaderQuery>(userQuery, queryRef);
-}
-
-function UserHeader() {
-  const query = useUserQuery();
-  if (!query.user) {
-    return (
-      <div
-        className="border-error/30 bg-error/10 text-base-content rounded-xl border p-4"
-        data-test="user-not-found"
-      >
-        <p className="font-medium">User not found</p>
-        <p className="text-base-content/70 mt-1 text-sm">
-          GitHub returned no profile for this login.
-        </p>
-      </div>
-    );
-  }
-  return <UserInfo user={query.user} />;
-}
-
-function ReposTab() {
-  const query = useUserQuery();
-  if (!query.user) return null;
-  return <UserRepos userReposKey={query.user} />;
-}
-
-function StarredTab() {
-  const query = useUserQuery();
-  if (!query.user) return null;
-  return <UserStarredRepos starredReposKey={query.user} />;
-}
-
-function FollowersTab() {
-  const query = useUserQuery();
-  if (!query.user) return null;
-  return <UserFollowersList followersKey={query.user} />;
-}
-
-function FollowingTab() {
-  const query = useUserQuery();
-  if (!query.user) return null;
-  return <UserFollowingList followingKey={query.user} />;
 }
 
 function HeaderFallback() {

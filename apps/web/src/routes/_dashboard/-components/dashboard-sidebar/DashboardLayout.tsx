@@ -34,15 +34,16 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const { githubLogin } = useRouteContext({ from: "/_dashboard" });
   const params = useParams({ strict: false }) as { user?: string };
-  const user = params.user?.trim() || githubLogin || "";
-  const primaryRoutes = user ? dashboardPrimaryRoutes(user) : [];
+  /** Sidebar nav follows the profile in the URL; home always goes to the signed-in user. */
+  const viewedUser = params.user?.trim() || githubLogin || "";
+  const primaryRoutes = viewedUser ? dashboardPrimaryRoutes(viewedUser) : [];
 
   return (
     <SidebarProvider defaultOpen={false} className="h-svh overflow-hidden">
       <QueryActivityNprogress />
       <Sidebar collapsible="icon">
         <SidebarHeader>
-          <DashboardSidebarHeader user={user || undefined} />
+          <DashboardSidebarHeader githubLogin={githubLogin ?? undefined} />
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="bg-base-300">

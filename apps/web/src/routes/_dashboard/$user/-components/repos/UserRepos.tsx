@@ -48,7 +48,7 @@ export function UserRepos({ userReposKey }: UserReposProps) {
 }
 
 const RepositoriesFragment = graphql`
-  fragment UserRepos_repositories on User
+  fragment UserRepos_repositories on RepositoryOwner
   @argumentDefinitions(
     first: { type: "Int", defaultValue: 24 }
     after: { type: "String" }

@@ -1,7 +1,7 @@
 import { repoDetailQueryOptions } from "@/data-access-layer/github/repo-detail-query-options";
 import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
 import { getRelativeTimeString } from "@/utils/date-helpers";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, Copy, ExternalLink, Github, Lock } from "lucide-react";
 
@@ -17,8 +17,22 @@ export const Route = createFileRoute("/_dashboard/$user/repos/$repo/")({
 
 function RepoDetailPage() {
   const { user, repo } = Route.useParams();
+  const router = useRouter();
   const { data } = useSuspenseQuery(repoDetailQueryOptions(user, repo));
   const repository = data.data;
+
+  const backToProfile = (
+    <Link
+      to="/$user"
+      params={{ user }}
+      search={defaultUserSearch}
+      className="text-base-content/60 hover:text-base-content inline-flex items-center gap-2 text-sm transition-colors"
+      data-test="repo-detail-back"
+    >
+      <ArrowLeft className="size-4" />
+      {user}
+    </Link>
+  );
 
   if (data.error || !repository) {
     return (
@@ -28,15 +42,18 @@ function RepoDetailPage() {
       >
         <p className="font-medium">Could not load this repository</p>
         <p className="text-base-content/70 text-sm">{data.error ?? "Repository not found."}</p>
-        <Link
-          to="/$user"
-          params={{ user }}
-          search={defaultUserSearch}
-          className="text-primary inline-flex items-center gap-2 text-sm font-medium hover:underline"
-        >
-          <ArrowLeft className="size-4" />
-          Back to repos
-        </Link>
+        <div className="flex flex-wrap gap-4">
+          <button
+            type="button"
+            className="text-primary inline-flex items-center gap-2 text-sm font-medium hover:underline"
+            onClick={() => router.history.back()}
+            data-test="repo-detail-history-back"
+          >
+            <ArrowLeft className="size-4" />
+            Go back
+          </button>
+          {backToProfile}
+        </div>
       </div>
     );
   }
@@ -51,16 +68,18 @@ function RepoDetailPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-8" data-test="repo-detail-page">
-      <Link
-        to="/$user"
-        params={{ user }}
-        search={defaultUserSearch}
-        className="text-base-content/60 hover:text-base-content inline-flex items-center gap-2 text-sm transition-colors"
-        data-test="repo-detail-back"
-      >
-        <ArrowLeft className="size-4" />
-        Repos
-      </Link>
+      <div className="flex flex-wrap items-center gap-4">
+        <button
+          type="button"
+          className="text-base-content/60 hover:text-base-content inline-flex items-center gap-2 text-sm transition-colors"
+          onClick={() => router.history.back()}
+          data-test="repo-detail-history-back"
+        >
+          <ArrowLeft className="size-4" />
+          Back
+        </button>
+        {backToProfile}
+      </div>
 
       {repository.openGraphImageUrl ? (
         <div className="border-base-300 bg-base-300 overflow-hidden rounded-xl border">

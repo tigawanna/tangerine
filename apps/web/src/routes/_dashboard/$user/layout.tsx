@@ -1,8 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { loadQuery } from "react-relay";
 import { graphql } from "relay-runtime";
 import { z } from "zod";
-import type { layoutUserPageLoaderQuery } from "./__generated__/layoutUserPageLoaderQuery.graphql";
 
 export const repositoryOrderOptions = [
   "PUSHED_AT",
@@ -13,14 +11,19 @@ export const repositoryOrderOptions = [
 ] as const;
 export const starOrderOptions = ["STARRED_AT"] as const;
 export const directionOptions = ["ASC", "DESC"] as const;
-export const userTabOptions = ["repos", "starred", "followers", "following"] as const;
+/** Profile tabs — `members` reserved for orgs when `read:org` is available. */
+export const userTabOptions = [
+  "repos",
+  "starred",
+  "followers",
+  "following",
+  "members",
+] as const;
 
-const searchparams = z.object({
+export const userSearchSchema = z.object({
   tab: z.enum(userTabOptions).default("repos"),
   isFork: z.boolean().default(false),
-  /** Starred tab: only repos owned by the signed-in viewer. */
   ownedByViewer: z.boolean().default(false),
-  /** Followers / following: client-side name/login filter (API has no search). */
   peopleQ: z.string().default(""),
   orderBy: z
     .object({
@@ -36,9 +39,8 @@ const searchparams = z.object({
     .default({ field: "STARRED_AT", direction: "DESC" }),
 });
 
-export type UserSearch = z.infer<typeof searchparams>;
+export type UserSearch = z.infer<typeof userSearchSchema>;
 
-/** Full search object for Links / redirects (Zod defaults make every field required). */
 export const defaultUserSearch = {
   tab: "repos",
   isFork: false,
@@ -48,11 +50,11 @@ export const defaultUserSearch = {
   starOrder: { field: "STARRED_AT", direction: "DESC" },
 } as const satisfies UserSearch;
 
+/**
+ * `$user` layout — auth gate + outlet only.
+ * Profile search + Relay preload live on the index route.
+ */
 export const Route = createFileRoute("/_dashboard/$user")({
-  validateSearch: (search) => searchparams.parse(search),
-  loaderDeps({ search: { isFork, orderBy, starOrder, ownedByViewer } }) {
-    return { isFork, orderBy, starOrder, ownedByViewer };
-  },
   beforeLoad: ({ params, context, location }) => {
     if (!context.relayEnvironment || !context.githubLogin) {
       throw redirect({ to: "/auth", search: { returnTo: location.pathname } });
@@ -65,26 +67,6 @@ export const Route = createFileRoute("/_dashboard/$user")({
       });
     }
   },
-  loader({ context, params, deps }) {
-    return loadQuery<layoutUserPageLoaderQuery>(
-      context.relayEnvironment!,
-      userQuery,
-      {
-        login: params.user,
-        isFork: deps.isFork,
-        ownedByViewer: deps.ownedByViewer,
-        orderBy: {
-          field: deps.orderBy.field,
-          direction: deps.orderBy.direction,
-        },
-        starOrder: {
-          field: deps.starOrder.field,
-          direction: deps.starOrder.direction,
-        },
-      },
-      { fetchPolicy: "store-or-network" },
-    );
-  },
   component: UserLayout,
 });
 
@@ -93,7 +75,14 @@ function UserLayout() {
 }
 
 /**
- * Profile hub query — preload once; tabs consume fragments via `usePreloadedQuery`.
+ * Profile hub query.
+ *
+ * - `user` — people profiles (starred / followers / following).
+ * - `repositoryOwner` — shared repos + public identity for **Users and Orgs**.
+ *
+ * Avoid `organization { … }`: those fields require `read:org` and GitHub
+ * fails the *entire* operation when the token lacks that scope (even for
+ * public orgs like firecrawl).
  */
 export const userQuery = graphql`
   query layoutUserPageLoaderQuery(
@@ -107,9 +96,13 @@ export const userQuery = graphql`
       ...UserInfo
       ...UserFollowingFragment
       ...UserFollowersFragment
-      ...UserRepos_repositories @arguments(isFork: $isFork, orderBy: $orderBy)
       ...UserStarredRepos_repositories
         @arguments(orderByStarredRepos: $starOrder, ownedByViewer: $ownedByViewer)
+    }
+    repositoryOwner(login: $login) {
+      __typename
+      ...OwnerCard
+      ...UserRepos_repositories @arguments(isFork: $isFork, orderBy: $orderBy)
     }
   }
 `;

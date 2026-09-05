@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b50fc4ac107e62eb03c41359eaec9913>>
+ * @generated SignedSource<<0f3d905674ceb2a69eb67ee04c38a653>>
  * @lightSyntaxTransform
  */
 
@@ -28,8 +28,12 @@ export type layoutUserPageLoaderQuery$variables = {
   starOrder?: StarOrder | null | undefined;
 };
 export type layoutUserPageLoaderQuery$data = {
+  readonly repositoryOwner: {
+    readonly __typename: string;
+    readonly " $fragmentSpreads": FragmentRefs<"OwnerCard" | "UserRepos_repositories">;
+  } | null | undefined;
   readonly user: {
-    readonly " $fragmentSpreads": FragmentRefs<"UserFollowersFragment" | "UserFollowingFragment" | "UserInfo" | "UserRepos_repositories" | "UserStarredRepos_repositories">;
+    readonly " $fragmentSpreads": FragmentRefs<"UserFollowersFragment" | "UserFollowingFragment" | "UserInfo" | "UserStarredRepos_repositories">;
   } | null | undefined;
 };
 export type layoutUserPageLoaderQuery = {
@@ -72,80 +76,80 @@ v5 = [
 ],
 v6 = {
   "kind": "Variable",
+  "name": "ownedByViewer",
+  "variableName": "ownedByViewer"
+},
+v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v8 = {
+  "kind": "Variable",
   "name": "isFork",
   "variableName": "isFork"
 },
-v7 = {
+v9 = {
   "kind": "Variable",
   "name": "orderBy",
   "variableName": "orderBy"
 },
-v8 = {
-  "kind": "Variable",
-  "name": "ownedByViewer",
-  "variableName": "ownedByViewer"
-},
-v9 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v10 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "name",
   "storageKey": null
 },
-v11 = {
+v12 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "login",
   "storageKey": null
 },
-v12 = {
+v13 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "bio",
   "storageKey": null
 },
-v13 = {
+v14 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "avatarUrl",
   "storageKey": null
 },
-v14 = {
+v15 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "url",
   "storageKey": null
 },
-v15 = [
+v16 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 12
   }
 ],
-v16 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "cursor",
-  "storageKey": null
-},
 v17 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
-  "name": "__typename",
+  "name": "cursor",
   "storageKey": null
 },
 v18 = {
@@ -203,7 +207,7 @@ v20 = [
     "name": "edges",
     "plural": true,
     "selections": [
-      (v16/*:: as any*/),
+      (v17/*:: as any*/),
       {
         "alias": null,
         "args": null,
@@ -212,12 +216,12 @@ v20 = [
         "name": "node",
         "plural": false,
         "selections": [
+          (v12/*:: as any*/),
           (v11/*:: as any*/),
           (v10/*:: as any*/),
-          (v9/*:: as any*/),
-          (v12/*:: as any*/),
           (v13/*:: as any*/),
-          (v17/*:: as any*/)
+          (v14/*:: as any*/),
+          (v7/*:: as any*/)
         ],
         "storageKey": null
       }
@@ -234,12 +238,16 @@ v21 = {
 },
 v22 = [
   (v21/*:: as any*/),
-  (v6/*:: as any*/),
-  (v7/*:: as any*/)
+  {
+    "kind": "Variable",
+    "name": "orderBy",
+    "variableName": "starOrder"
+  },
+  (v6/*:: as any*/)
 ],
 v23 = [
-  (v9/*:: as any*/),
   (v10/*:: as any*/),
+  (v11/*:: as any*/),
   {
     "alias": null,
     "args": null,
@@ -249,7 +257,7 @@ v23 = [
   }
 ],
 v24 = [
-  (v16/*:: as any*/),
+  (v17/*:: as any*/),
   {
     "alias": null,
     "args": null,
@@ -258,8 +266,8 @@ v24 = [
     "name": "node",
     "plural": false,
     "selections": [
-      (v9/*:: as any*/),
       (v10/*:: as any*/),
+      (v11/*:: as any*/),
       {
         "alias": null,
         "args": null,
@@ -288,7 +296,7 @@ v24 = [
         "name": "diskUsage",
         "storageKey": null
       },
-      (v14/*:: as any*/),
+      (v15/*:: as any*/),
       {
         "alias": null,
         "args": null,
@@ -339,11 +347,11 @@ v24 = [
         "name": "owner",
         "plural": false,
         "selections": [
-          (v17/*:: as any*/),
-          (v11/*:: as any*/),
+          (v7/*:: as any*/),
+          (v12/*:: as any*/),
+          (v15/*:: as any*/),
           (v14/*:: as any*/),
-          (v13/*:: as any*/),
-          (v9/*:: as any*/)
+          (v10/*:: as any*/)
         ],
         "storageKey": null
       },
@@ -392,24 +400,20 @@ v24 = [
         "name": "defaultBranchRef",
         "plural": false,
         "selections": [
-          (v10/*:: as any*/),
-          (v9/*:: as any*/)
+          (v11/*:: as any*/),
+          (v10/*:: as any*/)
         ],
         "storageKey": null
       },
-      (v17/*:: as any*/)
+      (v7/*:: as any*/)
     ],
     "storageKey": null
   }
 ],
 v25 = [
   (v21/*:: as any*/),
-  {
-    "kind": "Variable",
-    "name": "orderBy",
-    "variableName": "starOrder"
-  },
-  (v8/*:: as any*/)
+  (v8/*:: as any*/),
+  (v9/*:: as any*/)
 ];
 return {
   "fragment": {
@@ -449,23 +453,40 @@ return {
           },
           {
             "args": [
-              (v6/*:: as any*/),
-              (v7/*:: as any*/)
-            ],
-            "kind": "FragmentSpread",
-            "name": "UserRepos_repositories"
-          },
-          {
-            "args": [
               {
                 "kind": "Variable",
                 "name": "orderByStarredRepos",
                 "variableName": "starOrder"
               },
-              (v8/*:: as any*/)
+              (v6/*:: as any*/)
             ],
             "kind": "FragmentSpread",
             "name": "UserStarredRepos_repositories"
+          }
+        ],
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": (v5/*:: as any*/),
+        "concreteType": null,
+        "kind": "LinkedField",
+        "name": "repositoryOwner",
+        "plural": false,
+        "selections": [
+          (v7/*:: as any*/),
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "OwnerCard"
+          },
+          {
+            "args": [
+              (v8/*:: as any*/),
+              (v9/*:: as any*/)
+            ],
+            "kind": "FragmentSpread",
+            "name": "UserRepos_repositories"
           }
         ],
         "storageKey": null
@@ -494,9 +515,9 @@ return {
         "name": "user",
         "plural": false,
         "selections": [
-          (v9/*:: as any*/),
           (v10/*:: as any*/),
           (v11/*:: as any*/),
+          (v12/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -504,8 +525,8 @@ return {
             "name": "email",
             "storageKey": null
           },
-          (v12/*:: as any*/),
           (v13/*:: as any*/),
+          (v14/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -555,10 +576,10 @@ return {
             "name": "location",
             "storageKey": null
           },
-          (v14/*:: as any*/),
+          (v15/*:: as any*/),
           {
             "alias": null,
-            "args": (v15/*:: as any*/),
+            "args": (v16/*:: as any*/),
             "concreteType": "FollowingConnection",
             "kind": "LinkedField",
             "name": "following",
@@ -568,7 +589,7 @@ return {
           },
           {
             "alias": null,
-            "args": (v15/*:: as any*/),
+            "args": (v16/*:: as any*/),
             "filters": null,
             "handle": "connection",
             "key": "UserFollowingFragment_following",
@@ -577,7 +598,7 @@ return {
           },
           {
             "alias": null,
-            "args": (v15/*:: as any*/),
+            "args": (v16/*:: as any*/),
             "concreteType": "FollowerConnection",
             "kind": "LinkedField",
             "name": "followers",
@@ -587,7 +608,7 @@ return {
           },
           {
             "alias": null,
-            "args": (v15/*:: as any*/),
+            "args": (v16/*:: as any*/),
             "filters": null,
             "handle": "connection",
             "key": "UserFollowersFragment_followers",
@@ -597,41 +618,6 @@ return {
           {
             "alias": null,
             "args": (v22/*:: as any*/),
-            "concreteType": "RepositoryConnection",
-            "kind": "LinkedField",
-            "name": "repositories",
-            "plural": false,
-            "selections": [
-              {
-                "alias": null,
-                "args": null,
-                "concreteType": "RepositoryEdge",
-                "kind": "LinkedField",
-                "name": "edges",
-                "plural": true,
-                "selections": (v24/*:: as any*/),
-                "storageKey": null
-              },
-              (v18/*:: as any*/),
-              (v19/*:: as any*/)
-            ],
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": (v22/*:: as any*/),
-            "filters": [
-              "orderBy",
-              "isFork"
-            ],
-            "handle": "connection",
-            "key": "UserRepos_repositories",
-            "kind": "LinkedHandle",
-            "name": "repositories"
-          },
-          {
-            "alias": null,
-            "args": (v25/*:: as any*/),
             "concreteType": "StarredRepositoryConnection",
             "kind": "LinkedField",
             "name": "starredRepositories",
@@ -654,7 +640,7 @@ return {
           },
           {
             "alias": null,
-            "args": (v25/*:: as any*/),
+            "args": (v22/*:: as any*/),
             "filters": [
               "orderBy",
               "ownedByViewer"
@@ -666,20 +652,75 @@ return {
           }
         ],
         "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": (v5/*:: as any*/),
+        "concreteType": null,
+        "kind": "LinkedField",
+        "name": "repositoryOwner",
+        "plural": false,
+        "selections": [
+          (v7/*:: as any*/),
+          {
+            "kind": "TypeDiscriminator",
+            "abstractKey": "__isRepositoryOwner"
+          },
+          (v12/*:: as any*/),
+          (v14/*:: as any*/),
+          (v15/*:: as any*/),
+          {
+            "alias": null,
+            "args": (v25/*:: as any*/),
+            "concreteType": "RepositoryConnection",
+            "kind": "LinkedField",
+            "name": "repositories",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "RepositoryEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": (v24/*:: as any*/),
+                "storageKey": null
+              },
+              (v18/*:: as any*/),
+              (v19/*:: as any*/)
+            ],
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": (v25/*:: as any*/),
+            "filters": [
+              "orderBy",
+              "isFork"
+            ],
+            "handle": "connection",
+            "key": "UserRepos_repositories",
+            "kind": "LinkedHandle",
+            "name": "repositories"
+          },
+          (v10/*:: as any*/)
+        ],
+        "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "c0e86a341a0ef8b6a05aa5ba4d92c25e",
+    "cacheID": "12b859a78a31800e702b0c9c939483ef",
     "id": null,
     "metadata": {},
     "name": "layoutUserPageLoaderQuery",
     "operationKind": "query",
-    "text": "query layoutUserPageLoaderQuery(\n  $login: String!\n  $isFork: Boolean\n  $orderBy: RepositoryOrder\n  $starOrder: StarOrder\n  $ownedByViewer: Boolean\n) {\n  user(login: $login) {\n    ...UserInfo\n    ...UserFollowingFragment\n    ...UserFollowersFragment\n    ...UserRepos_repositories_3LFRQw\n    ...UserStarredRepos_repositories_ts4aV\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserCard_user on User {\n  id\n  name\n  login\n  bio\n  avatarUrl\n}\n\nfragment UserFollowersFragment on User {\n  followers(first: 12) {\n    edges {\n      cursor\n      node {\n        login\n        name\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserFollowingFragment on User {\n  following(first: 12) {\n    edges {\n      cursor\n      node {\n        login\n        name\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserInfo on User {\n  id\n  name\n  login\n  email\n  bio\n  avatarUrl\n  company\n  twitterUsername\n  createdAt\n  isFollowingViewer\n  viewerIsFollowing\n  isViewer\n  location\n  url\n}\n\nfragment UserRepos_repositories_3LFRQw on User {\n  repositories(first: 24, orderBy: $orderBy, isFork: $isFork) {\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserStarredRepos_repositories_ts4aV on User {\n  starredRepositories(first: 24, orderBy: $starOrder, ownedByViewer: $ownedByViewer) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query layoutUserPageLoaderQuery(\n  $login: String!\n  $isFork: Boolean\n  $orderBy: RepositoryOrder\n  $starOrder: StarOrder\n  $ownedByViewer: Boolean\n) {\n  user(login: $login) {\n    ...UserInfo\n    ...UserFollowingFragment\n    ...UserFollowersFragment\n    ...UserStarredRepos_repositories_ts4aV\n    id\n  }\n  repositoryOwner(login: $login) {\n    __typename\n    ...OwnerCard\n    ...UserRepos_repositories_3LFRQw\n    id\n  }\n}\n\nfragment OwnerCard on RepositoryOwner {\n  __isRepositoryOwner: __typename\n  __typename\n  login\n  avatarUrl\n  url\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserCard_user on User {\n  id\n  name\n  login\n  bio\n  avatarUrl\n}\n\nfragment UserFollowersFragment on User {\n  followers(first: 12) {\n    edges {\n      cursor\n      node {\n        login\n        name\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserFollowingFragment on User {\n  following(first: 12) {\n    edges {\n      cursor\n      node {\n        login\n        name\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserInfo on User {\n  id\n  name\n  login\n  email\n  bio\n  avatarUrl\n  company\n  twitterUsername\n  createdAt\n  isFollowingViewer\n  viewerIsFollowing\n  isViewer\n  location\n  url\n}\n\nfragment UserRepos_repositories_3LFRQw on RepositoryOwner {\n  __isRepositoryOwner: __typename\n  repositories(first: 24, orderBy: $orderBy, isFork: $isFork) {\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserStarredRepos_repositories_ts4aV on User {\n  starredRepositories(first: 24, orderBy: $starOrder, ownedByViewer: $ownedByViewer) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5f4b1ecd11f4ca5e9fd19c9ba7c62a29";
+(node as any).hash = "595046ba39b5c33b721e5467cc8dea7c";
 
 export default node;

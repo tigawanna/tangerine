@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<99ecd3b8e451f52c4cfef83fc07cec35>>
+ * @generated SignedSource<<2ff69fcad4027c070352f39ad7e21729>>
  * @lightSyntaxTransform
  */
 
@@ -216,11 +216,11 @@ return {
     },
     (v1/*:: as any*/)
   ],
-  "type": "User",
-  "abstractKey": null
+  "type": "RepositoryOwner",
+  "abstractKey": "__isRepositoryOwner"
 };
 })();
 
-(node as any).hash = "0f142597bc0d1576275f306f56444a9f";
+(node as any).hash = "6acb3cecc46aff5ab5a48509e01c1742";
 
 export default node;

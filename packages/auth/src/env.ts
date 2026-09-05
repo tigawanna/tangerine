@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const DEFAULT_GITHUB_SCOPES = ["read:user", "user:email", "repo"] as const;
+export const DEFAULT_GITHUB_SCOPES = ["read:user", "user:email", "repo", "read:org"] as const;
 
 /**
  * Better Auth + GitHub OAuth env schema.
