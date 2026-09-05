@@ -25,4 +25,4 @@ GitHub OAuth only. No database — Better Auth keeps the session and GitHub acco
 
 Callback URL: `{BETTER_AUTH_URL}/api/auth/callback/github`.
 
-Default scopes: `read:user`, `user:email`, `repo`, `read:org` (private repos + org profiles/members). Existing sessions need a fresh GitHub sign-in after scope changes.
+Default scopes: `read:user`, `user:email`, `repo`, `delete_repo`, `read:org` (private repos, bulk delete, org profiles/members). Existing sessions need a fresh GitHub sign-in after scope changes.

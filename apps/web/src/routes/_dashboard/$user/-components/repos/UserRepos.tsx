@@ -1,23 +1,50 @@
 import { LoadMoreButton } from "@/lib/relay/LoadMoreButton";
 import { RepoCard } from "@/routes/_dashboard/-components/repo/RepoCard";
 import type { layoutUserPageLoaderQuery } from "@/routes/_dashboard/$user/__generated__/layoutUserPageLoaderQuery.graphql";
+import { useEffect } from "react";
 import { graphql, usePaginationFragment } from "react-relay";
 import type { UserRepos_repositories$key } from "./__generated__/UserRepos_repositories.graphql";
+import type { SelectableRepo } from "./use-repo-selector";
+
+export type RepoListEdge = {
+  node?: {
+    id: string;
+    name: string;
+    nameWithOwner: string;
+    viewerPermission?: string | null;
+  } | null;
+} | null | undefined;
 
 interface UserReposProps {
   userReposKey: UserRepos_repositories$key;
+  editing: boolean;
+  selected: SelectableRepo[];
+  selectItem: (item: SelectableRepo) => void;
+  unselectItem: (item: SelectableRepo) => void;
+  onEdgesReady: (edges: ReadonlyArray<RepoListEdge>) => void;
 }
 
 /**
  * Paginated repositories for the profile Repos tab.
- * Filters live on `UserPage` (outside Suspense).
+ * Filters + bulk-edit chrome live on `UserPage` (outside Suspense).
  */
-export function UserRepos({ userReposKey }: UserReposProps) {
+export function UserRepos({
+  userReposKey,
+  editing,
+  selected,
+  selectItem,
+  unselectItem,
+  onEdgesReady,
+}: UserReposProps) {
   const frag = usePaginationFragment<layoutUserPageLoaderQuery, UserRepos_repositories$key>(
     RepositoriesFragment,
     userReposKey,
   );
   const edges = frag.data.repositories.edges ?? [];
+
+  useEffect(() => {
+    onEdgesReady(edges);
+  }, [edges, onEdgesReady]);
 
   if (edges.length === 0) {
     return (
@@ -35,9 +62,30 @@ export function UserRepos({ userReposKey }: UserReposProps) {
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {edges.map((edge) => {
           if (!edge?.node) return null;
+          const node = edge.node;
+          const canSelect = node.viewerPermission === "ADMIN";
+          const isSelected = selected.some((item) => item.id === node.id);
+
           return (
-            <li key={edge.node.id} className="min-w-0">
-              <RepoCard repository={edge.node} />
+            <li key={node.id} className="min-w-0">
+              <RepoCard
+                repository={node}
+                editing={editing}
+                selected={isSelected}
+                canSelect={canSelect}
+                onToggleSelect={() => {
+                  const item = {
+                    id: node.id,
+                    name: node.name,
+                    nameWithOwner: node.nameWithOwner,
+                  };
+                  if (isSelected) {
+                    unselectItem(item);
+                  } else {
+                    selectItem(item);
+                  }
+                }}
+              />
             </li>
           );
         })}
@@ -62,6 +110,9 @@ const RepositoriesFragment = graphql`
         cursor
         node {
           id
+          name
+          nameWithOwner
+          viewerPermission
           ...RepoCard_repository
         }
       }

@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import type { GithubRepoNode } from "@/types/github";
 import { getRelativeTimeString } from "@/utils/date-helpers";
 import { Link } from "@tanstack/react-router";
@@ -11,6 +12,11 @@ interface RepoCardProps {
   repository?: RepoCard_repository$key | null;
   /** Plain node from React Query lists (detail pages, legacy). */
   repo?: GithubRepoNode | null;
+  /** Bulk-edit mode: show selection checkbox when `canSelect`. */
+  editing?: boolean;
+  selected?: boolean;
+  canSelect?: boolean;
+  onToggleSelect?: () => void;
 }
 
 type RepoCardView = {
@@ -73,21 +79,43 @@ function fromGithubNode(repo: GithubRepoNode): RepoCardView {
   };
 }
 
+type RepoCardSelection = {
+  editing?: boolean;
+  selected?: boolean;
+  canSelect?: boolean;
+  onToggleSelect?: () => void;
+};
+
 /**
  * Modern repository card. Primary navigation goes to in-app repo details;
  * GitHub / VS Code stay as explicit external actions.
  */
-export function RepoCard({ repository, repo }: RepoCardProps) {
+export function RepoCard({
+  repository,
+  repo,
+  editing,
+  selected,
+  canSelect,
+  onToggleSelect,
+}: RepoCardProps) {
+  const selection = { editing, selected, canSelect, onToggleSelect } satisfies RepoCardSelection;
+
   if (repository != null) {
-    return <RelayRepoCard repository={repository} />;
+    return <RelayRepoCard repository={repository} selection={selection} />;
   }
   if (repo != null) {
-    return <RepoCardSurface view={fromGithubNode(repo)} />;
+    return <RepoCardSurface view={fromGithubNode(repo)} selection={selection} />;
   }
   return null;
 }
 
-function RelayRepoCard({ repository }: { repository: RepoCard_repository$key }) {
+function RelayRepoCard({
+  repository,
+  selection,
+}: {
+  repository: RepoCard_repository$key;
+  selection: RepoCardSelection;
+}) {
   const fragData = useFragment(RepoCardFragment, repository);
   const view: RepoCardView = {
     id: fragData.id,
@@ -114,19 +142,27 @@ function RelayRepoCard({ repository }: { repository: RepoCard_repository$key }) 
           color: lang.color ?? null,
         })) ?? [],
   };
-  return <RepoCardSurface view={view} />;
+  return <RepoCardSurface view={view} selection={selection} />;
 }
 
-function RepoCardSurface({ view }: { view: RepoCardView }) {
+function RepoCardSurface({
+  view,
+  selection,
+}: {
+  view: RepoCardView;
+  selection: RepoCardSelection;
+}) {
   const vscodeUrl = `https://vscode.dev/${view.url}`;
   const pushedLabel = view.pushedAt ? getRelativeTimeString(new Date(view.pushedAt)) : null;
   const disk = formatDiskUsage(view.diskUsage);
   const detailParams = { user: view.ownerLogin, repo: view.name };
+  const showCheckbox = Boolean(selection.editing && selection.canSelect);
 
   return (
     <article
-      className="border-base-300 bg-base-200 hover:bg-primary/20 group relative flex h-full flex-col overflow-hidden rounded-xl border transition-colors duration-200 ease-out"
+      className={`border-base-300 bg-base-200 hover:bg-primary/20 group relative flex h-full flex-col overflow-hidden rounded-xl border transition-colors duration-200 ease-out ${selection.selected ? "ring-primary/60 ring-2" : ""} ${selection.editing && !selection.canSelect ? "opacity-60" : ""}`}
       data-test={`repo-card-${view.name}`}
+      data-selected={selection.selected ? "true" : undefined}
     >
       <div className="bg-base-300 relative aspect-16/9 overflow-hidden">
         <img
@@ -142,12 +178,33 @@ function RepoCardSurface({ view }: { view: RepoCardView }) {
               );
           }}
         />
+        {showCheckbox ? (
+          <div className="bg-base-100/90 absolute top-3 left-3 z-20 rounded-lg border border-base-300 p-1.5 backdrop-blur-sm">
+            <Checkbox
+              className="size-5"
+              checked={selection.selected}
+              data-test={`repo-select-${view.name}`}
+              aria-label={`Select ${view.nameWithOwner}`}
+              onCheckedChange={() => {
+                selection.onToggleSelect?.();
+              }}
+            />
+          </div>
+        ) : null}
         <Link
           to="/$user/repos/$repo"
           params={detailParams}
           className="absolute inset-0"
           aria-label={`Open ${view.name} details`}
           preload="intent"
+          onClick={(event) => {
+            if (selection.editing) {
+              event.preventDefault();
+              if (selection.canSelect) {
+                selection.onToggleSelect?.();
+              }
+            }
+          }}
         />
         <div className="absolute top-3 right-3 z-10 flex gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
           <a
@@ -181,6 +238,14 @@ function RepoCardSurface({ view }: { view: RepoCardView }) {
               params={detailParams}
               preload="intent"
               className="group-hover:text-primary min-w-0 flex-1 truncate text-base font-semibold tracking-tight transition-colors"
+              onClick={(event) => {
+                if (selection.editing) {
+                  event.preventDefault();
+                  if (selection.canSelect) {
+                    selection.onToggleSelect?.();
+                  }
+                }
+              }}
             >
               {view.name}
             </Link>

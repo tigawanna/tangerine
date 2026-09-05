@@ -1,14 +1,12 @@
 import { UserInfo } from "./UserInfo";
 import { OwnerCard } from "./OwnerCard";
-import { UserRepos } from "../repos/UserRepos";
 import {
   PeopleSearchInput,
-  RepoIsForkSwitch,
-  RepoOrderSelect,
   StarOrderSelect,
   StarOwnedByViewerSwitch,
   TabFilterBar,
 } from "../repos/RepoFilters";
+import { ReposTabPanel } from "../repos/ReposTabPanel";
 import { UserStarredRepos } from "../starred/UserStarredRepos";
 import { UserFollowersList } from "../followers/UserFollowersList";
 import { UserFollowingList } from "../following/UserFollowingList";
@@ -95,15 +93,7 @@ export function UserPage() {
 
         {owner ? (
           <Activity mode={activeTab === "repos" ? "visible" : "hidden"}>
-            <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-repos">
-              <TabFilterBar testId="repo-filters">
-                <RepoOrderSelect />
-                <RepoIsForkSwitch />
-              </TabFilterBar>
-              <Suspense fallback={<TabFallback label="repos" />}>
-                <UserRepos userReposKey={owner} />
-              </Suspense>
-            </div>
+            <ReposTabPanel owner={owner} />
           </Activity>
         ) : null}
 

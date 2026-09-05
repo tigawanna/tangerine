@@ -11,7 +11,7 @@ export type CreateAuthOptions = {
   github: {
     clientId: string;
     clientSecret: string;
-    /** OAuth scopes. Defaults to `read:user user:email repo read:org`. */
+    /** OAuth scopes. Defaults to `read:user user:email repo delete_repo read:org`. */
     scope?: string[];
   };
   adminEmail?: string;

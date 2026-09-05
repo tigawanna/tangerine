@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2ff69fcad4027c070352f39ad7e21729>>
+ * @generated SignedSource<<5b2c94ece65693ca3c5802ba5890d303>>
  * @lightSyntaxTransform
  */
 
@@ -8,6 +8,7 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
+export type RepositoryPermission = "ADMIN" | "MAINTAIN" | "READ" | "TRIAGE" | "WRITE" | "%future added value";
 import { FragmentRefs } from "relay-runtime";
 export type UserRepos_repositories$data = {
   readonly id: string;
@@ -16,6 +17,9 @@ export type UserRepos_repositories$data = {
       readonly cursor: string;
       readonly node: {
         readonly id: string;
+        readonly name: string;
+        readonly nameWithOwner: string;
+        readonly viewerPermission: RepositoryPermission | null | undefined;
         readonly " $fragmentSpreads": FragmentRefs<"RepoCard_repository">;
       } | null | undefined;
     } | null | undefined> | null | undefined;
@@ -148,6 +152,27 @@ return {
               "selections": [
                 (v1/*:: as any*/),
                 {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "name",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "nameWithOwner",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "viewerPermission",
+                  "storageKey": null
+                },
+                {
                   "args": null,
                   "kind": "FragmentSpread",
                   "name": "RepoCard_repository"
@@ -221,6 +246,6 @@ return {
 };
 })();
 
-(node as any).hash = "6acb3cecc46aff5ab5a48509e01c1742";
+(node as any).hash = "a277ffe8df77810d26091013a502a30d";
 
 export default node;

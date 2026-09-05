@@ -24,22 +24,22 @@ export function UserInfo({ user }: UserInfoProps) {
 
   return (
     <section
-      className="border-base-300 bg-base-200/25 flex flex-col gap-6 rounded-2xl border p-5 md:flex-row md:items-start md:gap-8 md:p-6"
+      className="border-base-300 bg-base-200/25 flex flex-row items-start gap-4 rounded-2xl border p-4 sm:gap-6 sm:p-5 md:gap-8 md:p-6"
       data-test="user-info"
     >
       <img
         src={data.avatarUrl}
         alt=""
-        className="border-base-300 size-28 shrink-0 rounded-2xl border object-cover md:size-36"
+        className="border-base-300 size-20 shrink-0 rounded-2xl border object-cover sm:size-28 md:size-36"
         data-test="user-avatar"
       />
 
-      <div className="min-w-0 flex-1 space-y-4">
+      <div className="min-w-0 flex-1 space-y-3 sm:space-y-4">
         <div className="space-y-1.5">
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+          <h1 className="text-xl font-bold tracking-tight sm:text-2xl md:text-3xl">
             {data.name ?? data.login}
           </h1>
-          <p className="text-base-content/55 text-base">@{data.login}</p>
+          <p className="text-base-content/55 text-sm sm:text-base">@{data.login}</p>
           {data.bio ? (
             <p className="text-base-content/75 max-w-2xl text-sm leading-6 md:text-base">
               {data.bio}
