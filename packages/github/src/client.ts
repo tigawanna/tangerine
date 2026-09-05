@@ -18,7 +18,7 @@ import {
   getRepoPage,
   getRepoStargazers,
 } from "./queries/repo-page";
-import { getRepoFileContent, getRepoTree } from "./queries/repo-contents";
+import { getRepoFileContent, getRepoReadme, getRepoTree } from "./queries/repo-contents";
 import {
   addStar,
   applyRepoMetadata,
@@ -89,6 +89,7 @@ export class GitHubClient {
   getRepoStargazers = getRepoStargazers;
   getRepoTree = getRepoTree;
   getRepoFileContent = getRepoFileContent;
+  getRepoReadme = getRepoReadme;
   deleteRepo = deleteRepo;
   setRepoVisibility = setRepoVisibility;
   applyRepoMetadata = applyRepoMetadata;

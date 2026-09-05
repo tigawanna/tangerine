@@ -9,17 +9,30 @@ const repoDetailInput = z.object({
 });
 
 /**
- * Fetches a single repository for the in-app details page.
+ * Fetches a single repository and its README for the in-app details page.
  */
 export const getRepoDetail = createServerFn({ method: "GET" })
   .inputValidator(repoDetailInput)
   .handler(async ({ data }) => {
     try {
       const client = createGitHubClient(await getGithubToken());
-      const repository = await client.getRepoDetail(data.owner, data.repo);
-      return { data: repository, error: null as string | null };
+      const [repository, readme] = await Promise.all([
+        client.getRepoDetail(data.owner, data.repo),
+        client.getRepoReadme(data.owner, data.repo),
+      ]);
+      return {
+        data: repository,
+        readme: readme?.content ?? null,
+        readmePath: readme?.path ?? null,
+        error: null as string | null,
+      };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to load repository";
-      return { data: null, error: message };
+      return {
+        data: null,
+        readme: null,
+        readmePath: null,
+        error: message,
+      };
     }
   });

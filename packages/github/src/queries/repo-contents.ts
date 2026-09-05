@@ -62,3 +62,26 @@ export async function getRepoFileContent(
     throw error;
   }
 }
+
+/**
+ * Returns the repository README (any common filename) via the GitHub REST API.
+ */
+export async function getRepoReadme(this: GitHubClient, owner: string, repo: string) {
+  try {
+    const response = await this.octokit.rest.repos.getReadme({ owner, repo });
+
+    if (response.data.encoding !== "base64" || !response.data.content) {
+      return null;
+    }
+
+    return {
+      content: decodeBase64Content(response.data.content),
+      path: response.data.path,
+    };
+  } catch (error: unknown) {
+    if (isNotFoundError(error)) {
+      return null;
+    }
+    throw error;
+  }
+}

@@ -4,6 +4,7 @@ import { getRelativeTimeString } from "@/utils/date-helpers";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowLeft, Copy, ExternalLink, Github, Lock } from "lucide-react";
+import { RepoReadme } from "./-components/RepoReadme";
 
 export const Route = createFileRoute("/_dashboard/$user/repos/$repo/")({
   loader: async ({ context, params }) => {
@@ -20,6 +21,8 @@ function RepoDetailPage() {
   const router = useRouter();
   const { data } = useSuspenseQuery(repoDetailQueryOptions(user, repo));
   const repository = data.data;
+  const readme = data.readme;
+  const readmePath = data.readmePath;
 
   const backToProfile = (
     <Link
@@ -159,6 +162,8 @@ function RepoDetailPage() {
           ) : null}
         </div>
       </header>
+
+      {readme ? <RepoReadme source={readme} path={readmePath} /> : null}
     </div>
   );
 }

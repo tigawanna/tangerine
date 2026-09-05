@@ -5,6 +5,7 @@ const octokitMocks = vi.hoisted(() => ({
   graphql: vi.fn(),
   getTree: vi.fn(),
   getContent: vi.fn(),
+  getReadme: vi.fn(),
   deleteRepo: vi.fn(),
   updateRepo: vi.fn(),
   replaceAllTopics: vi.fn(),
@@ -29,6 +30,7 @@ vi.mock("octokit", () => {
         git: { getTree: octokitMocks.getTree },
         repos: {
           getContent: octokitMocks.getContent,
+          getReadme: octokitMocks.getReadme,
           delete: octokitMocks.deleteRepo,
           update: octokitMocks.updateRepo,
           replaceAllTopics: octokitMocks.replaceAllTopics,
@@ -470,6 +472,26 @@ describe("GitHubClient", () => {
     await expect(
       client.getRepoFileContent("octocat", "demo", "missing.txt", "main"),
     ).resolves.toBeNull();
+  });
+
+  it("decodes the repository README and returns null when missing", async () => {
+    octokitMocks.getReadme
+      .mockResolvedValueOnce({
+        data: {
+          encoding: "base64",
+          content: btoa("# Hello"),
+          path: "README.md",
+        },
+      })
+      .mockRejectedValueOnce(createRequestError(404, "Not Found"));
+
+    const client = createGitHubClient("ghp_test_token");
+
+    await expect(client.getRepoReadme("octocat", "demo")).resolves.toEqual({
+      content: "# Hello",
+      path: "README.md",
+    });
+    await expect(client.getRepoReadme("octocat", "empty")).resolves.toBeNull();
   });
 
   it("deletes repositories by full name", async () => {
