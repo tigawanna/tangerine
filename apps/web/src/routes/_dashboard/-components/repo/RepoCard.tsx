@@ -1,6 +1,7 @@
 import type { GithubRepoNode } from "@/types/github";
 import { getRelativeTimeString } from "@/utils/date-helpers";
-import { Activity, ExternalLink, GitFork, Github, Lock, Star } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Copy, Github, Lock, Star } from "lucide-react";
 import { VscVscodeInsiders } from "react-icons/vsc";
 
 interface RepoCardProps {
@@ -16,153 +17,138 @@ function formatDiskUsage(kilobytes: number | null | undefined): string | null {
   return `${(kilobytes / 1024).toFixed(1)} MB`;
 }
 
+function languageList(repo: GithubRepoNode) {
+  const fromNodes =
+    repo.languages?.nodes?.filter((lang): lang is NonNullable<typeof lang> => lang != null) ?? [];
+  if (fromNodes.length > 0) return fromNodes.slice(0, 3);
+  if (repo.primaryLanguage) return [repo.primaryLanguage];
+  return [];
+}
+
 /**
- * Repository card matching the old dashboard look: OG image, languages,
- * activity, stars/forks, and external GitHub / VS Code links.
+ * Modern repository card. Primary navigation goes to in-app repo details;
+ * GitHub / VS Code stay as explicit external actions.
  */
 export function RepoCard({ repo }: RepoCardProps) {
-  const languages =
-    repo.languages?.nodes?.filter((lang): lang is NonNullable<typeof lang> => lang != null).slice(0, 3) ??
-    [];
+  const languages = languageList(repo);
   const ownerLogin = repo.owner?.login ?? repo.nameWithOwner.split("/")[0] ?? "";
   const vscodeUrl = `https://vscode.dev/${repo.url}`;
-  const pushedLabel = repo.pushedAt
-    ? getRelativeTimeString(new Date(repo.pushedAt))
-    : null;
+  const pushedLabel = repo.pushedAt ? getRelativeTimeString(new Date(repo.pushedAt)) : null;
   const disk = formatDiskUsage(repo.diskUsage);
   const branch = repo.defaultBranchRef?.name;
+  const detailParams = { user: ownerLogin, repo: repo.name };
 
   return (
-    <li
-      className="border-primary bg-primary/10 relative flex min-h-fit w-full flex-col justify-between rounded-2xl border md:min-h-[370px]"
+    <article
+      className="border-base-300 bg-base-100 group relative flex h-full flex-col overflow-hidden rounded-xl border transition-[border-color,transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:border-base-content/20 hover:shadow-lg hover:shadow-base-content/5"
       data-test={`repo-card-${repo.name}`}
     >
-      <div className="flex w-full cursor-pointer flex-col justify-center gap-1">
+      <div className="bg-base-300 relative aspect-video overflow-hidden">
         <img
-          height={150}
-          width={150}
-          className="aspect-video max-h-[150px] w-full rounded-t-2xl object-cover brightness-90 hover:brightness-75 dark:brightness-50"
-          loading="lazy"
           src={repo.openGraphImageUrl || undefined}
           alt=""
+          loading="lazy"
+          className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
           onError={(event) => {
             event.currentTarget.src =
               "data:image/svg+xml," +
               encodeURIComponent(
-                `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320"><rect fill="%2318181b" width="100%" height="100%"/><text x="50%" y="50%" fill="%2371717a" font-family="sans-serif" font-size="24" text-anchor="middle" dominant-baseline="middle">${repo.name}</text></svg>`,
+                `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect fill="oklch(0.22 0.02 260)" width="100%" height="100%"/><text x="50%" y="50%" fill="oklch(0.65 0.02 260)" font-family="ui-sans-serif,system-ui,sans-serif" font-size="20" text-anchor="middle" dominant-baseline="middle">${repo.name}</text></svg>`,
               );
           }}
         />
-
-        <div className="flex h-full w-full gap-3 p-2">
+        <Link
+          to="/$user/repos/$repo"
+          params={detailParams}
+          className="absolute inset-0"
+          aria-label={`Open ${repo.name} details`}
+          preload="intent"
+        />
+        <div className="from-base-100 via-base-100/50 pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-linear-to-t to-transparent" />
+        <div className="absolute top-3 right-3 z-10 flex gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
           <a
-            href={repo.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-secondary flex w-full flex-col justify-center gap-2 p-2"
-          >
-            <div className="flex flex-col justify-center break-all">
-              <div className="line-clamp-1 text-2xl font-bold">{repo.name}</div>
-              <div className="text-base-content/70 line-clamp-2 text-sm">
-                {repo.description ?? `${repo.name} repository`}
-              </div>
-              {ownerLogin ? (
-                <div className="text-base-content/50 mt-1 text-xs">@{ownerLogin}</div>
-              ) : null}
-            </div>
-
-            {languages.length > 0 ? (
-              <div className="flex w-full flex-wrap gap-1">
-                {languages.map((lang) => (
-                  <div
-                    key={lang.id}
-                    style={{
-                      borderStyle: "solid",
-                      borderWidth: "1px",
-                      borderColor: lang.color ?? "currentColor",
-                    }}
-                    className="m-px rounded-2xl px-1 py-px text-xs break-all"
-                  >
-                    {lang.name}
-                  </div>
-                ))}
-              </div>
-            ) : repo.primaryLanguage ? (
-              <div className="flex w-full flex-wrap gap-1">
-                <div
-                  style={{
-                    borderStyle: "solid",
-                    borderWidth: "1px",
-                    borderColor: repo.primaryLanguage.color ?? "currentColor",
-                  }}
-                  className="m-px rounded-2xl px-1 py-px text-xs break-all"
-                >
-                  {repo.primaryLanguage.name}
-                </div>
-              </div>
-            ) : null}
-          </a>
-        </div>
-      </div>
-
-      {branch ? (
-        <div className="text-base-content/70 flex w-full items-center justify-center gap-1 px-2 text-sm">
-          <span className="text-secondary line-clamp-1">{branch}</span>
-        </div>
-      ) : null}
-
-      <div className="flex w-full flex-wrap items-center justify-evenly gap-3 p-1 text-sm">
-        {pushedLabel ? (
-          <div className="flex items-center justify-center gap-1 text-xs font-bold">
-            <Activity className="size-3.5" />
-            {pushedLabel}
-          </div>
-        ) : null}
-        <div className="flex items-center justify-center gap-1">
-          <GitFork className="size-3.5" />
-          {repo.forkCount ?? 0}
-        </div>
-        <div className="flex items-center justify-center gap-1">
-          <Star className="size-3.5" />
-          {repo.stargazerCount ?? 0}
-        </div>
-      </div>
-
-      <div className="flex w-full items-center justify-center gap-3 p-1 pb-2">
-        {repo.isPrivate ? <Lock className="text-error size-4" aria-label="Private" /> : null}
-        {disk ? <div className="text-base-content/60 text-xs">{disk}</div> : null}
-        <div className="flex items-center justify-center gap-3">
-          <a
+            href={vscodeUrl}
             target="_blank"
             rel="noreferrer"
-            href={vscodeUrl}
-            className="text-info hover:text-accent"
+            className="bg-base-100/90 text-base-content/70 hover:text-base-content border-base-300 inline-flex size-8 items-center justify-center rounded-lg border backdrop-blur-sm transition-colors"
             aria-label="Open in VS Code"
             data-test={`repo-vscode-${repo.name}`}
           >
-            <VscVscodeInsiders className="size-5" />
+            <VscVscodeInsiders className="size-4" />
           </a>
           <a
+            href={repo.url}
             target="_blank"
             rel="noreferrer"
-            href={repo.url}
-            className="border-base-content hover:text-accent rounded-full border p-0.5"
+            className="bg-base-100/90 text-base-content/70 hover:text-base-content border-base-300 inline-flex size-8 items-center justify-center rounded-lg border backdrop-blur-sm transition-colors"
             aria-label="Open on GitHub"
             data-test={`repo-github-${repo.name}`}
           >
-            <Github className="size-5" />
-          </a>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href={repo.url}
-            className="text-base-content/50 hover:text-accent"
-            aria-label="Open repository"
-          >
-            <ExternalLink className="size-4" />
+            <Github className="size-4" />
           </a>
         </div>
       </div>
-    </li>
+
+      <div className="flex flex-1 flex-col gap-3 p-4 pt-3">
+        <div className="min-w-0 space-y-1.5">
+          <div className="flex items-start gap-2">
+            <Link
+              to="/$user/repos/$repo"
+              params={detailParams}
+              preload="intent"
+              className="hover:text-primary min-w-0 flex-1 truncate text-base font-semibold tracking-tight transition-colors"
+            >
+              {repo.name}
+            </Link>
+            {repo.isPrivate ? (
+              <Lock className="text-base-content/40 mt-0.5 size-3.5 shrink-0" aria-label="Private" />
+            ) : null}
+            {repo.isFork ? (
+              <span className="bg-base-200 text-base-content/60 shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase">
+                Fork
+              </span>
+            ) : null}
+          </div>
+          {ownerLogin ? (
+            <p className="text-base-content/45 truncate text-xs">@{ownerLogin}</p>
+          ) : null}
+          <p className="text-base-content/65 line-clamp-2 min-h-10 text-sm leading-5">
+            {repo.description ?? "No description"}
+          </p>
+        </div>
+
+        {languages.length > 0 ? (
+          <ul className="flex flex-wrap gap-x-3 gap-y-1.5">
+            {languages.map((lang) => (
+              <li
+                key={lang.id}
+                className="text-base-content/55 inline-flex items-center gap-1.5 text-xs"
+              >
+                <span
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: lang.color ?? "currentColor" }}
+                  aria-hidden
+                />
+                {lang.name}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        <div className="border-base-300/80 text-base-content/45 mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 border-t pt-3 text-xs">
+          <span className="inline-flex items-center gap-1">
+            <Star className="size-3.5" aria-hidden />
+            {repo.stargazerCount ?? 0}
+          </span>
+          <span className="inline-flex items-center gap-1" title="Forks">
+            <Copy className="size-3.5" aria-hidden />
+            {repo.forkCount ?? 0}
+          </span>
+          {branch ? <span className="truncate font-mono text-[11px]">{branch}</span> : null}
+          {pushedLabel ? <span className="ml-auto truncate">{pushedLabel}</span> : null}
+          {disk ? <span className="text-base-content/35">{disk}</span> : null}
+        </div>
+      </div>
+    </article>
   );
 }

@@ -156,14 +156,11 @@ function RepoGrid({
       ) : null}
 
       {repos.length > 0 ? (
-        <ul className="@container/repos flex w-full flex-wrap items-stretch justify-center gap-5">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {repos.map((repo) => (
-            <div
-              key={repo.nameWithOwner}
-              className="flex w-full justify-center @md/repos:w-[45%] @2xl/repos:w-[30%]"
-            >
+            <li key={repo.nameWithOwner} className="min-w-0">
               <RepoCard repo={repo} />
-            </div>
+            </li>
           ))}
         </ul>
       ) : (
