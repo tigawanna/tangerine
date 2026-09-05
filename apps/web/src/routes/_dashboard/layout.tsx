@@ -1,6 +1,6 @@
 import { getSession } from "@/data-access-layer/auth/auth.functions";
-import { authClient } from "@/lib/auth-client";
 import { getGithubRelayEnvironment } from "@/lib/relay/create-environment";
+import { getClientGithubAccessToken } from "@/lib/relay/github-access-token";
 import { fetchGithubLogin } from "@/lib/relay/resolve-github-login";
 import { RouterErrorComponent } from "@/lib/tanstack/router/routerErrorComponent";
 import { RouterNotFoundComponent } from "@/lib/tanstack/router/RouterNotFoundComponent";
@@ -20,16 +20,11 @@ export const Route = createFileRoute("/_dashboard")({
       throw redirect({ to: "/auth", search: { returnTo: location.pathname } });
     }
 
-    const tokenResult = await authClient.getAccessToken({
-      useAccountCookie: true,
-    });
-    const accessToken = tokenResult.data?.accessToken;
-    if (!accessToken) {
-      throw redirect({ to: "/auth", search: { returnTo: location.pathname } });
-    }
-
     const fromSession = session.user.githubUsername?.trim();
-    const githubLogin = fromSession || (await fetchGithubLogin(accessToken));
+    // Prefer session login so we skip `/get-access-token` on every nav.
+    // Relay still resolves the token (cached) when it queries GitHub.
+    const githubLogin =
+      fromSession || (await fetchGithubLogin(await getClientGithubAccessToken()));
 
     return {
       githubLogin,

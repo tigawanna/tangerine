@@ -1,4 +1,7 @@
-import { authClient } from "@/lib/auth-client";
+import {
+  clearClientGithubAccessToken,
+  getClientGithubAccessToken,
+} from "@/lib/relay/github-access-token";
 import {
   Environment,
   Network,
@@ -9,25 +12,6 @@ import {
 } from "relay-runtime";
 
 const GITHUB_GRAPHQL = "https://api.github.com/graphql";
-
-/**
- * Resolves the signed-in user's GitHub OAuth token from the Better Auth
- * account cookie (no-DB / cookie-session mode).
- */
-async function getClientGithubAccessToken(): Promise<string> {
-  const result = await authClient.getAccessToken({
-    useAccountCookie: true,
-  });
-
-  const accessToken = result.data?.accessToken;
-  if (!accessToken) {
-    const message =
-      result.error?.message ?? "GitHub access token unavailable. Sign in again.";
-    throw new Error(message);
-  }
-
-  return accessToken;
-}
 
 const fetchGithubGraphQL: FetchFunction = async (params, variables) => {
   const accessToken = await getClientGithubAccessToken();
@@ -54,7 +38,7 @@ const fetchGithubGraphQL: FetchFunction = async (params, variables) => {
 
 /**
  * Client-only Relay Environment pointed at GitHub GraphQL.
- * Refreshes the OAuth token on each network request via Better Auth.
+ * Uses a cached Better Auth account-cookie token (see github-access-token).
  */
 export function createGithubRelayEnvironment(): Environment {
   return new Environment({
@@ -82,7 +66,8 @@ export function getGithubRelayEnvironment(existing?: Environment | null): Enviro
   return dashboardRelayEnvironment;
 }
 
-/** Drop the cached env (e.g. after sign-out). */
+/** Drop the cached env + token (e.g. after sign-out). */
 export function resetGithubRelayEnvironment(): void {
   dashboardRelayEnvironment = null;
+  clearClientGithubAccessToken();
 }

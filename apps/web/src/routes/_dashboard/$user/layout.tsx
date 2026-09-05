@@ -76,9 +76,10 @@ export const defaultUserSearch = { tab: "repos" } as const satisfies UserSearch;
  * `$user` layout — auth gate + outlet only.
  */
 export const Route = createFileRoute("/_dashboard/$user")({
-  beforeLoad: ({ params, context, location }) => {
+  beforeLoad: ({ params, context }) => {
     if (!context.relayEnvironment || !context.githubLogin) {
-      throw redirect({ to: "/auth", search: { returnTo: location.pathname } });
+      // Do not redirect to /auth — a valid session there bounces back (loop).
+      throw new Error("Dashboard auth context missing. Refresh or sign in again.");
     }
     if (!params.user?.trim()) {
       throw redirect({

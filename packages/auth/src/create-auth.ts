@@ -11,7 +11,7 @@ export type CreateAuthOptions = {
   github: {
     clientId: string;
     clientSecret: string;
-    /** OAuth scopes. Defaults to `read:user user:email repo delete_repo read:org`. */
+    /** OAuth scopes. Defaults to base scopes; extras are opted in at sign-in. */
     scope?: string[];
   };
   adminEmail?: string;
@@ -69,6 +69,11 @@ export function createAuth(options: CreateAuthOptions) {
       enabled: true,
       window: 60,
       max: 100,
+      customRules: {
+        // SPA navigations + Relay share this endpoint; session cookie already
+        // gates it. Global 100/min was easy to trip and then loop via /auth.
+        "/get-access-token": false,
+      },
     },
   });
 }

@@ -1,11 +1,14 @@
 import { getSession } from "@/data-access-layer/auth/auth.functions";
 import { AuthSignInScreen } from "@/routes/auth/-components/AuthSignInScreen";
 import { AppConfig } from "@/utils/system";
+import { parseOptionalGithubScopes } from "@repo/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 
 const authSearchSchema = z.object({
   returnTo: z.string().optional().default("/viewer"),
+  /** Comma-separated optional scopes to pre-check (e.g. `user:follow,delete_repo`). */
+  optScopes: z.string().optional(),
 });
 
 export const Route = createFileRoute("/auth/")({
@@ -29,7 +32,12 @@ export const Route = createFileRoute("/auth/")({
 });
 
 function AuthPage() {
-  const { returnTo } = Route.useSearch();
+  const { returnTo, optScopes } = Route.useSearch();
 
-  return <AuthSignInScreen returnTo={returnTo} />;
+  return (
+    <AuthSignInScreen
+      returnTo={returnTo}
+      initialOptionalScopes={parseOptionalGithubScopes(optScopes)}
+    />
+  );
 }

@@ -5,14 +5,19 @@ import { landingRippleToneClassName } from "@/lib/landing/rippleTone";
 import { cn } from "@/lib/utils";
 import { GitHubSignIn } from "@/routes/auth/-components/GitHubSignIn";
 import { AppConfig } from "@/utils/system";
+import type { GithubOptionalScopeId } from "@repo/auth";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
 type AuthSignInScreenProps = {
   returnTo: string;
+  initialOptionalScopes?: readonly GithubOptionalScopeId[];
 };
 
-export function AuthSignInScreen({ returnTo }: AuthSignInScreenProps) {
+export function AuthSignInScreen({
+  returnTo,
+  initialOptionalScopes = [],
+}: AuthSignInScreenProps) {
   const Icon = AppConfig.icon;
 
   return (
@@ -81,10 +86,13 @@ export function AuthSignInScreen({ returnTo }: AuthSignInScreenProps) {
               Sign in
             </h2>
             <p className="text-landing-fg-muted mt-2 text-sm leading-6">
-              Continue with GitHub to open your repos and stars.
+              Continue with GitHub to open your repos and stars. Extra permissions are optional.
             </p>
             <div className="mt-8 space-y-3">
-              <GitHubSignIn callbackURL={returnTo} />
+              <GitHubSignIn
+                callbackURL={returnTo}
+                initialOptionalScopes={initialOptionalScopes}
+              />
               <Link to="/" className="landing-cta-secondary w-full" data-test="auth-back-home">
                 <ArrowLeft className="size-4" aria-hidden />
                 Back to home
