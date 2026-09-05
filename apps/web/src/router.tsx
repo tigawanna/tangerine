@@ -22,6 +22,7 @@ export const getRouter = async () => {
       ...tanstackQueryContext,
       /** Populated in `/_dashboard` `beforeLoad` (client-only). */
       relayEnvironment: null,
+      githubLogin: null,
     },
     defaultPreload: "intent",
     scrollRestoration: true,

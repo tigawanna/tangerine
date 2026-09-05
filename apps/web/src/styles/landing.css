@@ -437,6 +437,18 @@
   }
 }
 
+/* Slow gear rotation for brand loading marks — mechanical, not a UI spinner. */
+@keyframes landing-brand-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.landing-brand-spin {
+  animation: landing-brand-spin 10s linear infinite;
+  will-change: transform;
+}
+
 @keyframes landing-fade-up {
   from {
     opacity: 0;
@@ -471,7 +483,8 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-hero-enter,
   .landing-proof-float,
-  .landing-feature-tile {
+  .landing-feature-tile,
+  .landing-brand-spin {
     animation: none !important;
     transition: none !important;
   }

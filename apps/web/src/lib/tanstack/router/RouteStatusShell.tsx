@@ -1,3 +1,5 @@
+import { BackgroundRippleEffect } from "@/components/acceternity/background-ripple-effect";
+import { landingRippleToneClassName } from "@/lib/landing/rippleTone";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
@@ -16,6 +18,7 @@ type RouteStatusShellProps = {
 
 /**
  * Full-viewport shell for router 404 / error / pending surfaces.
+ * Uses the landing theme + pulsing ripple grid (same language as auth).
  */
 export function RouteStatusShell({
   eyebrow,
@@ -35,46 +38,42 @@ export function RouteStatusShell({
       aria-live={busy ? "polite" : undefined}
       aria-busy={busy || undefined}
       className={cn(
-        "bg-base-100 text-base-content relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-20",
+        "landing-page relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-20",
         className,
       )}
     >
-      <div
-        aria-hidden
-        className="from-base-200/80 via-base-100 to-base-100 pointer-events-none absolute inset-0 bg-linear-to-b"
+      <BackgroundRippleEffect
+        rows={14}
+        cols={16}
+        cellSize={48}
+        pulse
+        pulseInterval={3600}
+        pulseTarget="random"
+        className={landingRippleToneClassName}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-60"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, color-mix(in oklab, var(--color-base-content) 18%, transparent) 1px, transparent 1px)",
-          backgroundSize: "18px 18px",
-        }}
+        className="from-landing-surface via-landing-surface/70 pointer-events-none absolute inset-0 bg-linear-to-t to-transparent"
       />
       <div
         aria-hidden
-        className="bg-primary/70 absolute inset-x-0 top-0 z-20 h-0.5"
-      />
-      <div
-        aria-hidden
-        className="bg-primary/70 absolute inset-x-0 bottom-0 z-20 h-0.5"
+        className="from-landing-surface via-transparent to-landing-surface pointer-events-none absolute inset-0 bg-linear-to-b"
       />
 
       <div className="relative z-10 flex w-full max-w-md flex-col items-center text-center">
-        <p className="text-muted-foreground inline-flex items-center gap-2.5 text-[12px] font-semibold tracking-[0.14em] uppercase">
+        <p className="text-landing-fg-muted inline-flex items-center gap-2.5 text-[11px] font-semibold tracking-[0.18em] uppercase">
           <span
             aria-hidden
-            className="bg-primary size-1.5 animate-pulse rounded-full"
+            className="bg-landing-amber size-1.5 animate-pulse rounded-full"
           />
-          <span className="text-primary">{eyebrow}</span>
+          <span className="text-landing-amber">{eyebrow}</span>
         </p>
 
         {visual ? <div className="mt-10">{visual}</div> : null}
 
         <h1
           className={cn(
-            "font-display text-[clamp(2.25rem,7vw,3.25rem)] leading-[1.05] font-bold tracking-[-0.04em] text-balance",
+            "landing-display text-landing-fg text-[clamp(2.25rem,7vw,3.25rem)] leading-[1.05] font-bold tracking-[-0.04em]",
             visual ? "mt-8" : "mt-6",
           )}
         >
@@ -82,7 +81,7 @@ export function RouteStatusShell({
         </h1>
 
         {description ? (
-          <p className="text-muted-foreground mt-4 max-w-sm text-[1.05rem] leading-relaxed text-pretty">
+          <p className="text-landing-fg-muted mt-4 max-w-sm text-[1.05rem] leading-relaxed">
             {description}
           </p>
         ) : null}

@@ -1,6 +1,7 @@
 import { getSession } from "@/data-access-layer/auth/auth.functions";
 import { authClient } from "@/lib/auth-client";
 import { createGithubRelayEnvironment } from "@/lib/relay/create-environment";
+import { fetchGithubLogin } from "@/lib/relay/resolve-github-login";
 import { RouterErrorComponent } from "@/lib/tanstack/router/routerErrorComponent";
 import { RouterNotFoundComponent } from "@/lib/tanstack/router/RouterNotFoundComponent";
 import { RouterPendingComponent } from "@/lib/tanstack/router/RouterPendingComponent";
@@ -22,11 +23,16 @@ export const Route = createFileRoute("/_dashboard")({
     const tokenResult = await authClient.getAccessToken({
       useAccountCookie: true,
     });
-    if (!tokenResult.data?.accessToken) {
+    const accessToken = tokenResult.data?.accessToken;
+    if (!accessToken) {
       throw redirect({ to: "/auth", search: { returnTo: location.pathname } });
     }
 
+    const fromSession = session.user.githubUsername?.trim();
+    const githubLogin = fromSession || (await fetchGithubLogin(accessToken));
+
     return {
+      githubLogin,
       relayEnvironment: createGithubRelayEnvironment(),
     };
   },

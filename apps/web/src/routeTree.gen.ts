@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardLayoutRouteImport } from './routes/_dashboard/layout'
 import { Route as OgRouteImport } from './routes/og'
+import { Route as DashboardUserLayoutRouteImport } from './routes/_dashboard/$user/layout'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
+import { Route as DashboardUserIndexRouteImport } from './routes/_dashboard/$user/index'
 import { Route as DashboardReposIndexRouteImport } from './routes/_dashboard/repos/index'
 import { Route as DashboardStarsIndexRouteImport } from './routes/_dashboard/stars/index'
 import { Route as DashboardViewerIndexRouteImport } from './routes/_dashboard/viewer/index'
@@ -32,10 +34,20 @@ const OgRoute = OgRouteImport.update({
   path: '/og',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardUserLayoutRoute = DashboardUserLayoutRouteImport.update({
+  id: '/$user',
+  path: '/$user',
+  getParentRoute: () => DashboardLayoutRoute,
+} as any)
 const AuthIndexRoute = AuthIndexRouteImport.update({
   id: '/auth/',
   path: '/auth/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardUserIndexRoute = DashboardUserIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardUserLayoutRoute,
 } as any)
 const DashboardReposIndexRoute = DashboardReposIndexRouteImport.update({
   id: '/repos/',
@@ -61,8 +73,10 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/og': typeof OgRoute
+  '/$user': typeof DashboardUserLayoutRouteWithChildren
   '/auth/': typeof AuthIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/$user/': typeof DashboardUserIndexRoute
   '/repos/': typeof DashboardReposIndexRoute
   '/stars/': typeof DashboardStarsIndexRoute
   '/viewer/': typeof DashboardViewerIndexRoute
@@ -72,6 +86,7 @@ export interface FileRoutesByTo {
   '/og': typeof OgRoute
   '/auth': typeof AuthIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/$user': typeof DashboardUserIndexRoute
   '/repos': typeof DashboardReposIndexRoute
   '/stars': typeof DashboardStarsIndexRoute
   '/viewer': typeof DashboardViewerIndexRoute
@@ -81,8 +96,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_dashboard': typeof DashboardLayoutRouteWithChildren
   '/og': typeof OgRoute
+  '/_dashboard/$user': typeof DashboardUserLayoutRouteWithChildren
   '/auth/': typeof AuthIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_dashboard/$user/': typeof DashboardUserIndexRoute
   '/_dashboard/repos/': typeof DashboardReposIndexRoute
   '/_dashboard/stars/': typeof DashboardStarsIndexRoute
   '/_dashboard/viewer/': typeof DashboardViewerIndexRoute
@@ -92,20 +109,32 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/og'
+    | '/$user'
     | '/auth/'
     | '/api/auth/$'
+    | '/$user/'
     | '/repos/'
     | '/stars/'
     | '/viewer/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/og' | '/auth' | '/api/auth/$' | '/repos' | '/stars' | '/viewer'
+  to:
+    | '/'
+    | '/og'
+    | '/auth'
+    | '/api/auth/$'
+    | '/$user'
+    | '/repos'
+    | '/stars'
+    | '/viewer'
   id:
     | '__root__'
     | '/'
     | '/_dashboard'
     | '/og'
+    | '/_dashboard/$user'
     | '/auth/'
     | '/api/auth/$'
+    | '/_dashboard/$user/'
     | '/_dashboard/repos/'
     | '/_dashboard/stars/'
     | '/_dashboard/viewer/'
@@ -142,12 +171,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OgRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_dashboard/$user': {
+      id: '/_dashboard/$user'
+      path: '/$user'
+      fullPath: '/$user'
+      preLoaderRoute: typeof DashboardUserLayoutRouteImport
+      parentRoute: typeof DashboardLayoutRoute
+    }
     '/auth/': {
       id: '/auth/'
       path: '/auth'
       fullPath: '/auth/'
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_dashboard/$user/': {
+      id: '/_dashboard/$user/'
+      path: '/'
+      fullPath: '/$user/'
+      preLoaderRoute: typeof DashboardUserIndexRouteImport
+      parentRoute: typeof DashboardUserLayoutRoute
     }
     '/_dashboard/repos/': {
       id: '/_dashboard/repos/'
@@ -180,13 +223,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardUserLayoutRouteChildren {
+  DashboardUserIndexRoute: typeof DashboardUserIndexRoute
+}
+
+const DashboardUserLayoutRouteChildren: DashboardUserLayoutRouteChildren = {
+  DashboardUserIndexRoute: DashboardUserIndexRoute,
+}
+
+const DashboardUserLayoutRouteWithChildren =
+  DashboardUserLayoutRoute._addFileChildren(DashboardUserLayoutRouteChildren)
+
 interface DashboardLayoutRouteChildren {
+  DashboardUserLayoutRoute: typeof DashboardUserLayoutRouteWithChildren
   DashboardReposIndexRoute: typeof DashboardReposIndexRoute
   DashboardStarsIndexRoute: typeof DashboardStarsIndexRoute
   DashboardViewerIndexRoute: typeof DashboardViewerIndexRoute
 }
 
 const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
+  DashboardUserLayoutRoute: DashboardUserLayoutRouteWithChildren,
   DashboardReposIndexRoute: DashboardReposIndexRoute,
   DashboardStarsIndexRoute: DashboardStarsIndexRoute,
   DashboardViewerIndexRoute: DashboardViewerIndexRoute,

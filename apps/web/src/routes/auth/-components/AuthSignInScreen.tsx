@@ -1,6 +1,7 @@
 import { BackgroundRippleEffect } from "@/components/acceternity/background-ripple-effect";
 import { AppBrandIcon } from "@/components/icon/AppBrandIcon";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
+import { landingRippleToneClassName } from "@/lib/landing/rippleTone";
 import { cn } from "@/lib/utils";
 import { GitHubSignIn } from "@/routes/auth/-components/GitHubSignIn";
 import { AppConfig } from "@/utils/system";
@@ -10,15 +11,6 @@ import { ArrowLeft } from "lucide-react";
 type AuthSignInScreenProps = {
   returnTo: string;
 };
-
-const rippleToneClassName = cn(
-  "[--cell-border-color:color-mix(in_oklch,var(--color-landing-amber)_28%,transparent)]",
-  "[--cell-fill-color:color-mix(in_oklch,var(--color-landing-amber)_8%,transparent)]",
-  "[--cell-shadow-color:color-mix(in_oklch,var(--color-landing-amber)_40%,transparent)]",
-  "dark:[--cell-border-color:color-mix(in_oklch,var(--color-landing-amber)_35%,transparent)]",
-  "dark:[--cell-fill-color:color-mix(in_oklch,var(--color-landing-amber)_10%,transparent)]",
-  "dark:[--cell-shadow-color:color-mix(in_oklch,var(--color-landing-amber)_45%,transparent)]",
-);
 
 export function AuthSignInScreen({ returnTo }: AuthSignInScreenProps) {
   const Icon = AppConfig.icon;
@@ -54,7 +46,7 @@ export function AuthSignInScreen({ returnTo }: AuthSignInScreenProps) {
             pulse
             pulseInterval={3600}
             pulseTarget="random"
-            className={rippleToneClassName}
+            className={landingRippleToneClassName}
           />
           <div className="from-landing-surface via-landing-surface/40 pointer-events-none absolute inset-0 bg-linear-to-t to-transparent" />
           <div className="pointer-events-none relative z-10 flex h-full flex-col justify-end gap-10 p-10 xl:gap-12 xl:p-14">
@@ -81,7 +73,7 @@ export function AuthSignInScreen({ returnTo }: AuthSignInScreenProps) {
             pulse
             pulseInterval={3600}
             pulseTarget="random"
-            className={cn("lg:hidden", rippleToneClassName)}
+            className={cn("lg:hidden", landingRippleToneClassName)}
           />
           <div className="from-landing-surface via-landing-surface/50 pointer-events-none absolute inset-0 bg-linear-to-t to-transparent lg:hidden" />
           <div className="relative z-10 w-full max-w-sm">
