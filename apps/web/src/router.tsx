@@ -20,6 +20,8 @@ export const getRouter = async () => {
     defaultErrorComponent: ({ error }) => <RouterErrorComponent error={error} />,
     context: {
       ...tanstackQueryContext,
+      /** Populated in `/_dashboard` `beforeLoad` (client-only). */
+      relayEnvironment: null,
     },
     defaultPreload: "intent",
     scrollRestoration: true,

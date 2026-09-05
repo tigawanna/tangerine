@@ -7,11 +7,12 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TanstackDevtools } from "@/lib/tanstack/devtools/devtools";
 import { ThemeProvider } from "@/lib/tanstack/router/theme-provider";
+import type { RelayRouterContext } from "@/lib/relay/relay-types";
 import { AppConfig } from "@/utils/system";
 import type { QueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
-interface MyRouterContext {
+interface MyRouterContext extends RelayRouterContext {
   queryClient: QueryClient;
 }
 

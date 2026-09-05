@@ -1,3 +1,4 @@
+import babel from "@rolldown/plugin-babel";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
@@ -14,7 +15,14 @@ const config = defineConfig({
     host: true,
   },
   resolve: {
-    dedupe: ["react", "react-dom", "@tanstack/react-query", "@tanstack/react-router"],
+    dedupe: [
+      "react",
+      "react-dom",
+      "@tanstack/react-query",
+      "@tanstack/react-router",
+      "react-relay",
+      "relay-runtime",
+    ],
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
@@ -47,6 +55,7 @@ const config = defineConfig({
     nitro(),
     tailwindcss(),
     viteReact(),
+    babel({ plugins: ["relay"] }),
   ],
 });
 

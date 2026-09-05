@@ -19,6 +19,8 @@ Before editing files for a substantial task:
 
 **Auth:** GitHub OAuth only, from `@repo/auth`. Protect dashboards with `beforeLoad` + `redirect()` to `/auth`. Server singleton is `getAuth()` in `src/lib/auth.server.ts`. React client is `@/lib/auth-client`.
 
-**Do:** `beforeLoad` + `redirect()` for auth. Route UI in `-components/`. Defaults on `validateSearch` — after parse use `search.page` / `search.q` directly. `queryOptions` + `useSuspenseQuery` in the component. Mutations: `meta.invalidates`, `onError(err: unknown)`.
+**Relay (dashboard only):** `/_dashboard` is `ssr: false`. `beforeLoad` loads the GitHub OAuth token via `authClient.getAccessToken({ useAccountCookie: true })`, builds a client Relay `Environment` (`src/lib/relay/create-environment.ts`), and puts it on router context. Wrap UI with `RelayEnvironmentProvider`. Run `pnpm relay` / `pnpm relay:watch` after changing GraphQL in components. Schema: `packages/github/schema.graphql`.
 
-**Don't:** Skip `beforeLoad` on protected routes. Put route UI in the route file or global `components/`. Wrap every query in `useX`. `qc.invalidateQueries` when `meta.invalidates` exists. Re-default search (`search.page ?? 1`) in the list. Invent a Next `app/` tree here.
+**Do:** `beforeLoad` + `redirect()` for auth. Route UI in `-components/`. Defaults on `validateSearch` — after parse use `search.page` / `search.q` directly. `queryOptions` + `useSuspenseQuery` in the component. Mutations: `meta.invalidates`, `onError(err: unknown)`. For new dashboard GraphQL, prefer Relay (`graphql` + `useLazyLoadQuery` / fragments) over React Query + `@repo/github` server fns.
+
+**Don't:** Skip `beforeLoad` on protected routes. Put route UI in the route file or global `components/`. Wrap every query in `useX`. `qc.invalidateQueries` when `meta.invalidates` exists. Re-default search (`search.page ?? 1`) in the list. Invent a Next `app/` tree here. Use Relay outside `/_dashboard` or enable SSR for Relay routes without a server Relay story.
