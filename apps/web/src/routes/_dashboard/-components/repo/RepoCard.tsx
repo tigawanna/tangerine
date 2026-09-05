@@ -164,7 +164,7 @@ function RepoCardSurface({
       data-test={`repo-card-${view.name}`}
       data-selected={selection.selected ? "true" : undefined}
     >
-      <div className="bg-base-300 relative aspect-16/9 overflow-hidden">
+      <div className="bg-base-300 relative aspect-video overflow-hidden">
         <img
           src={view.openGraphImageUrl || undefined}
           alt=""

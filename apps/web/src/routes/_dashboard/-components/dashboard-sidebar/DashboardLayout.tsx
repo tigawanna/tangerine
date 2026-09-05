@@ -34,7 +34,7 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const { githubLogin } = useRouteContext({ from: "/_dashboard" });
   const params = useParams({ strict: false }) as { user?: string };
-  /** Sidebar nav follows the profile in the URL; home always goes to the signed-in user. */
+  /** Sidebar nav follows the profile in the URL; brand → landing, “My profile” → signed-in user. */
   const viewedUser = params.user?.trim() || githubLogin || "";
   const primaryRoutes = viewedUser ? dashboardPrimaryRoutes(viewedUser) : [];
 

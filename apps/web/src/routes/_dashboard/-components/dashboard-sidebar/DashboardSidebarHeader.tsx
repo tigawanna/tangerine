@@ -6,15 +6,23 @@ import {
 } from "@/components/ui/sidebar";
 import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
 import { AppConfig } from "@/utils/system";
-import { Link } from "@tanstack/react-router";
+import { Link, useParams } from "@tanstack/react-router";
+import { CircleUser } from "lucide-react";
 
 interface DashboardSidebarHeaderProps {
-  /** Signed-in GitHub login — home always opens *their* profile. */
+  /** Signed-in GitHub login — “My profile” opens their `/$user` route. */
   githubLogin?: string;
 }
 
 export function DashboardSidebarHeader({ githubLogin }: DashboardSidebarHeaderProps) {
   const { state, setOpenMobile, isMobile } = useSidebar();
+  const expanded = state === "expanded" || isMobile;
+  const params = useParams({ strict: false }) as { user?: string };
+  const viewedUser = params.user?.trim();
+  const viewingOther = Boolean(
+    githubLogin && viewedUser && viewedUser.toLowerCase() !== githubLogin.toLowerCase(),
+  );
+  const myProfileLabel = viewingOther ? "Back to my profile" : "My profile";
 
   return (
     <SidebarMenu>
@@ -22,26 +30,43 @@ export function DashboardSidebarHeader({ githubLogin }: DashboardSidebarHeaderPr
         <SidebarMenuButton
           size="lg"
           asChild
+          tooltip="Landing"
           onClick={() => setOpenMobile(false)}
-          data-test="dashboard-sidebar-home"
+          data-test="dashboard-sidebar-landing"
         >
-          {githubLogin ? (
+          <Link to="/" className="hover:bg-primary/10 flex w-full justify-center">
+            <HeaderBrand expanded={expanded} />
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+      {githubLogin ? (
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            size="lg"
+            asChild
+            tooltip={myProfileLabel}
+            isActive={!viewingOther && Boolean(viewedUser)}
+            onClick={() => setOpenMobile(false)}
+            data-test="dashboard-sidebar-my-profile"
+          >
             <Link
               to="/$user"
               params={{ user: githubLogin }}
               search={defaultUserSearch}
-              replace={false}
-              className="hover:bg-primary/10 flex w-full justify-center"
+              className={
+                expanded
+                  ? "hover:bg-primary/10"
+                  : "hover:bg-primary/10 flex w-full justify-center"
+              }
             >
-              <HeaderBrand expanded={state === "expanded" || isMobile} />
+              <span className="flex aspect-square size-5 items-center justify-center">
+                <CircleUser className="size-5 shrink-0" aria-hidden />
+              </span>
+              {expanded ? <span className="truncate">{myProfileLabel}</span> : null}
             </Link>
-          ) : (
-            <Link to="/viewer" className="hover:bg-primary/10 flex w-full justify-center">
-              <HeaderBrand expanded={state === "expanded" || isMobile} />
-            </Link>
-          )}
-        </SidebarMenuButton>
-      </SidebarMenuItem>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ) : null}
     </SidebarMenu>
   );
 }
