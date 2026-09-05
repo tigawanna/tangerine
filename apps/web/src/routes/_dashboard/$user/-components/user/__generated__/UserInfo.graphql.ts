@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<ea1f4dc921576d5aba44b23e9af9102b>>
+ * @generated SignedSource<<99a25960294ca5f9ab1d95b3887db56b>>
  * @lightSyntaxTransform
  */
 
@@ -16,12 +16,14 @@ export type UserInfo$data = {
   readonly createdAt: string;
   readonly email: string;
   readonly id: string;
+  readonly isFollowingViewer: boolean;
   readonly isViewer: boolean;
   readonly location: string | null | undefined;
   readonly login: string;
   readonly name: string | null | undefined;
   readonly twitterUsername: string | null | undefined;
   readonly url: string;
+  readonly viewerIsFollowing: boolean;
   readonly " $fragmentType": "UserInfo";
 };
 export type UserInfo$key = {
@@ -102,6 +104,27 @@ const node: ReaderFragment = {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
+      "name": "isFollowingViewer",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "viewerIsFollowing",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "isViewer",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
       "name": "location",
       "storageKey": null
     },
@@ -111,19 +134,12 @@ const node: ReaderFragment = {
       "kind": "ScalarField",
       "name": "url",
       "storageKey": null
-    },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "isViewer",
-      "storageKey": null
     }
   ],
   "type": "User",
   "abstractKey": null
 };
 
-(node as any).hash = "cae217bec98d89377d8a382b371f5048";
+(node as any).hash = "fb77ab27a504d7a3f85d877e6a8dcc09";
 
 export default node;

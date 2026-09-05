@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<af0118a493e848c6ecd85e5b5892ff16>>
+ * @generated SignedSource<<8df16ceac588f8d5ddb4e0f2439719e6>>
  * @lightSyntaxTransform
  */
 
@@ -9,12 +9,26 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 import { FragmentRefs } from "relay-runtime";
+export type OrderDirection = "ASC" | "DESC" | "%future added value";
+export type RepositoryOrderField = "CREATED_AT" | "NAME" | "PUSHED_AT" | "STARGAZERS" | "UPDATED_AT" | "%future added value";
+export type StarOrderField = "STARRED_AT" | "%future added value";
+export type RepositoryOrder = {
+  direction: OrderDirection;
+  field: RepositoryOrderField;
+};
+export type StarOrder = {
+  direction: OrderDirection;
+  field: StarOrderField;
+};
 export type layoutUserPageLoaderQuery$variables = {
+  isFork?: boolean | null | undefined;
   login: string;
+  orderBy?: RepositoryOrder | null | undefined;
+  starOrder?: StarOrder | null | undefined;
 };
 export type layoutUserPageLoaderQuery$data = {
   readonly user: {
-    readonly " $fragmentSpreads": FragmentRefs<"UserInfo">;
+    readonly " $fragmentSpreads": FragmentRefs<"UserFollowersFragment" | "UserFollowingFragment" | "UserInfo" | "UserRepos_repositories" | "UserStarredRepos_repositories">;
   } | null | undefined;
 };
 export type layoutUserPageLoaderQuery = {
@@ -23,30 +37,383 @@ export type layoutUserPageLoaderQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "defaultValue": null,
-    "kind": "LocalArgument",
-    "name": "login"
-  }
-],
-v1 = [
+var v0 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "isFork"
+},
+v1 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "login"
+},
+v2 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "orderBy"
+},
+v3 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
+  "name": "starOrder"
+},
+v4 = [
   {
     "kind": "Variable",
     "name": "login",
     "variableName": "login"
   }
+],
+v5 = {
+  "kind": "Variable",
+  "name": "isFork",
+  "variableName": "isFork"
+},
+v6 = {
+  "kind": "Variable",
+  "name": "orderBy",
+  "variableName": "orderBy"
+},
+v7 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+},
+v8 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "name",
+  "storageKey": null
+},
+v9 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "login",
+  "storageKey": null
+},
+v10 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "bio",
+  "storageKey": null
+},
+v11 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "avatarUrl",
+  "storageKey": null
+},
+v12 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "url",
+  "storageKey": null
+},
+v13 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 12
+  }
+],
+v14 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v15 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v16 = {
+  "alias": null,
+  "args": null,
+  "concreteType": "PageInfo",
+  "kind": "LinkedField",
+  "name": "pageInfo",
+  "plural": false,
+  "selections": [
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "endCursor",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "hasNextPage",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "hasPreviousPage",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "startCursor",
+      "storageKey": null
+    }
+  ],
+  "storageKey": null
+},
+v17 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "totalCount",
+  "storageKey": null
+},
+v18 = [
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "UserEdge",
+    "kind": "LinkedField",
+    "name": "edges",
+    "plural": true,
+    "selections": [
+      (v14/*:: as any*/),
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "User",
+        "kind": "LinkedField",
+        "name": "node",
+        "plural": false,
+        "selections": [
+          (v7/*:: as any*/),
+          (v8/*:: as any*/),
+          (v9/*:: as any*/),
+          (v10/*:: as any*/),
+          (v11/*:: as any*/),
+          (v15/*:: as any*/)
+        ],
+        "storageKey": null
+      }
+    ],
+    "storageKey": null
+  },
+  (v16/*:: as any*/),
+  (v17/*:: as any*/)
+],
+v19 = {
+  "kind": "Literal",
+  "name": "first",
+  "value": 24
+},
+v20 = [
+  (v19/*:: as any*/),
+  (v5/*:: as any*/),
+  (v6/*:: as any*/)
+],
+v21 = [
+  (v7/*:: as any*/),
+  (v8/*:: as any*/),
+  {
+    "alias": null,
+    "args": null,
+    "kind": "ScalarField",
+    "name": "color",
+    "storageKey": null
+  }
+],
+v22 = [
+  (v14/*:: as any*/),
+  {
+    "alias": null,
+    "args": null,
+    "concreteType": "Repository",
+    "kind": "LinkedField",
+    "name": "node",
+    "plural": false,
+    "selections": [
+      (v7/*:: as any*/),
+      (v8/*:: as any*/),
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "nameWithOwner",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "description",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "pushedAt",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "diskUsage",
+        "storageKey": null
+      },
+      (v12/*:: as any*/),
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "visibility",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "isPrivate",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "isFork",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "stargazerCount",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "forkCount",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "kind": "ScalarField",
+        "name": "openGraphImageUrl",
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": null,
+        "kind": "LinkedField",
+        "name": "owner",
+        "plural": false,
+        "selections": [
+          (v15/*:: as any*/),
+          (v9/*:: as any*/),
+          (v12/*:: as any*/),
+          (v11/*:: as any*/),
+          (v7/*:: as any*/)
+        ],
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "Language",
+        "kind": "LinkedField",
+        "name": "primaryLanguage",
+        "plural": false,
+        "selections": (v21/*:: as any*/),
+        "storageKey": null
+      },
+      {
+        "alias": null,
+        "args": [
+          {
+            "kind": "Literal",
+            "name": "first",
+            "value": 3
+          }
+        ],
+        "concreteType": "LanguageConnection",
+        "kind": "LinkedField",
+        "name": "languages",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "concreteType": "Language",
+            "kind": "LinkedField",
+            "name": "nodes",
+            "plural": true,
+            "selections": (v21/*:: as any*/),
+            "storageKey": null
+          }
+        ],
+        "storageKey": "languages(first:3)"
+      },
+      {
+        "alias": null,
+        "args": null,
+        "concreteType": "Ref",
+        "kind": "LinkedField",
+        "name": "defaultBranchRef",
+        "plural": false,
+        "selections": [
+          (v8/*:: as any*/),
+          (v7/*:: as any*/)
+        ],
+        "storageKey": null
+      },
+      (v15/*:: as any*/)
+    ],
+    "storageKey": null
+  }
+],
+v23 = [
+  (v19/*:: as any*/),
+  {
+    "kind": "Variable",
+    "name": "orderBy",
+    "variableName": "starOrder"
+  }
 ];
 return {
   "fragment": {
-    "argumentDefinitions": (v0/*:: as any*/),
+    "argumentDefinitions": [
+      (v0/*:: as any*/),
+      (v1/*:: as any*/),
+      (v2/*:: as any*/),
+      (v3/*:: as any*/)
+    ],
     "kind": "Fragment",
     "metadata": null,
     "name": "layoutUserPageLoaderQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v1/*:: as any*/),
+        "args": (v4/*:: as any*/),
         "concreteType": "User",
         "kind": "LinkedField",
         "name": "user",
@@ -56,6 +423,35 @@ return {
             "args": null,
             "kind": "FragmentSpread",
             "name": "UserInfo"
+          },
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "UserFollowingFragment"
+          },
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "UserFollowersFragment"
+          },
+          {
+            "args": [
+              (v5/*:: as any*/),
+              (v6/*:: as any*/)
+            ],
+            "kind": "FragmentSpread",
+            "name": "UserRepos_repositories"
+          },
+          {
+            "args": [
+              {
+                "kind": "Variable",
+                "name": "orderByStarredRepos",
+                "variableName": "starOrder"
+              }
+            ],
+            "kind": "FragmentSpread",
+            "name": "UserStarredRepos_repositories"
           }
         ],
         "storageKey": null
@@ -66,39 +462,26 @@ return {
   },
   "kind": "Request",
   "operation": {
-    "argumentDefinitions": (v0/*:: as any*/),
+    "argumentDefinitions": [
+      (v1/*:: as any*/),
+      (v0/*:: as any*/),
+      (v2/*:: as any*/),
+      (v3/*:: as any*/)
+    ],
     "kind": "Operation",
     "name": "layoutUserPageLoaderQuery",
     "selections": [
       {
         "alias": null,
-        "args": (v1/*:: as any*/),
+        "args": (v4/*:: as any*/),
         "concreteType": "User",
         "kind": "LinkedField",
         "name": "user",
         "plural": false,
         "selections": [
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "id",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "name",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "login",
-            "storageKey": null
-          },
+          (v7/*:: as any*/),
+          (v8/*:: as any*/),
+          (v9/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -106,20 +489,8 @@ return {
             "name": "email",
             "storageKey": null
           },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "bio",
-            "storageKey": null
-          },
-          {
-            "alias": null,
-            "args": null,
-            "kind": "ScalarField",
-            "name": "avatarUrl",
-            "storageKey": null
-          },
+          (v10/*:: as any*/),
+          (v11/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -145,14 +516,14 @@ return {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "location",
+            "name": "isFollowingViewer",
             "storageKey": null
           },
           {
             "alias": null,
             "args": null,
             "kind": "ScalarField",
-            "name": "url",
+            "name": "viewerIsFollowing",
             "storageKey": null
           },
           {
@@ -161,6 +532,121 @@ return {
             "kind": "ScalarField",
             "name": "isViewer",
             "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "location",
+            "storageKey": null
+          },
+          (v12/*:: as any*/),
+          {
+            "alias": null,
+            "args": (v13/*:: as any*/),
+            "concreteType": "FollowingConnection",
+            "kind": "LinkedField",
+            "name": "following",
+            "plural": false,
+            "selections": (v18/*:: as any*/),
+            "storageKey": "following(first:12)"
+          },
+          {
+            "alias": null,
+            "args": (v13/*:: as any*/),
+            "filters": null,
+            "handle": "connection",
+            "key": "UserFollowingFragment_following",
+            "kind": "LinkedHandle",
+            "name": "following"
+          },
+          {
+            "alias": null,
+            "args": (v13/*:: as any*/),
+            "concreteType": "FollowerConnection",
+            "kind": "LinkedField",
+            "name": "followers",
+            "plural": false,
+            "selections": (v18/*:: as any*/),
+            "storageKey": "followers(first:12)"
+          },
+          {
+            "alias": null,
+            "args": (v13/*:: as any*/),
+            "filters": null,
+            "handle": "connection",
+            "key": "UserFollowersFragment_followers",
+            "kind": "LinkedHandle",
+            "name": "followers"
+          },
+          {
+            "alias": null,
+            "args": (v20/*:: as any*/),
+            "concreteType": "RepositoryConnection",
+            "kind": "LinkedField",
+            "name": "repositories",
+            "plural": false,
+            "selections": [
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "RepositoryEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": (v22/*:: as any*/),
+                "storageKey": null
+              },
+              (v16/*:: as any*/),
+              (v17/*:: as any*/)
+            ],
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": (v20/*:: as any*/),
+            "filters": [
+              "orderBy",
+              "isFork"
+            ],
+            "handle": "connection",
+            "key": "UserRepos_repositories",
+            "kind": "LinkedHandle",
+            "name": "repositories"
+          },
+          {
+            "alias": null,
+            "args": (v23/*:: as any*/),
+            "concreteType": "StarredRepositoryConnection",
+            "kind": "LinkedField",
+            "name": "starredRepositories",
+            "plural": false,
+            "selections": [
+              (v17/*:: as any*/),
+              {
+                "alias": null,
+                "args": null,
+                "concreteType": "StarredRepositoryEdge",
+                "kind": "LinkedField",
+                "name": "edges",
+                "plural": true,
+                "selections": (v22/*:: as any*/),
+                "storageKey": null
+              },
+              (v16/*:: as any*/)
+            ],
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": (v23/*:: as any*/),
+            "filters": [
+              "orderBy"
+            ],
+            "handle": "connection",
+            "key": "UserStarredRepos_starredRepositories",
+            "kind": "LinkedHandle",
+            "name": "starredRepositories"
           }
         ],
         "storageKey": null
@@ -168,16 +654,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "8850f956918991f54ea01f39957d5646",
+    "cacheID": "b9b9b9de981cb4d303486560f916ab11",
     "id": null,
     "metadata": {},
     "name": "layoutUserPageLoaderQuery",
     "operationKind": "query",
-    "text": "query layoutUserPageLoaderQuery(\n  $login: String!\n) {\n  user(login: $login) {\n    ...UserInfo\n    id\n  }\n}\n\nfragment UserInfo on User {\n  id\n  name\n  login\n  email\n  bio\n  avatarUrl\n  company\n  twitterUsername\n  createdAt\n  location\n  url\n  isViewer\n}\n"
+    "text": "query layoutUserPageLoaderQuery(\n  $login: String!\n  $isFork: Boolean\n  $orderBy: RepositoryOrder\n  $starOrder: StarOrder\n) {\n  user(login: $login) {\n    ...UserInfo\n    ...UserFollowingFragment\n    ...UserFollowersFragment\n    ...UserRepos_repositories_3LFRQw\n    ...UserStarredRepos_repositories_fFbs1\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserCard_user on User {\n  id\n  name\n  login\n  bio\n  avatarUrl\n}\n\nfragment UserFollowersFragment on User {\n  followers(first: 12) {\n    edges {\n      cursor\n      node {\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserFollowingFragment on User {\n  following(first: 12) {\n    edges {\n      cursor\n      node {\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserInfo on User {\n  id\n  name\n  login\n  email\n  bio\n  avatarUrl\n  company\n  twitterUsername\n  createdAt\n  isFollowingViewer\n  viewerIsFollowing\n  isViewer\n  location\n  url\n}\n\nfragment UserRepos_repositories_3LFRQw on User {\n  repositories(first: 24, orderBy: $orderBy, isFork: $isFork) {\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserStarredRepos_repositories_fFbs1 on User {\n  starredRepositories(first: 24, orderBy: $starOrder) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "bb81b7f1e1924124a02470af10fb9202";
+(node as any).hash = "5e5cf5d09fea5eacf2710839d1ad1ee4";
 
 export default node;

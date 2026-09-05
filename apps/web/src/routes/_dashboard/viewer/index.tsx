@@ -1,3 +1,4 @@
+import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 /**
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/_dashboard/viewer/")({
     throw redirect({
       to: "/$user",
       params: { user: login },
+      search: defaultUserSearch,
       replace: true,
     });
   },

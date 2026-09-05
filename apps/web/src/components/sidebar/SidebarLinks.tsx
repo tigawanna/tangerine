@@ -79,7 +79,7 @@ export function SidebarLinks({ links, isNested = false }: SidebarLinksProps) {
                 <Tooltip delayDuration={200}>
                   <TooltipTrigger asChild>
                     <SidebarMenuButton asChild>
-                      <Link to={item.href} params={item.params}>
+                      <Link to={item.href} params={item.params} search={item.search}>
                         {item.icon && <item.icon />}
                         <span>{item.title}</span>
                       </Link>
@@ -90,7 +90,7 @@ export function SidebarLinks({ links, isNested = false }: SidebarLinksProps) {
               </TooltipProvider>
             ) : (
               <SidebarMenuButton asChild>
-                <Link to={item.href} params={item.params}>
+                <Link to={item.href} params={item.params} search={item.search}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </Link>

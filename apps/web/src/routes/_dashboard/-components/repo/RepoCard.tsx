@@ -1,12 +1,36 @@
 import type { GithubRepoNode } from "@/types/github";
 import { getRelativeTimeString } from "@/utils/date-helpers";
+import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
 import { Link } from "@tanstack/react-router";
+import { graphql, useFragment } from "react-relay";
 import { Copy, Github, Lock, Star } from "lucide-react";
 import { VscVscodeInsiders } from "react-icons/vsc";
+import type { RepoCard_repository$key } from "./__generated__/RepoCard_repository.graphql";
 
 interface RepoCardProps {
-  repo: GithubRepoNode;
+  /** Relay fragment key — preferred for dashboard lists. */
+  repository?: RepoCard_repository$key | null;
+  /** Plain node from React Query lists (detail pages, legacy). */
+  repo?: GithubRepoNode | null;
 }
+
+type RepoCardView = {
+  id: string;
+  name: string;
+  nameWithOwner: string;
+  description: string | null;
+  pushedAt: string | null;
+  diskUsage: number | null;
+  url: string;
+  isPrivate: boolean;
+  isFork: boolean;
+  stargazerCount: number;
+  forkCount: number;
+  openGraphImageUrl: string | null;
+  ownerLogin: string;
+  branch: string | null;
+  languages: Array<{ id: string; name: string; color: string | null }>;
+};
 
 /**
  * Formats GitHub `diskUsage` (kilobytes) for display on repo cards.
@@ -17,35 +41,97 @@ function formatDiskUsage(kilobytes: number | null | undefined): string | null {
   return `${(kilobytes / 1024).toFixed(1)} MB`;
 }
 
-function languageList(repo: GithubRepoNode) {
-  const fromNodes =
-    repo.languages?.nodes?.filter((lang): lang is NonNullable<typeof lang> => lang != null) ?? [];
-  if (fromNodes.length > 0) return fromNodes.slice(0, 3);
-  if (repo.primaryLanguage) return [repo.primaryLanguage];
-  return [];
+function fromGithubNode(repo: GithubRepoNode): RepoCardView {
+  const languages =
+    repo.languages?.nodes?.filter((lang): lang is NonNullable<typeof lang> => lang != null).slice(0, 3) ??
+    [];
+  const primary = repo.primaryLanguage;
+  return {
+    id: repo.nameWithOwner,
+    name: repo.name,
+    nameWithOwner: repo.nameWithOwner,
+    description: repo.description,
+    pushedAt: repo.pushedAt,
+    diskUsage: repo.diskUsage,
+    url: repo.url,
+    isPrivate: repo.isPrivate,
+    isFork: repo.isFork,
+    stargazerCount: repo.stargazerCount,
+    forkCount: repo.forkCount,
+    openGraphImageUrl: repo.openGraphImageUrl,
+    ownerLogin: repo.owner?.login ?? repo.nameWithOwner.split("/")[0] ?? "",
+    branch: repo.defaultBranchRef?.name ?? null,
+    languages:
+      languages.length > 0
+        ? languages.map((lang) => ({
+            id: lang.id,
+            name: lang.name,
+            color: lang.color,
+          }))
+        : primary
+          ? [{ id: primary.id, name: primary.name, color: primary.color }]
+          : [],
+  };
 }
 
 /**
  * Modern repository card. Primary navigation goes to in-app repo details;
  * GitHub / VS Code stay as explicit external actions.
  */
-export function RepoCard({ repo }: RepoCardProps) {
-  const languages = languageList(repo);
-  const ownerLogin = repo.owner?.login ?? repo.nameWithOwner.split("/")[0] ?? "";
-  const vscodeUrl = `https://vscode.dev/${repo.url}`;
-  const pushedLabel = repo.pushedAt ? getRelativeTimeString(new Date(repo.pushedAt)) : null;
-  const disk = formatDiskUsage(repo.diskUsage);
-  const branch = repo.defaultBranchRef?.name;
-  const detailParams = { user: ownerLogin, repo: repo.name };
+export function RepoCard({ repository, repo }: RepoCardProps) {
+  if (repository != null) {
+    return <RelayRepoCard repository={repository} />;
+  }
+  if (repo != null) {
+    return <RepoCardSurface view={fromGithubNode(repo)} />;
+  }
+  return null;
+}
+
+function RelayRepoCard({ repository }: { repository: RepoCard_repository$key }) {
+  const fragData = useFragment(RepoCardFragment, repository);
+  const view: RepoCardView = {
+    id: fragData.id,
+    name: fragData.name,
+    nameWithOwner: fragData.nameWithOwner,
+    description: fragData.description ?? null,
+    pushedAt: fragData.pushedAt ?? null,
+    diskUsage: fragData.diskUsage ?? null,
+    url: fragData.url,
+    isPrivate: fragData.isPrivate ?? fragData.visibility === "PRIVATE",
+    isFork: fragData.isFork,
+    stargazerCount: fragData.stargazerCount,
+    forkCount: fragData.forkCount,
+    openGraphImageUrl: fragData.openGraphImageUrl ?? null,
+    ownerLogin: fragData.owner.login,
+    branch: fragData.defaultBranchRef?.name ?? null,
+    languages:
+      fragData.languages?.nodes
+        ?.filter((lang): lang is NonNullable<typeof lang> => lang != null)
+        .slice(0, 3)
+        .map((lang) => ({
+          id: lang.id,
+          name: lang.name,
+          color: lang.color ?? null,
+        })) ?? [],
+  };
+  return <RepoCardSurface view={view} />;
+}
+
+function RepoCardSurface({ view }: { view: RepoCardView }) {
+  const vscodeUrl = `https://vscode.dev/${view.url}`;
+  const pushedLabel = view.pushedAt ? getRelativeTimeString(new Date(view.pushedAt)) : null;
+  const disk = formatDiskUsage(view.diskUsage);
+  const detailParams = { user: view.ownerLogin, repo: view.name };
 
   return (
     <article
       className="border-base-300 bg-base-100 group relative flex h-full flex-col overflow-hidden rounded-xl border transition-colors duration-200 ease-out hover:border-base-content/20"
-      data-test={`repo-card-${repo.name}`}
+      data-test={`repo-card-${view.name}`}
     >
-      <div className="bg-base-300 relative aspect-video overflow-hidden">
+      <div className="bg-base-300 relative aspect-16/9 overflow-hidden">
         <img
-          src={repo.openGraphImageUrl || undefined}
+          src={view.openGraphImageUrl || undefined}
           alt=""
           loading="lazy"
           className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
@@ -53,15 +139,16 @@ export function RepoCard({ repo }: RepoCardProps) {
             event.currentTarget.src =
               "data:image/svg+xml," +
               encodeURIComponent(
-                `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect fill="oklch(0.22 0.02 260)" width="100%" height="100%"/><text x="50%" y="50%" fill="oklch(0.65 0.02 260)" font-family="ui-sans-serif,system-ui,sans-serif" font-size="20" text-anchor="middle" dominant-baseline="middle">${repo.name}</text></svg>`,
+                `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect fill="oklch(0.22 0.02 260)" width="100%" height="100%"/><text x="50%" y="50%" fill="oklch(0.65 0.02 260)" font-family="ui-sans-serif,system-ui,sans-serif" font-size="20" text-anchor="middle" dominant-baseline="middle">${view.name}</text></svg>`,
               );
           }}
         />
         <Link
           to="/$user/repos/$repo"
           params={detailParams}
+          search={defaultUserSearch}
           className="absolute inset-0"
-          aria-label={`Open ${repo.name} details`}
+          aria-label={`Open ${view.name} details`}
           preload="intent"
         />
         <div className="from-base-100 via-base-100/50 pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-linear-to-t to-transparent" />
@@ -72,17 +159,17 @@ export function RepoCard({ repo }: RepoCardProps) {
             rel="noreferrer"
             className="bg-base-100/90 text-base-content/70 hover:text-base-content border-base-300 inline-flex size-8 items-center justify-center rounded-lg border backdrop-blur-sm transition-colors"
             aria-label="Open in VS Code"
-            data-test={`repo-vscode-${repo.name}`}
+            data-test={`repo-vscode-${view.name}`}
           >
             <VscVscodeInsiders className="size-4" />
           </a>
           <a
-            href={repo.url}
+            href={view.url}
             target="_blank"
             rel="noreferrer"
             className="bg-base-100/90 text-base-content/70 hover:text-base-content border-base-300 inline-flex size-8 items-center justify-center rounded-lg border backdrop-blur-sm transition-colors"
             aria-label="Open on GitHub"
-            data-test={`repo-github-${repo.name}`}
+            data-test={`repo-github-${view.name}`}
           >
             <Github className="size-4" />
           </a>
@@ -95,31 +182,32 @@ export function RepoCard({ repo }: RepoCardProps) {
             <Link
               to="/$user/repos/$repo"
               params={detailParams}
+              search={defaultUserSearch}
               preload="intent"
               className="group-hover:text-primary min-w-0 flex-1 truncate text-base font-semibold tracking-tight transition-colors"
             >
-              {repo.name}
+              {view.name}
             </Link>
-            {repo.isPrivate ? (
+            {view.isPrivate ? (
               <Lock className="text-base-content/40 mt-0.5 size-3.5 shrink-0" aria-label="Private" />
             ) : null}
-            {repo.isFork ? (
+            {view.isFork ? (
               <span className="bg-base-200 text-base-content/60 shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase">
                 Fork
               </span>
             ) : null}
           </div>
-          {ownerLogin ? (
-            <p className="text-base-content/45 truncate text-xs">@{ownerLogin}</p>
+          {view.ownerLogin ? (
+            <p className="text-base-content/45 truncate text-xs">@{view.ownerLogin}</p>
           ) : null}
           <p className="text-base-content/65 line-clamp-2 min-h-10 text-sm leading-5">
-            {repo.description ?? "No description"}
+            {view.description ?? "No description"}
           </p>
         </div>
 
-        {languages.length > 0 ? (
+        {view.languages.length > 0 ? (
           <ul className="flex flex-wrap gap-x-3 gap-y-1.5">
-            {languages.map((lang) => (
+            {view.languages.map((lang) => (
               <li
                 key={lang.id}
                 className="text-base-content/55 inline-flex items-center gap-1.5 text-xs"
@@ -138,13 +226,15 @@ export function RepoCard({ repo }: RepoCardProps) {
         <div className="border-base-300/80 text-base-content/45 mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 border-t pt-3 text-xs">
           <span className="inline-flex items-center gap-1">
             <Star className="size-3.5" aria-hidden />
-            {repo.stargazerCount ?? 0}
+            {view.stargazerCount}
           </span>
           <span className="inline-flex items-center gap-1" title="Forks">
             <Copy className="size-3.5" aria-hidden />
-            {repo.forkCount ?? 0}
+            {view.forkCount}
           </span>
-          {branch ? <span className="truncate font-mono text-[11px]">{branch}</span> : null}
+          {view.branch ? (
+            <span className="truncate font-mono text-[11px]">{view.branch}</span>
+          ) : null}
           {pushedLabel ? <span className="ml-auto truncate">{pushedLabel}</span> : null}
           {disk ? <span className="text-base-content/35">{disk}</span> : null}
         </div>
@@ -152,3 +242,41 @@ export function RepoCard({ repo }: RepoCardProps) {
     </article>
   );
 }
+
+const RepoCardFragment = graphql`
+  fragment RepoCard_repository on Repository {
+    id
+    name
+    nameWithOwner
+    description
+    pushedAt
+    diskUsage
+    url
+    visibility
+    isPrivate
+    isFork
+    stargazerCount
+    forkCount
+    openGraphImageUrl
+    owner {
+      login
+      url
+      avatarUrl
+    }
+    primaryLanguage {
+      id
+      name
+      color
+    }
+    languages(first: 3) {
+      nodes {
+        id
+        name
+        color
+      }
+    }
+    defaultBranchRef {
+      name
+    }
+  }
+`;

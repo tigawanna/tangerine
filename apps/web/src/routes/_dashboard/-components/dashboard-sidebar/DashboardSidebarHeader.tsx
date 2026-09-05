@@ -4,6 +4,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
 import { AppConfig } from "@/utils/system";
 import { Link } from "@tanstack/react-router";
 
@@ -28,6 +29,7 @@ export function DashboardSidebarHeader({ user }: DashboardSidebarHeaderProps) {
             <Link
               to="/$user"
               params={{ user }}
+              search={defaultUserSearch}
               className="hover:bg-primary/10 flex w-full justify-center"
             >
               <HeaderBrand expanded={state === "expanded" || isMobile} />

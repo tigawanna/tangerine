@@ -1,4 +1,5 @@
 import { repoDetailQueryOptions } from "@/data-access-layer/github/repo-detail-query-options";
+import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
 import { getRelativeTimeString } from "@/utils/date-helpers";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -28,9 +29,9 @@ function RepoDetailPage() {
         <p className="font-medium">Could not load this repository</p>
         <p className="text-base-content/70 text-sm">{data.error ?? "Repository not found."}</p>
         <Link
-          to="/$user/repos"
+          to="/$user"
           params={{ user }}
-          search={{ view: "all" }}
+          search={defaultUserSearch}
           className="text-primary inline-flex items-center gap-2 text-sm font-medium hover:underline"
         >
           <ArrowLeft className="size-4" />
@@ -51,9 +52,9 @@ function RepoDetailPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8" data-test="repo-detail-page">
       <Link
-        to="/$user/repos"
+        to="/$user"
         params={{ user }}
-        search={{ view: "all" }}
+        search={defaultUserSearch}
         className="text-base-content/60 hover:text-base-content inline-flex items-center gap-2 text-sm transition-colors"
         data-test="repo-detail-back"
       >
@@ -66,7 +67,7 @@ function RepoDetailPage() {
           <img
             src={repository.openGraphImageUrl}
             alt=""
-            className="aspect-16/9 w-full object-cover"
+            className="aspect-video w-full object-cover"
           />
         </div>
       ) : null}
