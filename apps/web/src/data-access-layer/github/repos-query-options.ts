@@ -6,7 +6,12 @@ export const pinnedReposQueryOptions = queryOptions({
   queryFn: () => getPinnedRepos(),
 });
 
-export const recentReposQueryOptions = queryOptions({
-  queryKey: ["github", "recent-repos"],
-  queryFn: () => getRecentRepos(),
-});
+/**
+ * Recent viewer repos. Pass `isFork: true|false` to filter, or omit for all.
+ */
+export function recentReposQueryOptions(isFork?: boolean | null) {
+  return queryOptions({
+    queryKey: ["github", "recent-repos", { isFork: isFork ?? null }],
+    queryFn: () => getRecentRepos({ data: { isFork: isFork ?? null } }),
+  });
+}

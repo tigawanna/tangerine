@@ -32,8 +32,26 @@ export const RecentReposQuery = graphql(`
           isArchived
           stargazerCount
           forkCount
+          diskUsage
           defaultBranchRef {
             name
+          }
+          owner {
+            login
+            avatarUrl
+            url
+          }
+          primaryLanguage {
+            id
+            name
+            color
+          }
+          languages(first: 3) {
+            nodes {
+              id
+              name
+              color
+            }
           }
           repositoryTopics(first: $firstTopics) {
             nodes {
@@ -75,8 +93,26 @@ export const PinnedReposQuery = graphql(`
             isArchived
             stargazerCount
             forkCount
+            diskUsage
             defaultBranchRef {
               name
+            }
+            owner {
+              login
+              avatarUrl
+              url
+            }
+            primaryLanguage {
+              id
+              name
+              color
+            }
+            languages(first: 3) {
+              nodes {
+                id
+                name
+                color
+              }
             }
             repositoryTopics(first: 10) {
               nodes {

@@ -16,7 +16,17 @@ export function createRepoNode(
     isArchived: false,
     stargazerCount: 0,
     forkCount: 0,
+    diskUsage: 128,
     defaultBranchRef: { name: "main" },
+    owner: {
+      login: overrides.nameWithOwner.split("/")[0] ?? "owner",
+      avatarUrl: "https://avatars.githubusercontent.com/u/1",
+      url: `https://github.com/${overrides.nameWithOwner.split("/")[0] ?? "owner"}`,
+    },
+    primaryLanguage: { id: "lang1", name: "TypeScript", color: "#3178c6" },
+    languages: {
+      nodes: [{ id: "lang1", name: "TypeScript", color: "#3178c6" }],
+    },
     repositoryTopics: { nodes: [] },
     ...overrides,
   };
