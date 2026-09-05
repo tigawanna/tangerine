@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<d7b525d6e3ee5d5d91dc44daa12d811b>>
+ * @generated SignedSource<<26935b50f69669042050d69fba675d48>>
  * @lightSyntaxTransform
  */
 
@@ -12,17 +12,17 @@ export type FollowUserInput = {
   clientMutationId?: string | null | undefined;
   userId: string;
 };
-export type UserInfofollowMutation$variables = {
+export type FollowUserButtonfollowMutation$variables = {
   input: FollowUserInput;
 };
-export type UserInfofollowMutation$data = {
+export type FollowUserButtonfollowMutation$data = {
   readonly followUser: {
     readonly clientMutationId: string | null | undefined;
   } | null | undefined;
 };
-export type UserInfofollowMutation = {
-  response: UserInfofollowMutation$data;
-  variables: UserInfofollowMutation$variables;
+export type FollowUserButtonfollowMutation = {
+  response: FollowUserButtonfollowMutation$data;
+  variables: FollowUserButtonfollowMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -64,7 +64,7 @@ return {
     "argumentDefinitions": (v0/*:: as any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "UserInfofollowMutation",
+    "name": "FollowUserButtonfollowMutation",
     "selections": (v1/*:: as any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -73,20 +73,20 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*:: as any*/),
     "kind": "Operation",
-    "name": "UserInfofollowMutation",
+    "name": "FollowUserButtonfollowMutation",
     "selections": (v1/*:: as any*/)
   },
   "params": {
-    "cacheID": "4055783021538a4cdab71fe63190aeb4",
+    "cacheID": "dc15d28e7e707d2420c9d631fc600b67",
     "id": null,
     "metadata": {},
-    "name": "UserInfofollowMutation",
+    "name": "FollowUserButtonfollowMutation",
     "operationKind": "mutation",
-    "text": "mutation UserInfofollowMutation(\n  $input: FollowUserInput!\n) {\n  followUser(input: $input) {\n    clientMutationId\n  }\n}\n"
+    "text": "mutation FollowUserButtonfollowMutation(\n  $input: FollowUserInput!\n) {\n  followUser(input: $input) {\n    clientMutationId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "b13a1607ba4bfef9d50e51739a84b66f";
+(node as any).hash = "798773585188e08ae2e522511262b946";
 
 export default node;

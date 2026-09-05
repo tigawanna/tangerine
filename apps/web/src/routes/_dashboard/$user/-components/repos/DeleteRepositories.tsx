@@ -21,6 +21,7 @@ interface DeleteRepositoriesProps {
   selected: SelectableRepo[];
   setOpen: (open: boolean) => void;
   setSelected: (selected: SelectableRepo[]) => void;
+  onNeedsDeleteRepoScope: () => void;
 }
 
 /**
@@ -31,13 +32,13 @@ export function DeleteRepositories({
   selected,
   setOpen,
   setSelected,
+  onNeedsDeleteRepoScope,
 }: DeleteRepositoriesProps) {
   const environment = useRelayEnvironment();
 
   const mutation = useMutation({
     mutationFn: () => deleteGithubRepos({ data: { repos: selected } }),
     onSuccess: (data) => {
-      setSelected([]);
       for (const item of data.successful) {
         environment.applyUpdate({
           storeUpdater: (store) => {
@@ -46,8 +47,23 @@ export function DeleteRepositories({
         });
       }
 
+      if (data.needsDeleteRepoScope) {
+        setOpen(false);
+        onNeedsDeleteRepoScope();
+        if (data.successful.length > 0) {
+          toast.success(
+            `Deleted ${data.successful.length} repositor${data.successful.length === 1 ? "y" : "ies"}; others need delete_repo scope.`,
+          );
+        }
+        return;
+      }
+
+      setSelected([]);
+
       if (data.failed.length === 0) {
-        toast.success(`Deleted ${data.successful.length} repositor${data.successful.length === 1 ? "y" : "ies"}`);
+        toast.success(
+          `Deleted ${data.successful.length} repositor${data.successful.length === 1 ? "y" : "ies"}`,
+        );
       } else if (data.successful.length === 0) {
         toast.error(
           `Failed to delete: ${data.failed.map((item) => `${item.repo} (${item.issue})`).join("; ")}`,
@@ -63,7 +79,8 @@ export function DeleteRepositories({
       setOpen(false);
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Something went wrong deleting repositories.";
+      const message =
+        error instanceof Error ? error.message : "Something went wrong deleting repositories.";
       toast.error(message);
     },
   });

@@ -13,6 +13,7 @@ type RepoBulkEditControlsProps = {
   onSelectAll: () => void;
   onDeselectAll: () => void;
   setSelected: (selected: SelectableRepo[]) => void;
+  onNeedsDeleteRepoScope: () => void;
 };
 
 /**
@@ -27,6 +28,7 @@ export function RepoBulkEditControls({
   onSelectAll,
   onDeselectAll,
   setSelected,
+  onNeedsDeleteRepoScope,
 }: RepoBulkEditControlsProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -53,6 +55,7 @@ export function RepoBulkEditControls({
           setOpen={setDeleteOpen}
           selected={selected}
           setSelected={setSelected}
+          onNeedsDeleteRepoScope={onNeedsDeleteRepoScope}
         />
       ) : null}
 

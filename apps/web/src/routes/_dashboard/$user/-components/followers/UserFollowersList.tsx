@@ -3,6 +3,7 @@ import type { layoutUserPageLoaderQuery } from "@/routes/_dashboard/$user/__gene
 import { defaultUserSearch, resolveUserSearch } from "@/routes/_dashboard/$user/layout";
 import { getRouteApi, Link } from "@tanstack/react-router";
 import { graphql, useFragment, usePaginationFragment } from "react-relay";
+import { FollowUserButton } from "../user/FollowUserButton";
 import type { UserFollowersFragment$key } from "./__generated__/UserFollowersFragment.graphql";
 import type { UserCard_user$key } from "./__generated__/UserCard_user.graphql";
 
@@ -80,27 +81,32 @@ function UserCard({ user }: { user: UserCard_user$key }) {
   const data = useFragment(UserCardFragment, user);
 
   return (
-    <Link
-      to="/$user"
-      params={{ user: data.login }}
-      search={defaultUserSearch}
-      replace={false}
+    <div
       className="border-base-300 bg-base-200 hover:bg-primary/20 flex items-center gap-3 rounded-xl border p-3 transition-colors"
       data-test={`user-card-${data.login}`}
     >
-      <img
-        src={data.avatarUrl}
-        alt=""
-        className="border-base-300 size-12 shrink-0 rounded-full border"
-      />
-      <div className="min-w-0">
-        <p className="truncate font-medium">{data.name ?? data.login}</p>
-        <p className="text-base-content/50 truncate text-sm">@{data.login}</p>
-        {data.bio ? (
-          <p className="text-base-content/60 mt-1 line-clamp-1 text-xs">{data.bio}</p>
-        ) : null}
-      </div>
-    </Link>
+      <Link
+        to="/$user"
+        params={{ user: data.login }}
+        search={defaultUserSearch}
+        replace={false}
+        className="flex min-w-0 flex-1 items-center gap-3"
+      >
+        <img
+          src={data.avatarUrl}
+          alt=""
+          className="border-base-300 size-12 shrink-0 rounded-full border"
+        />
+        <div className="min-w-0">
+          <p className="truncate font-medium">{data.name ?? data.login}</p>
+          <p className="text-base-content/50 truncate text-sm">@{data.login}</p>
+          {data.bio ? (
+            <p className="text-base-content/60 mt-1 line-clamp-1 text-xs">{data.bio}</p>
+          ) : null}
+        </div>
+      </Link>
+      <FollowUserButton user={data} size="xs" className="shrink-0" />
+    </div>
   );
 }
 
@@ -135,6 +141,7 @@ const UserCardFragment = graphql`
     login
     bio
     avatarUrl
+    ...FollowUserButton_user
   }
 `;
 

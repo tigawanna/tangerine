@@ -18,7 +18,9 @@ const deleteReposInput = z.object({
 
 export type DeleteReposResult = {
   successful: Array<{ id: string; name: string }>;
-  failed: Array<{ repo: string; issue: string }>;
+  failed: Array<{ repo: string; issue: string; code?: "missing_delete_repo_scope" | "forbidden" | "not_found" | "unknown" }>;
+  /** True when at least one failure looks like a missing `delete_repo` OAuth scope. */
+  needsDeleteRepoScope: boolean;
 };
 
 /**
@@ -40,30 +42,42 @@ export const deleteGithubRepos = createServerFn({ method: "POST" })
         } catch (error: unknown) {
           failed.push({
             repo: repo.nameWithOwner,
-            issue: describeDeleteError(error),
+            ...describeDeleteFailure(error),
           });
         }
       }),
     );
 
-    return { successful, failed };
+    return {
+      successful,
+      failed,
+      needsDeleteRepoScope: failed.some((item) => item.code === "missing_delete_repo_scope"),
+    };
   });
 
 /**
- * Maps Octokit / unknown errors into a short toast-friendly message.
+ * Maps Octokit / unknown errors into a toast-friendly issue + machine-readable code.
  */
-function describeDeleteError(error: unknown): string {
+function describeDeleteFailure(error: unknown): {
+  issue: string;
+  code: NonNullable<DeleteReposResult["failed"][number]["code"]>;
+} {
   if (error instanceof RequestError) {
     if (error.status === 403) {
-      return "Forbidden — needs delete_repo scope or admin access. Sign out and back in.";
+      // List UI only selects ADMIN repos, so 403 here is almost always a missing
+      // `delete_repo` OAuth scope on an older session.
+      return {
+        code: "missing_delete_repo_scope",
+        issue: "Missing delete_repo scope — sign in again to grant it.",
+      };
     }
     if (error.status === 404) {
-      return "Not found or no access";
+      return { code: "not_found", issue: "Not found or no access" };
     }
-    return error.message || `HTTP ${error.status}`;
+    return { code: "unknown", issue: error.message || `HTTP ${error.status}` };
   }
   if (error instanceof Error) {
-    return error.message;
+    return { code: "unknown", issue: error.message };
   }
-  return "Unknown error";
+  return { code: "unknown", issue: "Unknown error" };
 }

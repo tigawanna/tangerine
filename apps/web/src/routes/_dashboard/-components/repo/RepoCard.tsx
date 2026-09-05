@@ -179,9 +179,11 @@ function RepoCardSurface({
           }}
         />
         {showCheckbox ? (
-          <div className="bg-base-100/90 absolute top-3 left-3 z-20 rounded-lg border border-base-300 p-1.5 backdrop-blur-sm">
+          <div
+            className={`absolute top-3 left-3 z-20 rounded-lg border p-1.5 backdrop-blur-sm ${selection.selected ? "border-primary bg-primary/15" : "border-primary/50 bg-base-100/90"}`}
+          >
             <Checkbox
-              className="size-5"
+              className="border-primary data-[state=checked]:border-primary data-[state=checked]:bg-primary size-5"
               checked={selection.selected}
               data-test={`repo-select-${view.name}`}
               aria-label={`Select ${view.nameWithOwner}`}

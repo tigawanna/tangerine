@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<5560cd769dee37a2c7bdaf25ca9a549a>>
+ * @generated SignedSource<<ce3ead3cec5b031bd4dd2926d8ae71d4>>
  * @lightSyntaxTransform
  */
 
@@ -12,17 +12,17 @@ export type UnfollowUserInput = {
   clientMutationId?: string | null | undefined;
   userId: string;
 };
-export type UserInfounfollowMutation$variables = {
+export type FollowUserButtonunfollowMutation$variables = {
   input: UnfollowUserInput;
 };
-export type UserInfounfollowMutation$data = {
+export type FollowUserButtonunfollowMutation$data = {
   readonly unfollowUser: {
     readonly clientMutationId: string | null | undefined;
   } | null | undefined;
 };
-export type UserInfounfollowMutation = {
-  response: UserInfounfollowMutation$data;
-  variables: UserInfounfollowMutation$variables;
+export type FollowUserButtonunfollowMutation = {
+  response: FollowUserButtonunfollowMutation$data;
+  variables: FollowUserButtonunfollowMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -64,7 +64,7 @@ return {
     "argumentDefinitions": (v0/*:: as any*/),
     "kind": "Fragment",
     "metadata": null,
-    "name": "UserInfounfollowMutation",
+    "name": "FollowUserButtonunfollowMutation",
     "selections": (v1/*:: as any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -73,20 +73,20 @@ return {
   "operation": {
     "argumentDefinitions": (v0/*:: as any*/),
     "kind": "Operation",
-    "name": "UserInfounfollowMutation",
+    "name": "FollowUserButtonunfollowMutation",
     "selections": (v1/*:: as any*/)
   },
   "params": {
-    "cacheID": "510f37c5692d2651f5e9e71e93b63119",
+    "cacheID": "81e8580f1350a40f79888c35f355ef63",
     "id": null,
     "metadata": {},
-    "name": "UserInfounfollowMutation",
+    "name": "FollowUserButtonunfollowMutation",
     "operationKind": "mutation",
-    "text": "mutation UserInfounfollowMutation(\n  $input: UnfollowUserInput!\n) {\n  unfollowUser(input: $input) {\n    clientMutationId\n  }\n}\n"
+    "text": "mutation FollowUserButtonunfollowMutation(\n  $input: UnfollowUserInput!\n) {\n  unfollowUser(input: $input) {\n    clientMutationId\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "d7acd445ab1681d367968f7c667beff9";
+(node as any).hash = "8a28513b09b6291b8d80c9ae4676b374";
 
 export default node;

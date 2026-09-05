@@ -1,12 +1,10 @@
-import { Button } from "@/components/ui/button";
 import { getRelativeTimeString } from "@/utils/date-helpers";
 import { Building2, Mail, MapPin } from "lucide-react";
-import { type ComponentType, useState } from "react";
-import { graphql, useFragment, useMutation } from "react-relay";
+import { type ComponentType } from "react";
+import { graphql, useFragment } from "react-relay";
 import { FaXTwitter } from "react-icons/fa6";
+import { FollowUserButton } from "./FollowUserButton";
 import type { UserInfo$key } from "./__generated__/UserInfo.graphql";
-import type { UserInfofollowMutation } from "./__generated__/UserInfofollowMutation.graphql";
-import type { UserInfounfollowMutation } from "./__generated__/UserInfounfollowMutation.graphql";
 
 interface UserInfoProps {
   user: UserInfo$key;
@@ -17,9 +15,6 @@ interface UserInfoProps {
  */
 export function UserInfo({ user }: UserInfoProps) {
   const data = useFragment(UserInfoFragment, user);
-  const [following, setFollowing] = useState(data.viewerIsFollowing);
-  const [followMutation] = useMutation<UserInfofollowMutation>(FOLLOW_USER);
-  const [unfollowMutation] = useMutation<UserInfounfollowMutation>(UNFOLLOW_USER);
   const joined = data.createdAt ? getRelativeTimeString(new Date(data.createdAt)) : null;
 
   return (
@@ -58,25 +53,7 @@ export function UserInfo({ user }: UserInfoProps) {
           />
         </ul>
 
-        {!data.isViewer ? (
-          <Button
-            type="button"
-            variant={following ? "outline" : "default"}
-            size="sm"
-            data-test={following ? "user-unfollow" : "user-follow"}
-            onClick={() => {
-              if (following) {
-                setFollowing(false);
-                unfollowMutation({ variables: { input: { userId: data.id } } });
-                return;
-              }
-              setFollowing(true);
-              followMutation({ variables: { input: { userId: data.id } } });
-            }}
-          >
-            {following ? "Unfollow" : data.isFollowingViewer ? "Follow back" : "Follow"}
-          </Button>
-        ) : null}
+        <FollowUserButton user={data} />
       </div>
     </section>
   );
@@ -109,26 +86,8 @@ const UserInfoFragment = graphql`
     company
     twitterUsername
     createdAt
-    isFollowingViewer
-    viewerIsFollowing
-    isViewer
     location
     url
-  }
-`;
-
-const FOLLOW_USER = graphql`
-  mutation UserInfofollowMutation($input: FollowUserInput!) {
-    followUser(input: $input) {
-      clientMutationId
-    }
-  }
-`;
-
-const UNFOLLOW_USER = graphql`
-  mutation UserInfounfollowMutation($input: UnfollowUserInput!) {
-    unfollowUser(input: $input) {
-      clientMutationId
-    }
+    ...FollowUserButton_user
   }
 `;

@@ -4,6 +4,7 @@ import {
   RepoOrderSelect,
   TabFilterBar,
 } from "./RepoFilters";
+import { DeleteRepoScopeDialog } from "./DeleteRepoScopeDialog";
 import { RepoBulkEditControls } from "./RepoBulkEditControls";
 import { UserRepos, type RepoListEdge } from "./UserRepos";
 import { useRepoSelector } from "./use-repo-selector";
@@ -18,6 +19,7 @@ type ReposTabPanelProps = {
  */
 export function ReposTabPanel({ owner }: ReposTabPanelProps) {
   const [editing, setEditing] = useState(false);
+  const [scopeDialogOpen, setScopeDialogOpen] = useState(false);
   const { deselectAll, selectAll, selected, unselectItem, selectItem, setSelected } =
     useRepoSelector();
   const edgesRef = useRef<ReadonlyArray<RepoListEdge>>([]);
@@ -36,6 +38,9 @@ export function ReposTabPanel({ owner }: ReposTabPanelProps) {
           adminCount={adminCount}
           isAllSelected={isAllSelected}
           setSelected={setSelected}
+          onNeedsDeleteRepoScope={() => {
+            setScopeDialogOpen(true);
+          }}
           onToggleEditing={() => {
             setEditing((prev) => {
               if (prev) deselectAll();
@@ -64,6 +69,7 @@ export function ReposTabPanel({ owner }: ReposTabPanelProps) {
           }}
         />
       </Suspense>
+      <DeleteRepoScopeDialog open={scopeDialogOpen} onOpenChange={setScopeDialogOpen} />
     </div>
   );
 }
