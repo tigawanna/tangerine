@@ -1,5 +1,43 @@
+import { print } from "graphql";
 import type { GitHubClient } from "../client";
+import { graphql, type ResultOf } from "../graphql";
 import { splitRepoFullName } from "../utils/repo";
+
+export const AddStarMutation = graphql(`
+  mutation AddStar($starrableId: ID!) {
+    addStar(input: { starrableId: $starrableId }) {
+      starrable {
+        __typename
+        ... on Repository {
+          id
+          stargazerCount
+          viewerHasStarred
+        }
+      }
+    }
+  }
+`);
+
+export const RemoveStarMutation = graphql(`
+  mutation RemoveStar($starrableId: ID!) {
+    removeStar(input: { starrableId: $starrableId }) {
+      starrable {
+        __typename
+        ... on Repository {
+          id
+          stargazerCount
+          viewerHasStarred
+        }
+      }
+    }
+  }
+`);
+
+export type AddStarMutationResult = ResultOf<typeof AddStarMutation>;
+export type RemoveStarMutationResult = ResultOf<typeof RemoveStarMutation>;
+
+export const ADD_STAR_MUTATION = print(AddStarMutation);
+export const REMOVE_STAR_MUTATION = print(RemoveStarMutation);
 
 /**
  * Deletes a repository by `owner/repo` full name.
@@ -52,4 +90,32 @@ export async function applyRepoMetadata(
     repo,
     names: input.topics,
   });
+}
+
+/**
+ * Stars a repository (or other starrable) by node id.
+ */
+export async function addStar(this: GitHubClient, starrableId: string) {
+  const result = await this.graphql<AddStarMutationResult>(ADD_STAR_MUTATION, {
+    variables: { starrableId },
+  });
+  const starrable = result.addStar?.starrable;
+  if (starrable?.__typename !== "Repository") {
+    return null;
+  }
+  return starrable;
+}
+
+/**
+ * Removes a star from a repository (or other starrable) by node id.
+ */
+export async function removeStar(this: GitHubClient, starrableId: string) {
+  const result = await this.graphql<RemoveStarMutationResult>(REMOVE_STAR_MUTATION, {
+    variables: { starrableId },
+  });
+  const starrable = result.removeStar?.starrable;
+  if (starrable?.__typename !== "Repository") {
+    return null;
+  }
+  return starrable;
 }

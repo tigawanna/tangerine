@@ -1,4 +1,4 @@
-import { RepoCard } from "@/routes/-components/dashboard/RepoCard";
+import { RepoCard } from "@/routes/_dashboard/-components/RepoCard";
 import {
   pinnedReposQueryOptions,
   recentReposQueryOptions,

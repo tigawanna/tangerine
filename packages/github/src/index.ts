@@ -1,9 +1,19 @@
 export { createGitHubClient, GitHubClient, RequestError } from "./client";
 export {
   ViewerQuery,
+  UserProfileQuery,
   VIEWER_QUERY,
+  USER_PROFILE_QUERY,
   type ViewerQueryResult,
+  type UserProfileQueryResult,
 } from "./queries/user";
+export { UserCardFragment } from "./queries/fragments/user-card";
+export { RepoCardFragment } from "./queries/fragments/repo-card";
+export { RepoGeneralInfoFragment } from "./queries/fragments/repo-general-info";
+export {
+  SearchRepoFragment,
+  SearchUserFragment,
+} from "./queries/fragments/search-results";
 export {
   RecentReposQuery,
   PinnedReposQuery,
@@ -35,6 +45,56 @@ export {
   type RepoByNameQueryResult,
   type GithubRepoDetail,
 } from "./queries/repo-info";
+export {
+  RepoPageQuery,
+  RepoLanguagesQuery,
+  RepoStargazersQuery,
+  REPO_PAGE_QUERY,
+  REPO_LANGUAGES_QUERY,
+  REPO_STARGAZERS_QUERY,
+  type RepoPageQueryResult,
+  type RepoPageVariables,
+  type RepoLanguagesQueryResult,
+  type RepoStargazersQueryResult,
+} from "./queries/repo-page";
+export {
+  UserReposQuery,
+  USER_REPOS_QUERY,
+  type UserReposQueryResult,
+  type UserReposVariables,
+} from "./queries/user-repos";
+export {
+  UserStarredReposQuery,
+  USER_STARRED_REPOS_QUERY,
+  type UserStarredReposQueryResult,
+  type UserStarredReposVariables,
+} from "./queries/user-starred";
+export {
+  UserFollowersQuery,
+  UserFollowingQuery,
+  USER_FOLLOWERS_QUERY,
+  USER_FOLLOWING_QUERY,
+  type UserFollowersQueryResult,
+  type UserFollowingQueryResult,
+} from "./queries/user-social";
+export {
+  SearchQuery,
+  SEARCH_QUERY,
+  type SearchQueryResult,
+  type SearchVariables,
+} from "./queries/search";
+export {
+  FollowUserMutation,
+  UnfollowUserMutation,
+  FOLLOW_USER_MUTATION,
+  UNFOLLOW_USER_MUTATION,
+} from "./queries/user-mutations";
+export {
+  AddStarMutation,
+  RemoveStarMutation,
+  ADD_STAR_MUTATION,
+  REMOVE_STAR_MUTATION,
+} from "./queries/repo-mutations";
 export { graphql, readFragment } from "./graphql";
 export type { FragmentOf, ResultOf, VariablesOf } from "./graphql";
 export {
