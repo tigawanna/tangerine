@@ -1,5 +1,6 @@
 import { LoadMoreButton } from "@/lib/relay/LoadMoreButton";
 import type { layoutUserPageLoaderQuery } from "@/routes/_dashboard/$user/__generated__/layoutUserPageLoaderQuery.graphql";
+import { FollowBackAllButton } from "@/routes/_dashboard/$user/-components/user/FollowBackAllButton";
 import { defaultUserSearch, resolveUserSearch } from "@/routes/_dashboard/$user/layout";
 import { getRouteApi, Link } from "@tanstack/react-router";
 import { graphql, useFragment, usePaginationFragment } from "react-relay";
@@ -9,6 +10,9 @@ import type { UserCard_user$key } from "./__generated__/UserCard_user.graphql";
 
 const userRoute = getRouteApi("/_dashboard/$user/");
 
+/** Matches `loadNext(12)` / fragment default — one “Follow back all” per loaded page. */
+const FOLLOWERS_BATCH_SIZE = 12;
+
 interface UserFollowersListProps {
   followersKey: UserFollowersFragment$key;
 }
@@ -16,6 +20,7 @@ interface UserFollowersListProps {
 /**
  * Paginated followers list. `peopleQ` filters loaded cards client-side
  * (GitHub's followers connection has no search/order args).
+ * Each loaded page of 12 gets a “Follow back all” for eligible users in that batch.
  */
 export function UserFollowersList({ followersKey }: UserFollowersListProps) {
   const { peopleQ } = resolveUserSearch(userRoute.useSearch());
@@ -25,14 +30,12 @@ export function UserFollowersList({ followersKey }: UserFollowersListProps) {
   );
   const edges = frag.data.followers.edges ?? [];
   const q = peopleQ.trim().toLowerCase();
-  const visible = q
-    ? edges.filter((edge) => {
-        const node = edge?.node;
-        if (!node) return false;
-        const hay = `${node.login} ${node.name ?? ""}`.toLowerCase();
-        return hay.includes(q);
-      })
-    : edges;
+
+  function matchesSearch(node: { login: string; name?: string | null }): boolean {
+    if (!q) return true;
+    const hay = `${node.login} ${node.name ?? ""}`.toLowerCase();
+    return hay.includes(q);
+  }
 
   if (edges.length === 0) {
     return (
@@ -45,7 +48,17 @@ export function UserFollowersList({ followersKey }: UserFollowersListProps) {
     );
   }
 
-  if (visible.length === 0) {
+  const batches: NonNullable<(typeof edges)[number]>[][] = [];
+  for (let i = 0; i < edges.length; i += FOLLOWERS_BATCH_SIZE) {
+    const slice = edges.slice(i, i + FOLLOWERS_BATCH_SIZE).filter((edge) => edge != null);
+    batches.push(slice);
+  }
+
+  const anyVisible = batches.some((batch) =>
+    batch.some((edge) => edge.node && matchesSearch(edge.node)),
+  );
+
+  if (!anyVisible) {
     return (
       <div
         className="border-base-300 text-base-content/70 space-y-4 rounded-xl border border-dashed p-8 text-sm"
@@ -61,17 +74,42 @@ export function UserFollowersList({ followersKey }: UserFollowersListProps) {
   }
 
   return (
-    <div className="space-y-4" data-test="user-followers">
-      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((edge) => {
-          if (!edge?.node) return null;
-          return (
-            <li key={edge.cursor}>
-              <UserCard user={edge.node} />
-            </li>
-          );
-        })}
-      </ul>
+    <div className="space-y-8" data-test="user-followers">
+      {batches.map((batch, batchIndex) => {
+        const visible = batch.filter((edge) => edge.node && matchesSearch(edge.node));
+        if (visible.length === 0) return null;
+
+        const followBackTargets = visible.flatMap((edge) => {
+          const node = edge.node;
+          if (!node) return [];
+          if (node.isViewer || node.viewerIsFollowing || !node.isFollowingViewer) return [];
+          return [{ id: node.id, login: node.login }];
+        });
+
+        return (
+          <section
+            key={`followers-batch-${batchIndex}`}
+            className="space-y-3"
+            data-test={`user-followers-batch-${batchIndex}`}
+          >
+            {followBackTargets.length > 0 ? (
+              <div className="flex justify-end">
+                <FollowBackAllButton targets={followBackTargets} batchIndex={batchIndex} />
+              </div>
+            ) : null}
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {visible.map((edge) => {
+                if (!edge.node) return null;
+                return (
+                  <li key={edge.cursor}>
+                    <UserCard user={edge.node} />
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })}
       <LoadMoreButton frag={frag} />
     </div>
   );
@@ -118,8 +156,12 @@ const FollowersFragment = graphql`
       edges {
         cursor
         node {
+          id
           login
           name
+          isViewer
+          isFollowingViewer
+          viewerIsFollowing
           ...UserCard_user
         }
       }

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<c99c90a565b810b6506368cb3daf7419>>
+ * @generated SignedSource<<9917c9d21d9eb62d3a87897e50a1bba3>>
  * @lightSyntaxTransform
  */
 
@@ -152,6 +152,7 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
+                          (v4/*:: as any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -164,21 +165,6 @@ return {
                             "args": null,
                             "kind": "ScalarField",
                             "name": "name",
-                            "storageKey": null
-                          },
-                          (v4/*:: as any*/),
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "bio",
-                            "storageKey": null
-                          },
-                          {
-                            "alias": null,
-                            "args": null,
-                            "kind": "ScalarField",
-                            "name": "avatarUrl",
                             "storageKey": null
                           },
                           {
@@ -200,6 +186,20 @@ return {
                             "args": null,
                             "kind": "ScalarField",
                             "name": "viewerIsFollowing",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "bio",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "avatarUrl",
                             "storageKey": null
                           },
                           (v3/*:: as any*/)
@@ -277,16 +277,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "f81527661c6f37f9c414beafec0e142e",
+    "cacheID": "5faa94eb56d6d2108100c21b1f143938",
     "id": null,
     "metadata": {},
     "name": "FollowersPaginationQuery",
     "operationKind": "query",
-    "text": "query FollowersPaginationQuery(\n  $after: String\n  $first: Int = 12\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...UserFollowersFragment_2HEEH6\n    id\n  }\n}\n\nfragment FollowUserButton_user on User {\n  id\n  login\n  isViewer\n  isFollowingViewer\n  viewerIsFollowing\n}\n\nfragment UserCard_user on User {\n  id\n  name\n  login\n  bio\n  avatarUrl\n  ...FollowUserButton_user\n}\n\nfragment UserFollowersFragment_2HEEH6 on User {\n  followers(first: $first, after: $after) {\n    edges {\n      cursor\n      node {\n        login\n        name\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n"
+    "text": "query FollowersPaginationQuery(\n  $after: String\n  $first: Int = 12\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...UserFollowersFragment_2HEEH6\n    id\n  }\n}\n\nfragment FollowUserButton_user on User {\n  id\n  login\n  isViewer\n  isFollowingViewer\n  viewerIsFollowing\n}\n\nfragment UserCard_user on User {\n  id\n  name\n  login\n  bio\n  avatarUrl\n  ...FollowUserButton_user\n}\n\nfragment UserFollowersFragment_2HEEH6 on User {\n  followers(first: $first, after: $after) {\n    edges {\n      cursor\n      node {\n        id\n        login\n        name\n        isViewer\n        isFollowingViewer\n        viewerIsFollowing\n        ...UserCard_user\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5ab8ff3f49b332558204db8a09bbc52a";
+(node as any).hash = "191c83af2596024b21246a936dee661f";
 
 export default node;

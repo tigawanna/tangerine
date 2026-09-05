@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { GithubMissingScopeDialog } from "@/routes/_dashboard/-components/GithubMissingScopeDialog";
+import {
+  isMissingFollowScope,
+  setViewerIsFollowing,
+} from "@/routes/_dashboard/$user/-components/user/follow-user-shared";
 import { useState } from "react";
 import { graphql, useFragment, useMutation } from "react-relay";
 import type { FollowUserButton_user$key } from "./__generated__/FollowUserButton_user.graphql";
@@ -14,29 +18,12 @@ interface FollowUserButtonProps {
 }
 
 /**
- * True when a Relay/GitHub GraphQL error is a missing `user:follow` scope.
- */
-function isMissingFollowScope(
-  errors: ReadonlyArray<{ message: string; type?: string }> | null | undefined,
-): boolean {
-  if (!errors?.length) return false;
-  return errors.some((error) => {
-    const message = error.message;
-    return (
-      message.includes("user:follow") ||
-      message.includes("INSUFFICIENT_SCOPES") ||
-      error.type === "INSUFFICIENT_SCOPES"
-    );
-  });
-}
-
-/**
  * Follow / Unfollow / Follow back control for a GitHub user.
  * Hidden when the target is the signed-in viewer.
+ * Updates Relay `viewerIsFollowing` so bulk follow-back stays in sync.
  */
 export function FollowUserButton({ user, size = "sm", className }: FollowUserButtonProps) {
   const data = useFragment(FollowUserButtonFragment, user);
-  const [following, setFollowing] = useState(data.viewerIsFollowing);
   const [scopeDialogOpen, setScopeDialogOpen] = useState(false);
   const [followMutation, isFollowPending] = useMutation<FollowUserButtonfollowMutation>(FOLLOW_USER);
   const [unfollowMutation, isUnfollowPending] =
@@ -44,18 +31,9 @@ export function FollowUserButton({ user, size = "sm", className }: FollowUserBut
 
   if (data.isViewer) return null;
 
+  const following = data.viewerIsFollowing;
   const pending = isFollowPending || isUnfollowPending;
   const label = following ? "Unfollow" : data.isFollowingViewer ? "Follow back" : "Follow";
-
-  function onScopeFailure(
-    previous: boolean,
-    errors: ReadonlyArray<{ message: string; type?: string }> | null | undefined,
-  ) {
-    if (!isMissingFollowScope(errors)) return false;
-    setFollowing(previous);
-    setScopeDialogOpen(true);
-    return true;
-  }
 
   return (
     <>
@@ -69,28 +47,37 @@ export function FollowUserButton({ user, size = "sm", className }: FollowUserBut
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          const previous = following;
           if (following) {
-            setFollowing(false);
             unfollowMutation({
               variables: { input: { userId: data.id } },
+              optimisticUpdater: (store) => {
+                setViewerIsFollowing(store, data.id, false);
+              },
+              updater: (store) => {
+                setViewerIsFollowing(store, data.id, false);
+              },
               onCompleted: (_response, errors) => {
-                onScopeFailure(previous, errors);
+                if (isMissingFollowScope(errors)) setScopeDialogOpen(true);
               },
               onError: (error) => {
-                onScopeFailure(previous, [error]);
+                if (isMissingFollowScope([error])) setScopeDialogOpen(true);
               },
             });
             return;
           }
-          setFollowing(true);
           followMutation({
             variables: { input: { userId: data.id } },
+            optimisticUpdater: (store) => {
+              setViewerIsFollowing(store, data.id, true);
+            },
+            updater: (store) => {
+              setViewerIsFollowing(store, data.id, true);
+            },
             onCompleted: (_response, errors) => {
-              onScopeFailure(previous, errors);
+              if (isMissingFollowScope(errors)) setScopeDialogOpen(true);
             },
             onError: (error) => {
-              onScopeFailure(previous, [error]);
+              if (isMissingFollowScope([error])) setScopeDialogOpen(true);
             },
           });
         }}

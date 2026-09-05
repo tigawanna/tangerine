@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<1eeff8fd608fbd9625fd22e8903eeff8>>
+ * @generated SignedSource<<6bbd945f2f4a08187ed5cd5a77a37d32>>
  * @lightSyntaxTransform
  */
 
@@ -14,8 +14,12 @@ export type UserFollowersFragment$data = {
     readonly edges: ReadonlyArray<{
       readonly cursor: string;
       readonly node: {
+        readonly id: string;
+        readonly isFollowingViewer: boolean;
+        readonly isViewer: boolean;
         readonly login: string;
         readonly name: string | null | undefined;
+        readonly viewerIsFollowing: boolean;
         readonly " $fragmentSpreads": FragmentRefs<"UserCard_user">;
       } | null | undefined;
     } | null | undefined> | null | undefined;
@@ -40,7 +44,14 @@ import FollowersPaginationQuery_graphql from './FollowersPaginationQuery.graphql
 const node: ReaderFragment = (function(){
 var v0 = [
   "followers"
-];
+],
+v1 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+};
 return {
   "argumentDefinitions": [
     {
@@ -116,6 +127,7 @@ return {
               "name": "node",
               "plural": false,
               "selections": [
+                (v1/*:: as any*/),
                 {
                   "alias": null,
                   "args": null,
@@ -128,6 +140,27 @@ return {
                   "args": null,
                   "kind": "ScalarField",
                   "name": "name",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "isViewer",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "isFollowingViewer",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "viewerIsFollowing",
                   "storageKey": null
                 },
                 {
@@ -197,19 +230,13 @@ return {
       ],
       "storageKey": null
     },
-    {
-      "alias": null,
-      "args": null,
-      "kind": "ScalarField",
-      "name": "id",
-      "storageKey": null
-    }
+    (v1/*:: as any*/)
   ],
   "type": "User",
   "abstractKey": null
 };
 })();
 
-(node as any).hash = "5ab8ff3f49b332558204db8a09bbc52a";
+(node as any).hash = "191c83af2596024b21246a936dee661f";
 
 export default node;
