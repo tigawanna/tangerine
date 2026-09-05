@@ -30,6 +30,7 @@ export function DashboardSidebarHeader({ githubLogin }: DashboardSidebarHeaderPr
               to="/$user"
               params={{ user: githubLogin }}
               search={defaultUserSearch}
+              replace={false}
               className="hover:bg-primary/10 flex w-full justify-center"
             >
               <HeaderBrand expanded={state === "expanded" || isMobile} />

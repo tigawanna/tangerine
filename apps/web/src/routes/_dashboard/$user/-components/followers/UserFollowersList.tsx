@@ -1,6 +1,6 @@
 import { LoadMoreButton } from "@/lib/relay/LoadMoreButton";
 import type { layoutUserPageLoaderQuery } from "@/routes/_dashboard/$user/__generated__/layoutUserPageLoaderQuery.graphql";
-import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
+import { defaultUserSearch, resolveUserSearch } from "@/routes/_dashboard/$user/layout";
 import { getRouteApi, Link } from "@tanstack/react-router";
 import { graphql, useFragment, usePaginationFragment } from "react-relay";
 import type { UserFollowersFragment$key } from "./__generated__/UserFollowersFragment.graphql";
@@ -17,7 +17,7 @@ interface UserFollowersListProps {
  * (GitHub's followers connection has no search/order args).
  */
 export function UserFollowersList({ followersKey }: UserFollowersListProps) {
-  const { peopleQ } = userRoute.useSearch();
+  const { peopleQ } = resolveUserSearch(userRoute.useSearch());
   const frag = usePaginationFragment<layoutUserPageLoaderQuery, UserFollowersFragment$key>(
     FollowersFragment,
     followersKey,
@@ -84,6 +84,7 @@ function UserCard({ user }: { user: UserCard_user$key }) {
       to="/$user"
       params={{ user: data.login }}
       search={defaultUserSearch}
+      replace={false}
       className="border-base-300 bg-base-100 hover:border-base-content/20 flex items-center gap-3 rounded-xl border p-3 transition-colors"
       data-test={`user-card-${data.login}`}
     >

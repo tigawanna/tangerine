@@ -3,7 +3,9 @@ import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
 import { Star, User, Users } from "lucide-react";
 
 /**
- * Sidebar links scoped to the active `/$user` login (tabs live on the profile page).
+ * Sidebar links for the profile in the URL.
+ * `replace: true` so tab switches don’t stack history — Back leaves the profile
+ * in one step (username / home navigations still push).
  */
 export function dashboardPrimaryRoutes(user: string): SidebarItem[] {
   const params = { user };
@@ -13,6 +15,7 @@ export function dashboardPrimaryRoutes(user: string): SidebarItem[] {
       href: "/$user",
       params,
       search: { ...defaultUserSearch, tab: "repos" },
+      replace: true,
       icon: User,
     },
     {
@@ -20,6 +23,7 @@ export function dashboardPrimaryRoutes(user: string): SidebarItem[] {
       href: "/$user",
       params,
       search: { ...defaultUserSearch, tab: "starred" },
+      replace: true,
       icon: Star,
     },
     {
@@ -27,6 +31,7 @@ export function dashboardPrimaryRoutes(user: string): SidebarItem[] {
       href: "/$user",
       params,
       search: { ...defaultUserSearch, tab: "followers" },
+      replace: true,
       icon: Users,
     },
   ];

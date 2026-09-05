@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   directionOptions,
   repositoryOrderOptions,
+  resolveUserSearch,
 } from "@/routes/_dashboard/$user/layout";
 import { getRouteApi } from "@tanstack/react-router";
 import { type ReactNode, startTransition } from "react";
@@ -38,13 +39,13 @@ export function TabFilterBar({
 }
 
 /**
- * Sort field + direction for the Repos tab (updates `$user` search → Relay reload).
+ * Sort field + direction for the Repos tab.
  */
 export function RepoOrderSelect() {
-  const { orderBy } = userRoute.useSearch();
+  const search = resolveUserSearch(userRoute.useSearch());
   const navigate = userRoute.useNavigate();
-  const field = orderBy.field;
-  const direction = orderBy.direction;
+  const field = search.orderField;
+  const direction = search.orderDir;
 
   return (
     <div className="flex items-center gap-2" data-test="repo-order-filters">
@@ -55,10 +56,7 @@ export function RepoOrderSelect() {
             void navigate({
               search: (prev) => ({
                 ...prev,
-                orderBy: {
-                  field: value as (typeof repositoryOrderOptions)[number],
-                  direction,
-                },
+                orderField: value as (typeof repositoryOrderOptions)[number],
               }),
               replace: true,
             });
@@ -83,10 +81,7 @@ export function RepoOrderSelect() {
             void navigate({
               search: (prev) => ({
                 ...prev,
-                orderBy: {
-                  field,
-                  direction: value as (typeof directionOptions)[number],
-                },
+                orderDir: value as (typeof directionOptions)[number],
               }),
               replace: true,
             });
@@ -112,7 +107,7 @@ export function RepoOrderSelect() {
  * Toggle forks vs sources for the Repos tab.
  */
 export function RepoIsForkSwitch() {
-  const { isFork } = userRoute.useSearch();
+  const { isFork } = resolveUserSearch(userRoute.useSearch());
   const navigate = userRoute.useNavigate();
 
   return (
@@ -140,22 +135,19 @@ export function RepoIsForkSwitch() {
  * Starred-at direction (GitHub only exposes `STARRED_AT`).
  */
 export function StarOrderSelect() {
-  const { starOrder } = userRoute.useSearch();
+  const { starDir } = resolveUserSearch(userRoute.useSearch());
   const navigate = userRoute.useNavigate();
 
   return (
     <div className="flex items-center gap-2" data-test="star-order-filters">
       <Select
-        value={starOrder.direction}
+        value={starDir}
         onValueChange={(value) => {
           startTransition(() => {
             void navigate({
               search: (prev) => ({
                 ...prev,
-                starOrder: {
-                  field: "STARRED_AT",
-                  direction: value as (typeof directionOptions)[number],
-                },
+                starDir: value as (typeof directionOptions)[number],
               }),
               replace: true,
             });
@@ -178,7 +170,7 @@ export function StarOrderSelect() {
  * Limit starred list to repos owned by the signed-in viewer.
  */
 export function StarOwnedByViewerSwitch() {
-  const { ownedByViewer } = userRoute.useSearch();
+  const { ownedByViewer } = resolveUserSearch(userRoute.useSearch());
   const navigate = userRoute.useNavigate();
 
   return (
@@ -203,10 +195,10 @@ export function StarOwnedByViewerSwitch() {
 }
 
 /**
- * Client-side name/login filter for followers / following (API has no order/search).
+ * Client-side name/login filter for followers / following.
  */
 export function PeopleSearchInput({ placeholder }: { placeholder: string }) {
-  const { peopleQ } = userRoute.useSearch();
+  const { peopleQ } = resolveUserSearch(userRoute.useSearch());
   const navigate = userRoute.useNavigate();
 
   return (

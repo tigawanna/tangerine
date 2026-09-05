@@ -12,7 +12,7 @@ import {
 import { UserStarredRepos } from "../starred/UserStarredRepos";
 import { UserFollowersList } from "../followers/UserFollowersList";
 import { UserFollowingList } from "../following/UserFollowingList";
-import { userQuery, userTabOptions } from "../../layout";
+import { userQuery, userTabOptions, resolveUserSearch } from "../../layout";
 import type { layoutUserPageLoaderQuery } from "../../__generated__/layoutUserPageLoaderQuery.graphql";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRouteApi } from "@tanstack/react-router";
@@ -29,7 +29,7 @@ type ProfileTab = (typeof userTabOptions)[number];
  */
 export function UserPage() {
   const navigate = userRoute.useNavigate();
-  const { tab } = userRoute.useSearch();
+  const { tab } = resolveUserSearch(userRoute.useSearch());
   const query = useOwnerQuery();
   const user = query.user;
   const owner = query.repositoryOwner;

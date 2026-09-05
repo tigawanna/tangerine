@@ -7,7 +7,6 @@ export function RouterPendingComponent() {
     <RouteStatusShell
       data-test="router-pending"
       busy
-      eyebrow="Loading"
       visual={<BrandLoadingMark />}
       title="Just a moment"
       description="Pulling this page together."

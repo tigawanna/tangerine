@@ -1,5 +1,6 @@
 import { LoadMoreButton } from "@/lib/relay/LoadMoreButton";
 import type { layoutUserPageLoaderQuery } from "@/routes/_dashboard/$user/__generated__/layoutUserPageLoaderQuery.graphql";
+import { resolveUserSearch } from "@/routes/_dashboard/$user/layout";
 import { getRouteApi } from "@tanstack/react-router";
 import { graphql, usePaginationFragment } from "react-relay";
 import { UserCard } from "../followers/UserFollowersList";
@@ -16,7 +17,7 @@ interface UserFollowingListProps {
  * (GitHub's following connection has no search/order args).
  */
 export function UserFollowingList({ followingKey }: UserFollowingListProps) {
-  const { peopleQ } = userRoute.useSearch();
+  const { peopleQ } = resolveUserSearch(userRoute.useSearch());
   const frag = usePaginationFragment<layoutUserPageLoaderQuery, UserFollowingFragment$key>(
     FollowingFragment,
     followingKey,

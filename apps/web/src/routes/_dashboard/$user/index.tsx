@@ -2,16 +2,22 @@ import { createFileRoute } from "@tanstack/react-router";
 import { loadQuery } from "react-relay";
 import type { layoutUserPageLoaderQuery } from "./__generated__/layoutUserPageLoaderQuery.graphql";
 import { UserPage } from "./-components/user/UserPage";
-import { userQuery, userSearchSchema } from "./layout";
+import { resolveUserSearch, userQuery, userSearchSchema } from "./layout";
 
 /**
- * Profile hub — owns tab/filter search + Relay preload (not the `$user` layout),
- * so nested routes like repo detail stay free of profile search params.
+ * Profile hub — owns tab/filter search + Relay preload.
  */
 export const Route = createFileRoute("/_dashboard/$user/")({
   validateSearch: (search) => userSearchSchema.parse(search),
-  loaderDeps({ search: { isFork, orderBy, starOrder, ownedByViewer } }) {
-    return { isFork, orderBy, starOrder, ownedByViewer };
+  loaderDeps({ search }) {
+    const resolved = resolveUserSearch(search);
+    return {
+      isFork: resolved.isFork,
+      ownedByViewer: resolved.ownedByViewer,
+      orderField: resolved.orderField,
+      orderDir: resolved.orderDir,
+      starDir: resolved.starDir,
+    };
   },
   loader({ context, params, deps }) {
     return loadQuery<layoutUserPageLoaderQuery>(
@@ -22,12 +28,12 @@ export const Route = createFileRoute("/_dashboard/$user/")({
         isFork: deps.isFork,
         ownedByViewer: deps.ownedByViewer,
         orderBy: {
-          field: deps.orderBy.field,
-          direction: deps.orderBy.direction,
+          field: deps.orderField,
+          direction: deps.orderDir,
         },
         starOrder: {
-          field: deps.starOrder.field,
-          direction: deps.starOrder.direction,
+          field: "STARRED_AT",
+          direction: deps.starDir,
         },
       },
       { fetchPolicy: "store-or-network" },

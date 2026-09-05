@@ -23,17 +23,6 @@ export function RouterErrorComponent({ error, reset }: RouterErrorComponentProps
   return (
     <RouteStatusShell
       data-test="router-error"
-      eyebrow="Something went wrong"
-      visual={
-        <span
-          aria-hidden
-          className="bg-landing-surface-raised border-landing-border inline-flex size-20 items-center justify-center rounded-2xl border"
-        >
-          <span className="landing-display text-landing-ember text-2xl font-bold tracking-tight">
-            !
-          </span>
-        </span>
-      }
       title={<>Something failed</>}
       description="This page hit a snag on our end. Give it another moment, or head back home while we sort things out."
       actions={

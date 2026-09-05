@@ -11,7 +11,6 @@ export const repositoryOrderOptions = [
 ] as const;
 export const starOrderOptions = ["STARRED_AT"] as const;
 export const directionOptions = ["ASC", "DESC"] as const;
-/** Profile tabs — `members` reserved for orgs when `read:org` is available. */
 export const userTabOptions = [
   "repos",
   "starred",
@@ -20,39 +19,61 @@ export const userTabOptions = [
   "members",
 ] as const;
 
+/**
+ * Coerce URL string booleans. Bare `z.boolean()` rejects `"false"` from the query
+ * string and can send TanStack into a validateSearch redirect loop.
+ */
+const searchBoolean = z.preprocess((value) => {
+  if (value === "true" || value === true) return true;
+  if (value === "false" || value === false) return false;
+  return value;
+}, z.boolean().optional());
+
+/**
+ * Flat, optional search only — no nested objects, no Zod `.default()`.
+ * Defaults are applied in `resolveUserSearch` so validateSearch does not rewrite
+ * the URL (rewrites → "Too many redirects" when opening another profile).
+ */
 export const userSearchSchema = z.object({
-  tab: z.enum(userTabOptions).default("repos"),
-  isFork: z.boolean().default(false),
-  ownedByViewer: z.boolean().default(false),
-  peopleQ: z.string().default(""),
-  orderBy: z
-    .object({
-      field: z.enum(repositoryOrderOptions).default("PUSHED_AT"),
-      direction: z.enum(directionOptions).default("DESC"),
-    })
-    .default({ field: "PUSHED_AT", direction: "DESC" }),
-  starOrder: z
-    .object({
-      field: z.enum(starOrderOptions).default("STARRED_AT"),
-      direction: z.enum(directionOptions).default("DESC"),
-    })
-    .default({ field: "STARRED_AT", direction: "DESC" }),
+  tab: z.enum(userTabOptions).optional(),
+  isFork: searchBoolean,
+  ownedByViewer: searchBoolean,
+  peopleQ: z.string().optional(),
+  orderField: z.enum(repositoryOrderOptions).optional(),
+  orderDir: z.enum(directionOptions).optional(),
+  starDir: z.enum(directionOptions).optional(),
 });
 
 export type UserSearch = z.infer<typeof userSearchSchema>;
 
-export const defaultUserSearch = {
-  tab: "repos",
-  isFork: false,
-  ownedByViewer: false,
-  peopleQ: "",
-  orderBy: { field: "PUSHED_AT", direction: "DESC" },
-  starOrder: { field: "STARRED_AT", direction: "DESC" },
-} as const satisfies UserSearch;
+export type ResolvedUserSearch = {
+  tab: (typeof userTabOptions)[number];
+  isFork: boolean;
+  ownedByViewer: boolean;
+  peopleQ: string;
+  orderField: (typeof repositoryOrderOptions)[number];
+  orderDir: (typeof directionOptions)[number];
+  starDir: (typeof directionOptions)[number];
+};
+
+/** Apply defaults in app code — not in validateSearch. */
+export function resolveUserSearch(search: UserSearch): ResolvedUserSearch {
+  return {
+    tab: search.tab ?? "repos",
+    isFork: search.isFork ?? false,
+    ownedByViewer: search.ownedByViewer ?? false,
+    peopleQ: search.peopleQ ?? "",
+    orderField: search.orderField ?? "PUSHED_AT",
+    orderDir: search.orderDir ?? "DESC",
+    starDir: search.starDir ?? "DESC",
+  };
+}
+
+/** Minimal search for profile Links (avoid stuffing every default into the URL). */
+export const defaultUserSearch = { tab: "repos" } as const satisfies UserSearch;
 
 /**
  * `$user` layout — auth gate + outlet only.
- * Profile search + Relay preload live on the index route.
  */
 export const Route = createFileRoute("/_dashboard/$user")({
   beforeLoad: ({ params, context, location }) => {
@@ -75,14 +96,7 @@ function UserLayout() {
 }
 
 /**
- * Profile hub query.
- *
- * - `user` — people profiles (starred / followers / following).
- * - `repositoryOwner` — shared repos + public identity for **Users and Orgs**.
- *
- * Avoid `organization { … }`: those fields require `read:org` and GitHub
- * fails the *entire* operation when the token lacks that scope (even for
- * public orgs like firecrawl).
+ * Profile hub query — `user` + `repositoryOwner` (public orgs without `read:org`).
  */
 export const userQuery = graphql`
   query layoutUserPageLoaderQuery(
