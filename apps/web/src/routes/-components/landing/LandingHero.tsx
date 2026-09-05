@@ -20,7 +20,7 @@ export function LandingHero() {
         <div className="landing-hero-enter landing-hero-enter-delay-2 mt-8">
           <Link
             to="/auth"
-            search={{ returnTo: "/repos" }}
+            search={{ returnTo: "/viewer" }}
             className="landing-cta-primary"
             data-test="landing-hero-get-started"
           >

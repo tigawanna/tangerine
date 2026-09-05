@@ -19,7 +19,7 @@ export function DashboardSidebarHeader() {
           onClick={() => setOpenMobile(false)}
           data-test="dashboard-sidebar-home"
         >
-          <Link to="/" className="hover:bg-primary/10 flex w-full justify-center">
+          <Link to="/viewer" className="hover:bg-primary/10 flex w-full justify-center">
             {/*
               SidebarMenuButton forces [&>svg]:size-4 on direct SVG children.
               Wrap like the shadcn Avatar/team-switcher pattern so size sticks.

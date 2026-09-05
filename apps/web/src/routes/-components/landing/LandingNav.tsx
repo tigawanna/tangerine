@@ -24,7 +24,7 @@ export function LandingNav() {
           />
           <Link
             to="/auth"
-            search={{ returnTo: "/repos" }}
+            search={{ returnTo: "/viewer" }}
             className="landing-cta-primary landing-cta-compact"
             data-test="landing-nav-get-started"
           >

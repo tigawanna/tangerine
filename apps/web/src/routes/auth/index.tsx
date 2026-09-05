@@ -5,7 +5,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 
 const authSearchSchema = z.object({
-  returnTo: z.string().optional().default("/repos"),
+  returnTo: z.string().optional().default("/viewer"),
 });
 
 export const Route = createFileRoute("/auth/")({

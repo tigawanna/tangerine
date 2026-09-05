@@ -39,7 +39,7 @@ export function LandingClosingCta() {
           <div className="mt-8">
             <Link
               to="/auth"
-              search={{ returnTo: "/repos" }}
+              search={{ returnTo: "/viewer" }}
               className="landing-cta-primary"
               data-test="landing-closing-get-started"
             >
