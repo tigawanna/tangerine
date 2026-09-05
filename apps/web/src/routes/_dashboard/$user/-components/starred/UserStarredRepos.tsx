@@ -10,6 +10,7 @@ interface UserStarredReposProps {
 
 /**
  * Paginated starred repositories for the profile Starred tab.
+ * Sort / owned-by-viewer filters live on `UserPage` (outside Suspense).
  */
 export function UserStarredRepos({ starredReposKey }: UserStarredReposProps) {
   const frag = usePaginationFragment<
@@ -20,8 +21,11 @@ export function UserStarredRepos({ starredReposKey }: UserStarredReposProps) {
 
   if (edges.length === 0) {
     return (
-      <div className="border-base-300 text-base-content/70 rounded-xl border border-dashed p-8 text-sm">
-        No starred repositories yet.
+      <div
+        className="border-base-300 text-base-content/70 rounded-xl border border-dashed p-8 text-sm"
+        data-test="user-starred-repos"
+      >
+        No starred repositories match these filters.
       </div>
     );
   }
@@ -52,13 +56,19 @@ const UserStarredReposFragment = graphql`
       type: "StarOrder"
       defaultValue: { field: STARRED_AT, direction: DESC }
     }
+    ownedByViewer: { type: "Boolean", defaultValue: false }
   )
   @refetchable(queryName: "StarredRepositoriesPaginationQuery") {
     starredRepositories(
       first: $firstStarredRepos
       after: $afterStarredRepo
       orderBy: $orderByStarredRepos
-    ) @connection(key: "UserStarredRepos_starredRepositories") {
+      ownedByViewer: $ownedByViewer
+    )
+      @connection(
+        key: "UserStarredRepos_starredRepositories"
+        filters: ["orderBy", "ownedByViewer"]
+      ) {
       totalCount
       edges {
         cursor

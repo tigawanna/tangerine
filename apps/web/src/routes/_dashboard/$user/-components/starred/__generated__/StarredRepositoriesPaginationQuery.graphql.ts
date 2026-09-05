@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<f829e18377b095c5fc5a01dae06be21a>>
+ * @generated SignedSource<<4ee54e92fe9775d40356cc40340d4735>>
  * @lightSyntaxTransform
  */
 
@@ -20,6 +20,7 @@ export type StarredRepositoriesPaginationQuery$variables = {
   firstStarredRepos?: number | null | undefined;
   id: string;
   orderByStarredRepos?: StarOrder | null | undefined;
+  ownedByViewer?: boolean | null | undefined;
 };
 export type StarredRepositoriesPaginationQuery$data = {
   readonly node: {
@@ -55,28 +56,38 @@ v3 = {
   "kind": "LocalArgument",
   "name": "orderByStarredRepos"
 },
-v4 = [
+v4 = {
+  "defaultValue": false,
+  "kind": "LocalArgument",
+  "name": "ownedByViewer"
+},
+v5 = [
   {
     "kind": "Variable",
     "name": "id",
     "variableName": "id"
   }
 ],
-v5 = {
+v6 = {
+  "kind": "Variable",
+  "name": "ownedByViewer",
+  "variableName": "ownedByViewer"
+},
+v7 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v6 = {
+v8 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v7 = [
+v9 = [
   {
     "kind": "Variable",
     "name": "after",
@@ -91,25 +102,26 @@ v7 = [
     "kind": "Variable",
     "name": "orderBy",
     "variableName": "orderByStarredRepos"
-  }
+  },
+  (v6/*:: as any*/)
 ],
-v8 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "name",
   "storageKey": null
 },
-v9 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "url",
   "storageKey": null
 },
-v10 = [
-  (v6/*:: as any*/),
+v12 = [
   (v8/*:: as any*/),
+  (v10/*:: as any*/),
   {
     "alias": null,
     "args": null,
@@ -124,7 +136,8 @@ return {
       (v0/*:: as any*/),
       (v1/*:: as any*/),
       (v2/*:: as any*/),
-      (v3/*:: as any*/)
+      (v3/*:: as any*/),
+      (v4/*:: as any*/)
     ],
     "kind": "Fragment",
     "metadata": null,
@@ -132,7 +145,7 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v4/*:: as any*/),
+        "args": (v5/*:: as any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
@@ -154,7 +167,8 @@ return {
                 "kind": "Variable",
                 "name": "orderByStarredRepos",
                 "variableName": "orderByStarredRepos"
-              }
+              },
+              (v6/*:: as any*/)
             ],
             "kind": "FragmentSpread",
             "name": "UserStarredRepos_repositories"
@@ -172,6 +186,7 @@ return {
       (v0/*:: as any*/),
       (v1/*:: as any*/),
       (v3/*:: as any*/),
+      (v4/*:: as any*/),
       (v2/*:: as any*/)
     ],
     "kind": "Operation",
@@ -179,20 +194,20 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v4/*:: as any*/),
+        "args": (v5/*:: as any*/),
         "concreteType": null,
         "kind": "LinkedField",
         "name": "node",
         "plural": false,
         "selections": [
-          (v5/*:: as any*/),
-          (v6/*:: as any*/),
+          (v7/*:: as any*/),
+          (v8/*:: as any*/),
           {
             "kind": "InlineFragment",
             "selections": [
               {
                 "alias": null,
-                "args": (v7/*:: as any*/),
+                "args": (v9/*:: as any*/),
                 "concreteType": "StarredRepositoryConnection",
                 "kind": "LinkedField",
                 "name": "starredRepositories",
@@ -228,8 +243,8 @@ return {
                         "name": "node",
                         "plural": false,
                         "selections": [
-                          (v6/*:: as any*/),
                           (v8/*:: as any*/),
+                          (v10/*:: as any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -258,7 +273,7 @@ return {
                             "name": "diskUsage",
                             "storageKey": null
                           },
-                          (v9/*:: as any*/),
+                          (v11/*:: as any*/),
                           {
                             "alias": null,
                             "args": null,
@@ -309,7 +324,7 @@ return {
                             "name": "owner",
                             "plural": false,
                             "selections": [
-                              (v5/*:: as any*/),
+                              (v7/*:: as any*/),
                               {
                                 "alias": null,
                                 "args": null,
@@ -317,7 +332,7 @@ return {
                                 "name": "login",
                                 "storageKey": null
                               },
-                              (v9/*:: as any*/),
+                              (v11/*:: as any*/),
                               {
                                 "alias": null,
                                 "args": null,
@@ -325,7 +340,7 @@ return {
                                 "name": "avatarUrl",
                                 "storageKey": null
                               },
-                              (v6/*:: as any*/)
+                              (v8/*:: as any*/)
                             ],
                             "storageKey": null
                           },
@@ -336,7 +351,7 @@ return {
                             "kind": "LinkedField",
                             "name": "primaryLanguage",
                             "plural": false,
-                            "selections": (v10/*:: as any*/),
+                            "selections": (v12/*:: as any*/),
                             "storageKey": null
                           },
                           {
@@ -360,7 +375,7 @@ return {
                                 "kind": "LinkedField",
                                 "name": "nodes",
                                 "plural": true,
-                                "selections": (v10/*:: as any*/),
+                                "selections": (v12/*:: as any*/),
                                 "storageKey": null
                               }
                             ],
@@ -374,12 +389,12 @@ return {
                             "name": "defaultBranchRef",
                             "plural": false,
                             "selections": [
-                              (v8/*:: as any*/),
-                              (v6/*:: as any*/)
+                              (v10/*:: as any*/),
+                              (v8/*:: as any*/)
                             ],
                             "storageKey": null
                           },
-                          (v5/*:: as any*/)
+                          (v7/*:: as any*/)
                         ],
                         "storageKey": null
                       }
@@ -430,9 +445,10 @@ return {
               },
               {
                 "alias": null,
-                "args": (v7/*:: as any*/),
+                "args": (v9/*:: as any*/),
                 "filters": [
-                  "orderBy"
+                  "orderBy",
+                  "ownedByViewer"
                 ],
                 "handle": "connection",
                 "key": "UserStarredRepos_starredRepositories",
@@ -449,16 +465,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "d9c587b8f3fbb49d8be6120ee3b717f7",
+    "cacheID": "999e27d3e7173ff5584e8b9c2555613a",
     "id": null,
     "metadata": {},
     "name": "StarredRepositoriesPaginationQuery",
     "operationKind": "query",
-    "text": "query StarredRepositoriesPaginationQuery(\n  $afterStarredRepo: String\n  $firstStarredRepos: Int = 24\n  $orderByStarredRepos: StarOrder = {field: STARRED_AT, direction: DESC}\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...UserStarredRepos_repositories_30IreX\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserStarredRepos_repositories_30IreX on User {\n  starredRepositories(first: $firstStarredRepos, after: $afterStarredRepo, orderBy: $orderByStarredRepos) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query StarredRepositoriesPaginationQuery(\n  $afterStarredRepo: String\n  $firstStarredRepos: Int = 24\n  $orderByStarredRepos: StarOrder = {field: STARRED_AT, direction: DESC}\n  $ownedByViewer: Boolean = false\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...UserStarredRepos_repositories_3BRI8l\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserStarredRepos_repositories_3BRI8l on User {\n  starredRepositories(first: $firstStarredRepos, after: $afterStarredRepo, orderBy: $orderByStarredRepos, ownedByViewer: $ownedByViewer) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e708489297d9e11aa1159b1f396d44fa";
+(node as any).hash = "64c976f24074688d63e857177fba5f32";
 
 export default node;

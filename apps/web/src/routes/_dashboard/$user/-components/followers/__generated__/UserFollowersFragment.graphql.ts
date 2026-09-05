@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<cc1106560ff5f175b2368c547522f1c3>>
+ * @generated SignedSource<<1eeff8fd608fbd9625fd22e8903eeff8>>
  * @lightSyntaxTransform
  */
 
@@ -14,6 +14,8 @@ export type UserFollowersFragment$data = {
     readonly edges: ReadonlyArray<{
       readonly cursor: string;
       readonly node: {
+        readonly login: string;
+        readonly name: string | null | undefined;
         readonly " $fragmentSpreads": FragmentRefs<"UserCard_user">;
       } | null | undefined;
     } | null | undefined> | null | undefined;
@@ -115,6 +117,20 @@ return {
               "plural": false,
               "selections": [
                 {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "login",
+                  "storageKey": null
+                },
+                {
+                  "alias": null,
+                  "args": null,
+                  "kind": "ScalarField",
+                  "name": "name",
+                  "storageKey": null
+                },
+                {
                   "args": null,
                   "kind": "FragmentSpread",
                   "name": "UserCard_user"
@@ -194,6 +210,6 @@ return {
 };
 })();
 
-(node as any).hash = "4defbe2cee160481ac311d8a0d9957a0";
+(node as any).hash = "5ab8ff3f49b332558204db8a09bbc52a";
 
 export default node;

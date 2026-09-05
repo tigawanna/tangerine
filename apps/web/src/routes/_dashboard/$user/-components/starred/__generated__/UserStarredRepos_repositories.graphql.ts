@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a3d7f0b7762f52990a27bb268390842f>>
+ * @generated SignedSource<<f4302e73b2543a7cca1488b18b0a1785>>
  * @lightSyntaxTransform
  */
 
@@ -66,6 +66,11 @@ return {
       },
       "kind": "LocalArgument",
       "name": "orderByStarredRepos"
+    },
+    {
+      "defaultValue": false,
+      "kind": "LocalArgument",
+      "name": "ownedByViewer"
     }
   ],
   "kind": "Fragment",
@@ -106,6 +111,11 @@ return {
           "kind": "Variable",
           "name": "orderBy",
           "variableName": "orderByStarredRepos"
+        },
+        {
+          "kind": "Variable",
+          "name": "ownedByViewer",
+          "variableName": "ownedByViewer"
         }
       ],
       "concreteType": "StarredRepositoryConnection",
@@ -211,6 +221,6 @@ return {
 };
 })();
 
-(node as any).hash = "e708489297d9e11aa1159b1f396d44fa";
+(node as any).hash = "64c976f24074688d63e857177fba5f32";
 
 export default node;

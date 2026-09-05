@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -12,9 +13,29 @@ import {
   repositoryOrderOptions,
 } from "@/routes/_dashboard/$user/layout";
 import { getRouteApi } from "@tanstack/react-router";
-import { startTransition } from "react";
+import { type ReactNode, startTransition } from "react";
 
 const userRoute = getRouteApi("/_dashboard/$user");
+
+/**
+ * Shared sticky chrome for tab filters (stays outside list Suspense).
+ */
+export function TabFilterBar({
+  children,
+  testId,
+}: {
+  children: ReactNode;
+  testId: string;
+}) {
+  return (
+    <div
+      className="border-base-300 bg-base-200/30 sticky top-0 z-20 flex flex-wrap items-center justify-end gap-3 rounded-xl border px-3 py-2 backdrop-blur-sm"
+      data-test={testId}
+    >
+      {children}
+    </div>
+  );
+}
 
 /**
  * Sort field + direction for the Repos tab (updates `$user` search → Relay reload).
@@ -112,5 +133,97 @@ export function RepoIsForkSwitch() {
         Forks only
       </Label>
     </div>
+  );
+}
+
+/**
+ * Starred-at direction (GitHub only exposes `STARRED_AT`).
+ */
+export function StarOrderSelect() {
+  const { starOrder } = userRoute.useSearch();
+  const navigate = userRoute.useNavigate();
+
+  return (
+    <div className="flex items-center gap-2" data-test="star-order-filters">
+      <Select
+        value={starOrder.direction}
+        onValueChange={(value) => {
+          startTransition(() => {
+            void navigate({
+              search: (prev) => ({
+                ...prev,
+                starOrder: {
+                  field: "STARRED_AT",
+                  direction: value as (typeof directionOptions)[number],
+                },
+              }),
+              replace: true,
+            });
+          });
+        }}
+      >
+        <SelectTrigger className="w-40" size="sm">
+          <SelectValue placeholder="Order" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="DESC">Newest starred</SelectItem>
+          <SelectItem value="ASC">Oldest starred</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+/**
+ * Limit starred list to repos owned by the signed-in viewer.
+ */
+export function StarOwnedByViewerSwitch() {
+  const { ownedByViewer } = userRoute.useSearch();
+  const navigate = userRoute.useNavigate();
+
+  return (
+    <div className="flex items-center gap-2" data-test="star-owned-switch">
+      <Switch
+        id="owned_by_viewer_switch"
+        checked={ownedByViewer}
+        onCheckedChange={(value) => {
+          startTransition(() => {
+            void navigate({
+              search: (prev) => ({ ...prev, ownedByViewer: value }),
+              replace: true,
+            });
+          });
+        }}
+      />
+      <Label htmlFor="owned_by_viewer_switch" className="text-sm">
+        Owned by me
+      </Label>
+    </div>
+  );
+}
+
+/**
+ * Client-side name/login filter for followers / following (API has no order/search).
+ */
+export function PeopleSearchInput({ placeholder }: { placeholder: string }) {
+  const { peopleQ } = userRoute.useSearch();
+  const navigate = userRoute.useNavigate();
+
+  return (
+    <Input
+      value={peopleQ}
+      placeholder={placeholder}
+      className="h-8 max-w-xs"
+      data-test="people-search"
+      onChange={(event) => {
+        const value = event.target.value;
+        startTransition(() => {
+          void navigate({
+            search: (prev) => ({ ...prev, peopleQ: value }),
+            replace: true,
+          });
+        });
+      }}
+    />
   );
 }

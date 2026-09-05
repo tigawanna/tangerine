@@ -18,6 +18,10 @@ export const userTabOptions = ["repos", "starred", "followers", "following"] as 
 const searchparams = z.object({
   tab: z.enum(userTabOptions).default("repos"),
   isFork: z.boolean().default(false),
+  /** Starred tab: only repos owned by the signed-in viewer. */
+  ownedByViewer: z.boolean().default(false),
+  /** Followers / following: client-side name/login filter (API has no search). */
+  peopleQ: z.string().default(""),
   orderBy: z
     .object({
       field: z.enum(repositoryOrderOptions).default("PUSHED_AT"),
@@ -38,14 +42,16 @@ export type UserSearch = z.infer<typeof searchparams>;
 export const defaultUserSearch = {
   tab: "repos",
   isFork: false,
+  ownedByViewer: false,
+  peopleQ: "",
   orderBy: { field: "PUSHED_AT", direction: "DESC" },
   starOrder: { field: "STARRED_AT", direction: "DESC" },
 } as const satisfies UserSearch;
 
 export const Route = createFileRoute("/_dashboard/$user")({
   validateSearch: (search) => searchparams.parse(search),
-  loaderDeps({ search: { isFork, orderBy, starOrder } }) {
-    return { isFork, orderBy, starOrder };
+  loaderDeps({ search: { isFork, orderBy, starOrder, ownedByViewer } }) {
+    return { isFork, orderBy, starOrder, ownedByViewer };
   },
   beforeLoad: ({ params, context, location }) => {
     if (!context.relayEnvironment || !context.githubLogin) {
@@ -66,6 +72,7 @@ export const Route = createFileRoute("/_dashboard/$user")({
       {
         login: params.user,
         isFork: deps.isFork,
+        ownedByViewer: deps.ownedByViewer,
         orderBy: {
           field: deps.orderBy.field,
           direction: deps.orderBy.direction,
@@ -94,13 +101,15 @@ export const userQuery = graphql`
     $isFork: Boolean
     $orderBy: RepositoryOrder
     $starOrder: StarOrder
+    $ownedByViewer: Boolean
   ) {
     user(login: $login) {
       ...UserInfo
       ...UserFollowingFragment
       ...UserFollowersFragment
       ...UserRepos_repositories @arguments(isFork: $isFork, orderBy: $orderBy)
-      ...UserStarredRepos_repositories @arguments(orderByStarredRepos: $starOrder)
+      ...UserStarredRepos_repositories
+        @arguments(orderByStarredRepos: $starOrder, ownedByViewer: $ownedByViewer)
     }
   }
 `;

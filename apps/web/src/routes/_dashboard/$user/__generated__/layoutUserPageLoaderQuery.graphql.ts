@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8df16ceac588f8d5ddb4e0f2439719e6>>
+ * @generated SignedSource<<b50fc4ac107e62eb03c41359eaec9913>>
  * @lightSyntaxTransform
  */
 
@@ -24,6 +24,7 @@ export type layoutUserPageLoaderQuery$variables = {
   isFork?: boolean | null | undefined;
   login: string;
   orderBy?: RepositoryOrder | null | undefined;
+  ownedByViewer?: boolean | null | undefined;
   starOrder?: StarOrder | null | undefined;
 };
 export type layoutUserPageLoaderQuery$data = {
@@ -55,89 +56,99 @@ v2 = {
 v3 = {
   "defaultValue": null,
   "kind": "LocalArgument",
+  "name": "ownedByViewer"
+},
+v4 = {
+  "defaultValue": null,
+  "kind": "LocalArgument",
   "name": "starOrder"
 },
-v4 = [
+v5 = [
   {
     "kind": "Variable",
     "name": "login",
     "variableName": "login"
   }
 ],
-v5 = {
+v6 = {
   "kind": "Variable",
   "name": "isFork",
   "variableName": "isFork"
 },
-v6 = {
+v7 = {
   "kind": "Variable",
   "name": "orderBy",
   "variableName": "orderBy"
 },
-v7 = {
+v8 = {
+  "kind": "Variable",
+  "name": "ownedByViewer",
+  "variableName": "ownedByViewer"
+},
+v9 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "id",
   "storageKey": null
 },
-v8 = {
+v10 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "name",
   "storageKey": null
 },
-v9 = {
+v11 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "login",
   "storageKey": null
 },
-v10 = {
+v12 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "bio",
   "storageKey": null
 },
-v11 = {
+v13 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "avatarUrl",
   "storageKey": null
 },
-v12 = {
+v14 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "url",
   "storageKey": null
 },
-v13 = [
+v15 = [
   {
     "kind": "Literal",
     "name": "first",
     "value": 12
   }
 ],
-v14 = {
+v16 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "cursor",
   "storageKey": null
 },
-v15 = {
+v17 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "__typename",
   "storageKey": null
 },
-v16 = {
+v18 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -176,14 +187,14 @@ v16 = {
   ],
   "storageKey": null
 },
-v17 = {
+v19 = {
   "alias": null,
   "args": null,
   "kind": "ScalarField",
   "name": "totalCount",
   "storageKey": null
 },
-v18 = [
+v20 = [
   {
     "alias": null,
     "args": null,
@@ -192,7 +203,7 @@ v18 = [
     "name": "edges",
     "plural": true,
     "selections": [
-      (v14/*:: as any*/),
+      (v16/*:: as any*/),
       {
         "alias": null,
         "args": null,
@@ -201,34 +212,34 @@ v18 = [
         "name": "node",
         "plural": false,
         "selections": [
-          (v7/*:: as any*/),
-          (v8/*:: as any*/),
-          (v9/*:: as any*/),
-          (v10/*:: as any*/),
           (v11/*:: as any*/),
-          (v15/*:: as any*/)
+          (v10/*:: as any*/),
+          (v9/*:: as any*/),
+          (v12/*:: as any*/),
+          (v13/*:: as any*/),
+          (v17/*:: as any*/)
         ],
         "storageKey": null
       }
     ],
     "storageKey": null
   },
-  (v16/*:: as any*/),
-  (v17/*:: as any*/)
+  (v18/*:: as any*/),
+  (v19/*:: as any*/)
 ],
-v19 = {
+v21 = {
   "kind": "Literal",
   "name": "first",
   "value": 24
 },
-v20 = [
-  (v19/*:: as any*/),
-  (v5/*:: as any*/),
-  (v6/*:: as any*/)
+v22 = [
+  (v21/*:: as any*/),
+  (v6/*:: as any*/),
+  (v7/*:: as any*/)
 ],
-v21 = [
-  (v7/*:: as any*/),
-  (v8/*:: as any*/),
+v23 = [
+  (v9/*:: as any*/),
+  (v10/*:: as any*/),
   {
     "alias": null,
     "args": null,
@@ -237,8 +248,8 @@ v21 = [
     "storageKey": null
   }
 ],
-v22 = [
-  (v14/*:: as any*/),
+v24 = [
+  (v16/*:: as any*/),
   {
     "alias": null,
     "args": null,
@@ -247,8 +258,8 @@ v22 = [
     "name": "node",
     "plural": false,
     "selections": [
-      (v7/*:: as any*/),
-      (v8/*:: as any*/),
+      (v9/*:: as any*/),
+      (v10/*:: as any*/),
       {
         "alias": null,
         "args": null,
@@ -277,7 +288,7 @@ v22 = [
         "name": "diskUsage",
         "storageKey": null
       },
-      (v12/*:: as any*/),
+      (v14/*:: as any*/),
       {
         "alias": null,
         "args": null,
@@ -328,11 +339,11 @@ v22 = [
         "name": "owner",
         "plural": false,
         "selections": [
-          (v15/*:: as any*/),
-          (v9/*:: as any*/),
-          (v12/*:: as any*/),
+          (v17/*:: as any*/),
           (v11/*:: as any*/),
-          (v7/*:: as any*/)
+          (v14/*:: as any*/),
+          (v13/*:: as any*/),
+          (v9/*:: as any*/)
         ],
         "storageKey": null
       },
@@ -343,7 +354,7 @@ v22 = [
         "kind": "LinkedField",
         "name": "primaryLanguage",
         "plural": false,
-        "selections": (v21/*:: as any*/),
+        "selections": (v23/*:: as any*/),
         "storageKey": null
       },
       {
@@ -367,7 +378,7 @@ v22 = [
             "kind": "LinkedField",
             "name": "nodes",
             "plural": true,
-            "selections": (v21/*:: as any*/),
+            "selections": (v23/*:: as any*/),
             "storageKey": null
           }
         ],
@@ -381,23 +392,24 @@ v22 = [
         "name": "defaultBranchRef",
         "plural": false,
         "selections": [
-          (v8/*:: as any*/),
-          (v7/*:: as any*/)
+          (v10/*:: as any*/),
+          (v9/*:: as any*/)
         ],
         "storageKey": null
       },
-      (v15/*:: as any*/)
+      (v17/*:: as any*/)
     ],
     "storageKey": null
   }
 ],
-v23 = [
-  (v19/*:: as any*/),
+v25 = [
+  (v21/*:: as any*/),
   {
     "kind": "Variable",
     "name": "orderBy",
     "variableName": "starOrder"
-  }
+  },
+  (v8/*:: as any*/)
 ];
 return {
   "fragment": {
@@ -405,7 +417,8 @@ return {
       (v0/*:: as any*/),
       (v1/*:: as any*/),
       (v2/*:: as any*/),
-      (v3/*:: as any*/)
+      (v3/*:: as any*/),
+      (v4/*:: as any*/)
     ],
     "kind": "Fragment",
     "metadata": null,
@@ -413,7 +426,7 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v4/*:: as any*/),
+        "args": (v5/*:: as any*/),
         "concreteType": "User",
         "kind": "LinkedField",
         "name": "user",
@@ -436,8 +449,8 @@ return {
           },
           {
             "args": [
-              (v5/*:: as any*/),
-              (v6/*:: as any*/)
+              (v6/*:: as any*/),
+              (v7/*:: as any*/)
             ],
             "kind": "FragmentSpread",
             "name": "UserRepos_repositories"
@@ -448,7 +461,8 @@ return {
                 "kind": "Variable",
                 "name": "orderByStarredRepos",
                 "variableName": "starOrder"
-              }
+              },
+              (v8/*:: as any*/)
             ],
             "kind": "FragmentSpread",
             "name": "UserStarredRepos_repositories"
@@ -466,6 +480,7 @@ return {
       (v1/*:: as any*/),
       (v0/*:: as any*/),
       (v2/*:: as any*/),
+      (v4/*:: as any*/),
       (v3/*:: as any*/)
     ],
     "kind": "Operation",
@@ -473,15 +488,15 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v4/*:: as any*/),
+        "args": (v5/*:: as any*/),
         "concreteType": "User",
         "kind": "LinkedField",
         "name": "user",
         "plural": false,
         "selections": [
-          (v7/*:: as any*/),
-          (v8/*:: as any*/),
           (v9/*:: as any*/),
+          (v10/*:: as any*/),
+          (v11/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -489,8 +504,8 @@ return {
             "name": "email",
             "storageKey": null
           },
-          (v10/*:: as any*/),
-          (v11/*:: as any*/),
+          (v12/*:: as any*/),
+          (v13/*:: as any*/),
           {
             "alias": null,
             "args": null,
@@ -540,20 +555,20 @@ return {
             "name": "location",
             "storageKey": null
           },
-          (v12/*:: as any*/),
+          (v14/*:: as any*/),
           {
             "alias": null,
-            "args": (v13/*:: as any*/),
+            "args": (v15/*:: as any*/),
             "concreteType": "FollowingConnection",
             "kind": "LinkedField",
             "name": "following",
             "plural": false,
-            "selections": (v18/*:: as any*/),
+            "selections": (v20/*:: as any*/),
             "storageKey": "following(first:12)"
           },
           {
             "alias": null,
-            "args": (v13/*:: as any*/),
+            "args": (v15/*:: as any*/),
             "filters": null,
             "handle": "connection",
             "key": "UserFollowingFragment_following",
@@ -562,17 +577,17 @@ return {
           },
           {
             "alias": null,
-            "args": (v13/*:: as any*/),
+            "args": (v15/*:: as any*/),
             "concreteType": "FollowerConnection",
             "kind": "LinkedField",
             "name": "followers",
             "plural": false,
-            "selections": (v18/*:: as any*/),
+            "selections": (v20/*:: as any*/),
             "storageKey": "followers(first:12)"
           },
           {
             "alias": null,
-            "args": (v13/*:: as any*/),
+            "args": (v15/*:: as any*/),
             "filters": null,
             "handle": "connection",
             "key": "UserFollowersFragment_followers",
@@ -581,7 +596,7 @@ return {
           },
           {
             "alias": null,
-            "args": (v20/*:: as any*/),
+            "args": (v22/*:: as any*/),
             "concreteType": "RepositoryConnection",
             "kind": "LinkedField",
             "name": "repositories",
@@ -594,17 +609,17 @@ return {
                 "kind": "LinkedField",
                 "name": "edges",
                 "plural": true,
-                "selections": (v22/*:: as any*/),
+                "selections": (v24/*:: as any*/),
                 "storageKey": null
               },
-              (v16/*:: as any*/),
-              (v17/*:: as any*/)
+              (v18/*:: as any*/),
+              (v19/*:: as any*/)
             ],
             "storageKey": null
           },
           {
             "alias": null,
-            "args": (v20/*:: as any*/),
+            "args": (v22/*:: as any*/),
             "filters": [
               "orderBy",
               "isFork"
@@ -616,13 +631,13 @@ return {
           },
           {
             "alias": null,
-            "args": (v23/*:: as any*/),
+            "args": (v25/*:: as any*/),
             "concreteType": "StarredRepositoryConnection",
             "kind": "LinkedField",
             "name": "starredRepositories",
             "plural": false,
             "selections": [
-              (v17/*:: as any*/),
+              (v19/*:: as any*/),
               {
                 "alias": null,
                 "args": null,
@@ -630,18 +645,19 @@ return {
                 "kind": "LinkedField",
                 "name": "edges",
                 "plural": true,
-                "selections": (v22/*:: as any*/),
+                "selections": (v24/*:: as any*/),
                 "storageKey": null
               },
-              (v16/*:: as any*/)
+              (v18/*:: as any*/)
             ],
             "storageKey": null
           },
           {
             "alias": null,
-            "args": (v23/*:: as any*/),
+            "args": (v25/*:: as any*/),
             "filters": [
-              "orderBy"
+              "orderBy",
+              "ownedByViewer"
             ],
             "handle": "connection",
             "key": "UserStarredRepos_starredRepositories",
@@ -654,16 +670,16 @@ return {
     ]
   },
   "params": {
-    "cacheID": "b9b9b9de981cb4d303486560f916ab11",
+    "cacheID": "c0e86a341a0ef8b6a05aa5ba4d92c25e",
     "id": null,
     "metadata": {},
     "name": "layoutUserPageLoaderQuery",
     "operationKind": "query",
-    "text": "query layoutUserPageLoaderQuery(\n  $login: String!\n  $isFork: Boolean\n  $orderBy: RepositoryOrder\n  $starOrder: StarOrder\n) {\n  user(login: $login) {\n    ...UserInfo\n    ...UserFollowingFragment\n    ...UserFollowersFragment\n    ...UserRepos_repositories_3LFRQw\n    ...UserStarredRepos_repositories_fFbs1\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserCard_user on User {\n  id\n  name\n  login\n  bio\n  avatarUrl\n}\n\nfragment UserFollowersFragment on User {\n  followers(first: 12) {\n    edges {\n      cursor\n      node {\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserFollowingFragment on User {\n  following(first: 12) {\n    edges {\n      cursor\n      node {\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserInfo on User {\n  id\n  name\n  login\n  email\n  bio\n  avatarUrl\n  company\n  twitterUsername\n  createdAt\n  isFollowingViewer\n  viewerIsFollowing\n  isViewer\n  location\n  url\n}\n\nfragment UserRepos_repositories_3LFRQw on User {\n  repositories(first: 24, orderBy: $orderBy, isFork: $isFork) {\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserStarredRepos_repositories_fFbs1 on User {\n  starredRepositories(first: 24, orderBy: $starOrder) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query layoutUserPageLoaderQuery(\n  $login: String!\n  $isFork: Boolean\n  $orderBy: RepositoryOrder\n  $starOrder: StarOrder\n  $ownedByViewer: Boolean\n) {\n  user(login: $login) {\n    ...UserInfo\n    ...UserFollowingFragment\n    ...UserFollowersFragment\n    ...UserRepos_repositories_3LFRQw\n    ...UserStarredRepos_repositories_ts4aV\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserCard_user on User {\n  id\n  name\n  login\n  bio\n  avatarUrl\n}\n\nfragment UserFollowersFragment on User {\n  followers(first: 12) {\n    edges {\n      cursor\n      node {\n        login\n        name\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserFollowingFragment on User {\n  following(first: 12) {\n    edges {\n      cursor\n      node {\n        login\n        name\n        ...UserCard_user\n        id\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserInfo on User {\n  id\n  name\n  login\n  email\n  bio\n  avatarUrl\n  company\n  twitterUsername\n  createdAt\n  isFollowingViewer\n  viewerIsFollowing\n  isViewer\n  location\n  url\n}\n\nfragment UserRepos_repositories_3LFRQw on User {\n  repositories(first: 24, orderBy: $orderBy, isFork: $isFork) {\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n\nfragment UserStarredRepos_repositories_ts4aV on User {\n  starredRepositories(first: 24, orderBy: $starOrder, ownedByViewer: $ownedByViewer) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5e5cf5d09fea5eacf2710839d1ad1ee4";
+(node as any).hash = "5f4b1ecd11f4ca5e9fd19c9ba7c62a29";
 
 export default node;

@@ -1,6 +1,13 @@
 import { UserInfo } from "./UserInfo";
 import { UserRepos } from "../repos/UserRepos";
-import { RepoIsForkSwitch, RepoOrderSelect } from "../repos/RepoFilters";
+import {
+  PeopleSearchInput,
+  RepoIsForkSwitch,
+  RepoOrderSelect,
+  StarOrderSelect,
+  StarOwnedByViewerSwitch,
+  TabFilterBar,
+} from "../repos/RepoFilters";
 import { UserStarredRepos } from "../starred/UserStarredRepos";
 import { UserFollowersList } from "../followers/UserFollowersList";
 import { UserFollowingList } from "../following/UserFollowingList";
@@ -16,7 +23,7 @@ const userRoute = getRouteApi("/_dashboard/$user");
 /**
  * Profile hub — UserInfo + tabs for repos / starred / followers / following.
  * Panels use React `Activity` so switching tabs keeps state / Relay data warm.
- * Repo filters stay outside the list Suspense so they remain usable while it reloads.
+ * Tab filters stay outside list Suspense so they remain usable while lists reload.
  */
 export function UserPage() {
   const navigate = userRoute.useNavigate();
@@ -79,18 +86,11 @@ export function UserPage() {
         </TabsList>
 
         <Activity mode={tab === "repos" ? "visible" : "hidden"}>
-          <div
-            role="tabpanel"
-            className="mt-0 space-y-4"
-            data-test="user-tabpanel-repos"
-          >
-            <div
-              className="border-base-300 bg-base-200/30 sticky top-0 z-20 flex flex-wrap items-center justify-end gap-3 rounded-xl border px-3 py-2 backdrop-blur-sm"
-              data-test="repo-filters"
-            >
+          <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-repos">
+            <TabFilterBar testId="repo-filters">
               <RepoOrderSelect />
               <RepoIsForkSwitch />
-            </div>
+            </TabFilterBar>
             <Suspense fallback={<TabFallback label="repos" />}>
               <ReposTab />
             </Suspense>
@@ -98,7 +98,11 @@ export function UserPage() {
         </Activity>
 
         <Activity mode={tab === "starred" ? "visible" : "hidden"}>
-          <div role="tabpanel" className="mt-0" data-test="user-tabpanel-starred">
+          <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-starred">
+            <TabFilterBar testId="starred-filters">
+              <StarOrderSelect />
+              <StarOwnedByViewerSwitch />
+            </TabFilterBar>
             <Suspense fallback={<TabFallback label="starred repos" />}>
               <StarredTab />
             </Suspense>
@@ -106,7 +110,10 @@ export function UserPage() {
         </Activity>
 
         <Activity mode={tab === "followers" ? "visible" : "hidden"}>
-          <div role="tabpanel" className="mt-0" data-test="user-tabpanel-followers">
+          <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-followers">
+            <TabFilterBar testId="followers-filters">
+              <PeopleSearchInput placeholder="Filter by name or login…" />
+            </TabFilterBar>
             <Suspense fallback={<TabFallback label="followers" />}>
               <FollowersTab />
             </Suspense>
@@ -114,7 +121,10 @@ export function UserPage() {
         </Activity>
 
         <Activity mode={tab === "following" ? "visible" : "hidden"}>
-          <div role="tabpanel" className="mt-0" data-test="user-tabpanel-following">
+          <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-following">
+            <TabFilterBar testId="following-filters">
+              <PeopleSearchInput placeholder="Filter by name or login…" />
+            </TabFilterBar>
             <Suspense fallback={<TabFallback label="following" />}>
               <FollowingTab />
             </Suspense>

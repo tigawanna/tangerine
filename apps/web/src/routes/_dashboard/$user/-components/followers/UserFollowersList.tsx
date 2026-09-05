@@ -1,29 +1,60 @@
 import { LoadMoreButton } from "@/lib/relay/LoadMoreButton";
 import type { layoutUserPageLoaderQuery } from "@/routes/_dashboard/$user/__generated__/layoutUserPageLoaderQuery.graphql";
 import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
-import { Link } from "@tanstack/react-router";
+import { getRouteApi, Link } from "@tanstack/react-router";
 import { graphql, useFragment, usePaginationFragment } from "react-relay";
 import type { UserFollowersFragment$key } from "./__generated__/UserFollowersFragment.graphql";
 import type { UserCard_user$key } from "./__generated__/UserCard_user.graphql";
+
+const userRoute = getRouteApi("/_dashboard/$user");
 
 interface UserFollowersListProps {
   followersKey: UserFollowersFragment$key;
 }
 
 /**
- * Paginated followers list for the profile Followers tab.
+ * Paginated followers list. `peopleQ` filters loaded cards client-side
+ * (GitHub's followers connection has no search/order args).
  */
 export function UserFollowersList({ followersKey }: UserFollowersListProps) {
+  const { peopleQ } = userRoute.useSearch();
   const frag = usePaginationFragment<layoutUserPageLoaderQuery, UserFollowersFragment$key>(
     FollowersFragment,
     followersKey,
   );
   const edges = frag.data.followers.edges ?? [];
+  const q = peopleQ.trim().toLowerCase();
+  const visible = q
+    ? edges.filter((edge) => {
+        const node = edge?.node;
+        if (!node) return false;
+        const hay = `${node.login} ${node.name ?? ""}`.toLowerCase();
+        return hay.includes(q);
+      })
+    : edges;
 
   if (edges.length === 0) {
     return (
-      <div className="border-base-300 text-base-content/70 rounded-xl border border-dashed p-8 text-sm">
+      <div
+        className="border-base-300 text-base-content/70 rounded-xl border border-dashed p-8 text-sm"
+        data-test="user-followers"
+      >
         No followers found.
+      </div>
+    );
+  }
+
+  if (visible.length === 0) {
+    return (
+      <div
+        className="border-base-300 text-base-content/70 space-y-4 rounded-xl border border-dashed p-8 text-sm"
+        data-test="user-followers"
+      >
+        <p>No loaded followers match “{peopleQ.trim()}”.</p>
+        <p className="text-base-content/50 text-xs">
+          Search only filters people already loaded — use Load more to fetch more.
+        </p>
+        <LoadMoreButton frag={frag} />
       </div>
     );
   }
@@ -31,7 +62,7 @@ export function UserFollowersList({ followersKey }: UserFollowersListProps) {
   return (
     <div className="space-y-4" data-test="user-followers">
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {edges.map((edge) => {
+        {visible.map((edge) => {
           if (!edge?.node) return null;
           return (
             <li key={edge.cursor}>
@@ -80,6 +111,8 @@ const FollowersFragment = graphql`
       edges {
         cursor
         node {
+          login
+          name
           ...UserCard_user
         }
       }
