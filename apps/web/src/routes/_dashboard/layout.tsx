@@ -1,6 +1,6 @@
 import { getSession } from "@/data-access-layer/auth/auth.functions";
 import { authClient } from "@/lib/auth-client";
-import { createGithubRelayEnvironment } from "@/lib/relay/create-environment";
+import { getGithubRelayEnvironment } from "@/lib/relay/create-environment";
 import { fetchGithubLogin } from "@/lib/relay/resolve-github-login";
 import { RouterErrorComponent } from "@/lib/tanstack/router/routerErrorComponent";
 import { RouterNotFoundComponent } from "@/lib/tanstack/router/RouterNotFoundComponent";
@@ -14,7 +14,7 @@ import { dashboard_account_routes } from "./-components/dashboard-sidebar/dashbo
 
 export const Route = createFileRoute("/_dashboard")({
   ssr: false,
-  beforeLoad: async ({ location }) => {
+  beforeLoad: async ({ context, location }) => {
     const session = await getSession();
     if (!session) {
       throw redirect({ to: "/auth", search: { returnTo: location.pathname } });
@@ -33,7 +33,9 @@ export const Route = createFileRoute("/_dashboard")({
 
     return {
       githubLogin,
-      relayEnvironment: createGithubRelayEnvironment(),
+      // Reuse the same Environment across dashboard navigations so
+      // loadQuery refs stay valid for usePreloadedQuery.
+      relayEnvironment: getGithubRelayEnvironment(context.relayEnvironment),
     };
   },
   pendingComponent: RouterPendingComponent,

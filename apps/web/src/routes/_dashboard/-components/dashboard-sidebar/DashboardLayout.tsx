@@ -16,10 +16,10 @@ import {
 } from "@/components/ui/sidebar";
 import { TSRBreadCrumbs } from "@/lib/tanstack/router/TSRBreadCrumbs";
 import { AppConfig } from "@/utils/system";
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, useParams, useRouteContext } from "@tanstack/react-router";
 import { DashboardSidebarFooter } from "./DashboardSidebarFooter";
 import { DashboardSidebarHeader } from "./DashboardSidebarHeader";
-import { dashboard_primary_routes } from "./dashboard_routes";
+import { dashboardPrimaryRoutes } from "./dashboard_routes";
 
 interface DashboardLayoutProps {
   sidebarLabel: string;
@@ -32,19 +32,24 @@ export function DashboardLayout({
   accountRoutes,
   accountLabel,
 }: DashboardLayoutProps) {
+  const { githubLogin } = useRouteContext({ from: "/_dashboard" });
+  const params = useParams({ strict: false }) as { user?: string };
+  const user = params.user?.trim() || githubLogin || "";
+  const primaryRoutes = user ? dashboardPrimaryRoutes(user) : [];
+
   return (
     <SidebarProvider defaultOpen={false} className="h-svh overflow-hidden">
       <QueryActivityNprogress />
       <Sidebar collapsible="icon">
         <SidebarHeader>
-          <DashboardSidebarHeader />
+          <DashboardSidebarHeader user={user || undefined} />
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup className="bg-base-300">
             <SidebarGroupLabel className="text-sm font-semibold tracking-wide">
               {sidebarLabel}
             </SidebarGroupLabel>
-            <SidebarLinks links={dashboard_primary_routes} />
+            <SidebarLinks links={primaryRoutes} />
           </SidebarGroup>
           {accountRoutes.length > 0 ? (
             <SidebarGroup className="bg-base-300">

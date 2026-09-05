@@ -44,9 +44,7 @@ export const AppConfig = {
   themeStorageKey: "tigawanna.tangerine.theme",
   links,
   navItems: [
-    { label: "Viewer", href: "/viewer" },
-    { label: "Repos", href: "/repos" },
-    { label: "Stars", href: "/stars" },
+    { label: "Dashboard", href: "/viewer" },
   ],
   assets,
   absoluteAsset,

@@ -8,7 +8,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
 
-export const Route = createFileRoute("/_dashboard/repos/")({
+export const Route = createFileRoute("/_dashboard/$user/repos/")({
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.query({ ...pinnedReposQueryOptions, staleTime: "static" }),

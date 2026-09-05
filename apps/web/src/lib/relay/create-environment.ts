@@ -62,3 +62,27 @@ export function createGithubRelayEnvironment(): Environment {
     store: new Store(new RecordSource()),
   });
 }
+
+/** One Environment per browser tab for the dashboard session. */
+let dashboardRelayEnvironment: Environment | null = null;
+
+/**
+ * Returns a stable Relay Environment for `/_dashboard`.
+ * Reuses `existing` from router context when present, otherwise the module singleton.
+ * Creating a new env per navigation breaks `loadQuery` + `usePreloadedQuery`.
+ */
+export function getGithubRelayEnvironment(existing?: Environment | null): Environment {
+  if (existing) {
+    dashboardRelayEnvironment = existing;
+    return existing;
+  }
+  if (!dashboardRelayEnvironment) {
+    dashboardRelayEnvironment = createGithubRelayEnvironment();
+  }
+  return dashboardRelayEnvironment;
+}
+
+/** Drop the cached env (e.g. after sign-out). */
+export function resetGithubRelayEnvironment(): void {
+  dashboardRelayEnvironment = null;
+}

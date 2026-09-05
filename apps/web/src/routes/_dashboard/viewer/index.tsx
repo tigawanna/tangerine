@@ -1,8 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 /**
- * Entry for "me" — resolves login from dashboard auth context and
- * redirects into the shared `/$user` Relay preload route.
+ * Post-login entry: send the signed-in user to `/$user` with their GitHub login.
  */
 export const Route = createFileRoute("/_dashboard/viewer/")({
   beforeLoad: ({ context }) => {

@@ -19,11 +19,11 @@ export function LandingFooter() {
         </div>
 
         <nav aria-label="Footer" className="text-landing-fg-muted flex flex-wrap gap-x-5 gap-y-2 text-sm">
-          <Link to="/repos" className="hover:text-landing-fg">
-            Repos
+          <Link to="/viewer" className="hover:text-landing-fg">
+            Dashboard
           </Link>
-          <Link to="/stars" className="hover:text-landing-fg">
-            Stars
+          <Link to="/auth" search={{ returnTo: "/viewer" }} className="hover:text-landing-fg">
+            Sign in
           </Link>
           <a
             href={AppConfig.links.github}

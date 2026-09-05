@@ -15,6 +15,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
+import { resetGithubRelayEnvironment } from "@/lib/relay/create-environment";
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronsUpDown, LogOut } from "lucide-react";
 
@@ -96,6 +97,7 @@ export function DashboardSidebarUser() {
               data-test="dashboard-sidebar-logout"
               onClick={() => {
                 void authClient.signOut().then(() => {
+                  resetGithubRelayEnvironment();
                   void navigate({ to: "/" });
                 });
               }}

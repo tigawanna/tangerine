@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 
-export const Route = createFileRoute("/_dashboard/stars/")({
+export const Route = createFileRoute("/_dashboard/$user/stars/")({
   component: StarsPage,
 });
 

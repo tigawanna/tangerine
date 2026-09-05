@@ -6,6 +6,8 @@ export type SidebarIcon = ComponentType<SVGProps<SVGSVGElement> & { className?: 
 export type SidebarItem = {
   title: string;
   href: string;
+  /** Route params when `href` includes `$param` segments (e.g. `/$user/repos`). */
+  params?: Record<string, string>;
   icon?: SidebarIcon;
   isActive?: boolean;
   sublinks?: SidebarItem[];

@@ -7,7 +7,12 @@ import {
 import { AppConfig } from "@/utils/system";
 import { Link } from "@tanstack/react-router";
 
-export function DashboardSidebarHeader() {
+interface DashboardSidebarHeaderProps {
+  /** Active dashboard user login — home links to their profile. */
+  user?: string;
+}
+
+export function DashboardSidebarHeader({ user }: DashboardSidebarHeaderProps) {
   const { state, setOpenMobile, isMobile } = useSidebar();
 
   return (
@@ -19,23 +24,37 @@ export function DashboardSidebarHeader() {
           onClick={() => setOpenMobile(false)}
           data-test="dashboard-sidebar-home"
         >
-          <Link to="/viewer" className="hover:bg-primary/10 flex w-full justify-center">
-            {/*
-              SidebarMenuButton forces [&>svg]:size-4 on direct SVG children.
-              Wrap like the shadcn Avatar/team-switcher pattern so size sticks.
-            */}
-            <span className="flex aspect-square size-5 items-center justify-center rounded-lg">
-              <AppConfig.icon className="text-sidebar-foreground size-5" />
-            </span>
-            {state === "expanded" || isMobile ? (
-              <span className="font-serif text-xl tracking-tight">
-                {AppConfig.name}
-                <span className="text-primary">.</span>
-              </span>
-            ) : null}
-          </Link>
+          {user ? (
+            <Link
+              to="/$user"
+              params={{ user }}
+              className="hover:bg-primary/10 flex w-full justify-center"
+            >
+              <HeaderBrand expanded={state === "expanded" || isMobile} />
+            </Link>
+          ) : (
+            <Link to="/viewer" className="hover:bg-primary/10 flex w-full justify-center">
+              <HeaderBrand expanded={state === "expanded" || isMobile} />
+            </Link>
+          )}
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
+  );
+}
+
+function HeaderBrand({ expanded }: { expanded: boolean }) {
+  return (
+    <>
+      <span className="flex aspect-square size-5 items-center justify-center rounded-lg">
+        <AppConfig.icon className="text-sidebar-foreground size-5" />
+      </span>
+      {expanded ? (
+        <span className="font-serif text-xl tracking-tight">
+          {AppConfig.name}
+          <span className="text-primary">.</span>
+        </span>
+      ) : null}
+    </>
   );
 }
