@@ -93,6 +93,43 @@
   --color-landing-footer: #f3ebe4;
 }
 
+/*
+  Bridge landing browns into DaisyUI base tokens.
+  ThemeProvider sets data-theme=light|dark (not "wanna"), so dashboard
+  surfaces stay on the same warm ladder as the landing page.
+*/
+[data-theme="light"],
+:root.light {
+  --color-base-100: #faf6f2;
+  --color-base-200: #ffffff;
+  --color-base-300: #f3ebe4;
+  --color-base-content: #4a3220;
+  --color-primary: #c45c1a;
+  --color-primary-content: #faf6f2;
+  --color-secondary: #f3ebe4;
+  --color-secondary-content: #4a3220;
+  --color-accent: #f7b538;
+  --color-accent-content: #2a1e14;
+  --color-neutral: #f3ebe4;
+  --color-neutral-content: #6b4e38;
+}
+
+[data-theme="dark"],
+:root.dark {
+  --color-base-100: #1a140f;
+  --color-base-200: #2c2118;
+  --color-base-300: #3a2a1c;
+  --color-base-content: #f4ebe2;
+  --color-primary: #f7b538;
+  --color-primary-content: #1a140f;
+  --color-secondary: #221a13;
+  --color-secondary-content: #f4ebe2;
+  --color-accent: #db7c26;
+  --color-accent-content: #1a140f;
+  --color-neutral: #221a13;
+  --color-neutral-content: #cbb5a0;
+}
+
 @utility landing-card {
   @apply relative rounded-2xl border border-landing-amber/15 bg-landing-panel shadow-xl shadow-black/30;
 }

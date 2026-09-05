@@ -125,7 +125,7 @@ function RepoCardSurface({ view }: { view: RepoCardView }) {
 
   return (
     <article
-      className="border-base-300 bg-base-100 group relative flex h-full flex-col overflow-hidden rounded-xl border transition-colors duration-200 ease-out hover:border-base-content/20"
+      className="border-base-300 bg-base-200 hover:bg-primary/20 group relative flex h-full flex-col overflow-hidden rounded-xl border transition-colors duration-200 ease-out"
       data-test={`repo-card-${view.name}`}
     >
       <div className="bg-base-300 relative aspect-16/9 overflow-hidden">
@@ -149,7 +149,6 @@ function RepoCardSurface({ view }: { view: RepoCardView }) {
           aria-label={`Open ${view.name} details`}
           preload="intent"
         />
-        <div className="from-base-100 via-base-100/50 pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-linear-to-t to-transparent" />
         <div className="absolute top-3 right-3 z-10 flex gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
           <a
             href={vscodeUrl}
@@ -189,7 +188,7 @@ function RepoCardSurface({ view }: { view: RepoCardView }) {
               <Lock className="text-base-content/40 mt-0.5 size-3.5 shrink-0" aria-label="Private" />
             ) : null}
             {view.isFork ? (
-              <span className="bg-base-200 text-base-content/60 shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase">
+              <span className="bg-base-300 text-base-content/60 shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase">
                 Fork
               </span>
             ) : null}

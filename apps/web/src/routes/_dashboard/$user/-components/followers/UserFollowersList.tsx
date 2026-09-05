@@ -85,7 +85,7 @@ function UserCard({ user }: { user: UserCard_user$key }) {
       params={{ user: data.login }}
       search={defaultUserSearch}
       replace={false}
-      className="border-base-300 bg-base-100 hover:border-base-content/20 flex items-center gap-3 rounded-xl border p-3 transition-colors"
+      className="border-base-300 bg-base-200 hover:bg-primary/20 flex items-center gap-3 rounded-xl border p-3 transition-colors"
       data-test={`user-card-${data.login}`}
     >
       <img
