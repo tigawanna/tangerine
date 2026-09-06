@@ -1,13 +1,14 @@
 {
-  "name": "web",
+  "name": "desktop",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vp dev --port 3064",
+    "dev": "vp dev --port 3065",
+    "desktop:dev": "deno desktop --hmr --env-file=.env --preload=./deno/window.ts -A .",
+    "desktop:build": "vp build && deno desktop --env-file=.env --preload=./deno/window.ts -A .",
+    "desktop:run": "deno desktop --env-file=.env --preload=./deno/window.ts -A .",
     "build": "vp build",
     "preview": "vp preview",
-    "deploy": "vercel --prod",
-    "deploy:vercel": "vercel --prod",
     "test": "vp test run",
     "check-types": "tsc -b --noEmit",
     "relay": "relay-compiler",

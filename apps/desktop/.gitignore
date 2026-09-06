@@ -2,6 +2,9 @@ node_modules
 .DS_Store
 dist
 dist-ssr
+dist-desktop/
+# Default / leftover `deno desktop` output dirs (do not nest under source)
+/desktop/
 *.local
 count.txt
 .env
@@ -16,6 +19,8 @@ local.db
 .vinxi
 todos.json
 /.swc
+.deno_desktop_entry-*.ts
+**/.desktop/
 
 # Lighthouse audit artifacts (local only)
 lighthouse-reports/

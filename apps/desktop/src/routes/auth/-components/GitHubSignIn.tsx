@@ -17,6 +17,20 @@ type GitHubSignInProps = {
   initialOptionalScopes?: readonly GithubOptionalScopeId[];
 };
 
+type DesktopBindings = {
+  navigate: (url: string) => Promise<void>;
+};
+
+/**
+ * Deno Desktop exposes `bindings` on the webview global.
+ * Prefer it for OAuth so GitHub stays in the same cookie jar as Better Auth.
+ */
+function getDesktopBindings(): DesktopBindings | null {
+  const candidate = (globalThis as { bindings?: Partial<DesktopBindings> }).bindings;
+  if (!candidate || typeof candidate.navigate !== "function") return null;
+  return candidate as DesktopBindings;
+}
+
 export function GitHubSignIn({ callbackURL, initialOptionalScopes = [] }: GitHubSignInProps) {
   const [selected, setSelected] = useState<Set<GithubOptionalScopeId>>(
     () => new Set(initialOptionalScopes),
@@ -27,11 +41,27 @@ export function GitHubSignIn({ callbackURL, initialOptionalScopes = [] }: GitHub
       const result = await authClient.signIn.social({
         provider: "github",
         callbackURL,
+        // Let us drive navigation — Better Auth's default `window.location.href`
+        // opens the system browser on Deno Desktop and drops the oauth_state cookie.
+        disableRedirect: true,
         scopes: buildGithubOAuthScopes([...selected]),
       });
       if (result.error) {
         throw new Error(authClientErrorMessage(result.error) ?? "GitHub sign-in failed.");
       }
+
+      const url = result.data?.url;
+      if (!url) {
+        throw new Error("GitHub sign-in did not return an authorize URL.");
+      }
+
+      const desktop = getDesktopBindings();
+      if (desktop) {
+        await desktop.navigate(url);
+        return result.data;
+      }
+
+      window.location.assign(url);
       return result.data;
     },
     onError: (error) => {
