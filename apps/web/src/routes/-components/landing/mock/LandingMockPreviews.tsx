@@ -1,7 +1,9 @@
 import { cn } from "@/lib/utils";
 import { AppBrandIcon } from "@/components/icon/AppBrandIcon";
-import { CircleUser, Search, Sparkles, Star, Zap } from "lucide-react";
+import { CircleUser, ListFilterPlus, Search, Sparkles, Star, Trash2, UserPlus, Zap } from "lucide-react";
 import {
+  landingMockBulkRepos,
+  landingMockPeople,
   landingMockRepos,
   landingMockStarredRepos,
 } from "./data";
@@ -82,12 +84,23 @@ export function LandingMockReposPreview({ className }: { className?: string }) {
       data-test="landing-mock-repos-preview"
       aria-hidden
     >
+      <div className="mb-3 flex flex-wrap items-center gap-1.5">
+        <span className="border-base-300 bg-base-200 text-base-content/70 rounded-full border px-2.5 py-1 text-[10px] font-medium">
+          Pushed recently
+        </span>
+        <span className="border-base-300 bg-base-200 text-base-content/70 rounded-full border px-2.5 py-1 text-[10px] font-medium">
+          Sources
+        </span>
+        <span className="bg-primary/15 text-primary rounded-full px-2.5 py-1 text-[10px] font-semibold">
+          TypeScript
+        </span>
+      </div>
       <LandingMockRepoCard repo={repo} />
     </div>
   );
 }
 
-/** Starred list preview — own work vs starred neighbors. */
+/** Starred list preview with quick filters. */
 export function LandingMockStarsPreview({ className }: { className?: string }) {
   return (
     <div
@@ -98,13 +111,21 @@ export function LandingMockStarsPreview({ className }: { className?: string }) {
       data-test="landing-mock-stars-preview"
       aria-hidden
     >
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <p className="text-base-content/55 text-[10px] font-semibold tracking-wide uppercase">
-          Starred
-        </p>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="bg-primary/15 text-primary rounded-full px-2.5 py-1 text-[10px] font-semibold">
+            Newest
+          </span>
+          <span className="border-base-300 bg-base-200 text-base-content/70 rounded-full border px-2.5 py-1 text-[10px] font-medium">
+            Most starred
+          </span>
+          <span className="border-base-300 bg-base-200 text-base-content/70 rounded-full border px-2.5 py-1 text-[10px] font-medium">
+            Not mine
+          </span>
+        </div>
         <span className="text-base-content/40 inline-flex items-center gap-1 text-[10px]">
           <Star className="size-3 fill-current" />
-          Newest
+          3 filters
         </span>
       </div>
       <ul className="space-y-2">
@@ -209,6 +230,203 @@ export function LandingMockSearchPreview({ className }: { className?: string }) 
       </ul>
       <p className="text-base-content/40 mt-2 text-center text-[10px] tracking-wide uppercase">
         Local RAG over your stars — soon
+      </p>
+    </div>
+  );
+}
+
+const mockQueryTokens = [
+  { label: "language", value: "TypeScript" },
+  { label: "stars", value: ">1000" },
+  { label: "user", value: "johndoe" },
+] as const;
+
+/** Ergonomic search bar + visual GitHub query editor preview. */
+export function LandingMockGithubSearchPreview({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "bg-base-100 text-base-content pointer-events-none select-none overflow-hidden rounded-xl p-3",
+        className,
+      )}
+      data-test="landing-mock-github-search-preview"
+      aria-hidden
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="border-base-300 bg-base-200/70 flex h-10 min-w-0 flex-1 items-center gap-2 rounded-xl border px-3">
+          <Search className="text-base-content/40 size-3.5 shrink-0" />
+          <span className="text-base-content/55 min-w-0 flex-1 truncate font-mono text-xs">
+            language:TypeScript stars:&gt;1000 user:johndoe
+          </span>
+          <span className="border-base-300 text-base-content/40 hidden rounded border px-1.5 py-0.5 font-mono text-[10px] sm:inline">
+            ⌘K
+          </span>
+        </div>
+        <div className="border-base-300 bg-base-200/50 text-base-content/70 flex h-10 shrink-0 items-center rounded-xl border px-3 text-xs">
+          Repositories
+        </div>
+        <div className="bg-primary text-primary-content flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-medium">
+          <ListFilterPlus className="size-3.5" />
+          Filters
+          <span className="bg-primary-content/20 rounded px-1.5 py-0.5 text-[10px]">3</span>
+        </div>
+      </div>
+
+      <div className="border-base-300 bg-base-200/40 mt-3 rounded-xl border p-3">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-base-content/45 text-[10px] font-semibold tracking-wide uppercase">
+            Query editor
+          </p>
+          <span className="text-base-content/40 text-[10px]">Live preview</span>
+        </div>
+        <code className="text-primary mt-2 block font-mono text-[11px] break-all">
+          language:TypeScript stars:&gt;1000 user:johndoe
+        </code>
+        <ul className="mt-3 flex flex-wrap gap-1.5">
+          {mockQueryTokens.map((token) => (
+            <li
+              key={token.label}
+              className="border-base-300 bg-base-100 text-base-content/70 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px]"
+            >
+              <span className="text-base-content/40">{token.label}:</span>
+              {token.value}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <div className="border-base-300/80 space-y-1 rounded-lg border px-2.5 py-2">
+            <p className="text-base-content/40 text-[10px] uppercase">Language</p>
+            <p className="text-xs font-medium">TypeScript</p>
+          </div>
+          <div className="border-base-300/80 space-y-1 rounded-lg border px-2.5 py-2">
+            <p className="text-base-content/40 text-[10px] uppercase">Stars</p>
+            <p className="text-xs font-medium">&gt; 1000</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Follow-graph hopping: followers → their projects → their followers. */
+export function LandingMockGraphPreview({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "bg-base-100 text-base-content pointer-events-none select-none overflow-hidden rounded-xl p-3",
+        className,
+      )}
+      data-test="landing-mock-graph-preview"
+      aria-hidden
+    >
+      <div className="mb-3 flex flex-wrap items-center gap-1.5 text-[10px]">
+        <span className="bg-primary/15 text-primary rounded-full px-2.5 py-1 font-semibold">
+          Followers
+        </span>
+        <span className="text-base-content/35">→</span>
+        <span className="border-base-300 bg-base-200 text-base-content/70 rounded-full border px-2.5 py-1 font-medium">
+          Their repos
+        </span>
+        <span className="text-base-content/35">→</span>
+        <span className="border-base-300 bg-base-200 text-base-content/70 rounded-full border px-2.5 py-1 font-medium">
+          Their followers
+        </span>
+      </div>
+
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-base-content/45 text-[10px] font-semibold tracking-wide uppercase">
+          Keep following the thread
+        </p>
+        <span className="bg-primary text-primary-content inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium">
+          <UserPlus className="size-3" />
+          Follow back all
+        </span>
+      </div>
+
+      <ul className="space-y-2">
+        {landingMockPeople.map((person) => (
+          <li
+            key={person.id}
+            className="border-base-300 bg-base-200/60 flex items-center gap-3 rounded-lg border px-2.5 py-2"
+          >
+            <img
+              src={person.avatarUrl}
+              alt=""
+              className="border-base-300 size-9 shrink-0 rounded-full border object-cover"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-semibold">{person.name}</p>
+              <p className="text-base-content/50 truncate text-[11px]">@{person.login}</p>
+            </div>
+            <span
+              className={cn(
+                "shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold",
+                person.action === "Following"
+                  ? "border-base-300 text-base-content/55 border"
+                  : "bg-primary/15 text-primary",
+              )}
+            >
+              {person.action}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Bulk repo deletion preview — select many, wipe in one pass. */
+export function LandingMockBulkDeletePreview({ className }: { className?: string }) {
+  const selectedCount = landingMockBulkRepos.filter((repo) => repo.selected).length;
+
+  return (
+    <div
+      className={cn(
+        "bg-base-100 text-base-content pointer-events-none select-none overflow-hidden rounded-xl p-3",
+        className,
+      )}
+      data-test="landing-mock-bulk-delete-preview"
+      aria-hidden
+    >
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <span className="text-base-content/55 text-[10px] font-semibold tracking-wide uppercase">
+          Bulk edit
+        </span>
+        <span className="bg-error/15 text-error inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold">
+          <Trash2 className="size-3" />
+          Delete {selectedCount} repos
+        </span>
+      </div>
+
+      <ul className="space-y-2">
+        {landingMockBulkRepos.map((repo) => (
+          <li
+            key={repo.id}
+            className={cn(
+              "border-base-300 flex items-center gap-3 rounded-lg border px-2.5 py-2",
+              repo.selected ? "bg-error/10 ring-error/40 ring-1" : "bg-base-200/50",
+            )}
+          >
+            <span
+              className={cn(
+                "flex size-4 shrink-0 items-center justify-center rounded border text-[10px]",
+                repo.selected
+                  ? "border-error bg-error text-error-content"
+                  : "border-base-300 bg-base-100",
+              )}
+            >
+              {repo.selected ? "✓" : null}
+            </span>
+            <span className="min-w-0 flex-1 truncate font-mono text-xs">{repo.name}</span>
+            {repo.selected ? (
+              <span className="text-error/70 text-[10px] font-medium">Selected</span>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+
+      <p className="text-base-content/45 mt-3 text-center text-[11px] leading-5">
+        Dozens gone in the time GitHub asks you to confirm one. Use with caution 🙂
       </p>
     </div>
   );

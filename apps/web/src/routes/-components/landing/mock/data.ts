@@ -152,3 +152,42 @@ export const landingMockStarredRepos = [
     cover: "linear-gradient(135deg, #111111 0%, #525252 40%, #e5e5e5 100%)",
   },
 ] as const satisfies readonly LandingMockRepo[];
+
+export type LandingMockPerson = {
+  id: string;
+  name: string;
+  login: string;
+  avatarUrl: string;
+  action: "Follow back" | "Following" | "Follow";
+};
+
+export const landingMockPeople = [
+  {
+    id: "p1",
+    name: "Ada Chen",
+    login: "adachen",
+    avatarUrl: "https://api.dicebear.com/9.x/notionists/svg?seed=AdaChen&backgroundColor=c0aede",
+    action: "Follow back",
+  },
+  {
+    id: "p2",
+    name: "Marcus Lee",
+    login: "marcuslee",
+    avatarUrl: "https://api.dicebear.com/9.x/notionists/svg?seed=MarcusLee&backgroundColor=b6e3f4",
+    action: "Following",
+  },
+  {
+    id: "p3",
+    name: "Priya Nair",
+    login: "priyanair",
+    avatarUrl: "https://api.dicebear.com/9.x/notionists/svg?seed=PriyaNair&backgroundColor=ffd5dc",
+    action: "Follow",
+  },
+] as const satisfies readonly LandingMockPerson[];
+
+export const landingMockBulkRepos = [
+  { id: "b1", name: "old-experiment", selected: true },
+  { id: "b2", name: "tmp-scratch", selected: true },
+  { id: "b3", name: "legacy-api-v1", selected: true },
+  { id: "b4", name: "demo-site-2019", selected: false },
+] as const;
