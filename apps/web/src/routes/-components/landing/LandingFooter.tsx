@@ -1,5 +1,7 @@
 import { AppConfig } from "@/utils/system";
 import { Link } from "@tanstack/react-router";
+import { TigawannaCredit } from "@tigawanna/credit";
+import "@tigawanna/credit/styles.css";
 
 export function LandingFooter() {
   const year = new Date().getFullYear();
@@ -39,6 +41,8 @@ export function LandingFooter() {
             © {year} {AppConfig.name}
           </p>
         </div>
+
+        <TigawannaCredit />
       </div>
     </footer>
   );
