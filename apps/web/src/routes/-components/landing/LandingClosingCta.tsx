@@ -5,7 +5,7 @@ import { ArrowRight, GitFork, Star, Zap } from "lucide-react";
 const perks = [
   { icon: GitFork, label: "Your repos" },
   { icon: Star, label: "Your stars" },
-  { icon: Zap, label: "Local-first speed" },
+  { icon: Zap, label: "Intelligent loading" },
 ] as const;
 
 export function LandingClosingCta() {
@@ -33,7 +33,7 @@ export function LandingClosingCta() {
           </h2>
 
           <p className="text-landing-fg-muted mx-auto mt-4 max-w-md text-base leading-7">
-            Sign in with GitHub and land in a quieter shell built for fast, local-first browsing.
+            Sign in with GitHub and land in a quieter shell with fast SPA navigation.
           </p>
 
           <div className="mt-8">

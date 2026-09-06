@@ -1,7 +1,7 @@
 import { AppConfig } from "@/utils/system";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { LandingShotPlaceholder } from "./LandingShotPlaceholder";
+import { LandingMockProfilePreview } from "./mock/LandingMockPreviews";
 
 export function LandingHero() {
   return (
@@ -14,7 +14,7 @@ export function LandingHero() {
         </h1>
 
         <p className="landing-hero-enter landing-hero-enter-delay-1 text-landing-fg-muted mx-auto mt-5 max-w-lg text-lg leading-8">
-          Local-first browsing for your GitHub repos and stars. Faster navigation, less noise.
+          Browse your GitHub repos and stars without the full-page reload tax.
         </p>
 
         <div className="landing-hero-enter landing-hero-enter-delay-2 mt-8">
@@ -31,20 +31,27 @@ export function LandingHero() {
       </div>
 
       <div className="landing-hero-enter landing-hero-enter-delay-3 landing-proof-float relative z-10 mx-auto mt-12 max-w-5xl px-4 sm:px-6 md:mt-16">
-        <div className="landing-browser" data-test="landing-hero-preview">
+        <div
+          className="landing-browser"
+          data-test="landing-hero-preview"
+          role="img"
+          aria-label={`${AppConfig.name} profile preview with sample repositories`}
+        >
           <div className="landing-browser-bar">
             <span className="landing-browser-dot" />
             <span className="landing-browser-dot" />
             <span className="landing-browser-dot" />
             <span className="text-landing-fg-muted ml-2 text-xs">
-              {AppConfig.name.toLowerCase()}
+              {AppConfig.name.toLowerCase()} · johndoe
             </span>
           </div>
-          <LandingShotPlaceholder
-            label="App screenshot placeholder"
-            aspect="video"
-            className="min-h-55 rounded-none border-0 border-t border-dashed md:min-h-90"
-          />
+          <div className="relative max-h-96 overflow-hidden md:max-h-[35rem]">
+            <LandingMockProfilePreview />
+            <div
+              className="from-base-100 pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t to-transparent md:h-24"
+              aria-hidden
+            />
+          </div>
         </div>
       </div>
     </section>

@@ -1,33 +1,50 @@
 import { Link } from "@tanstack/react-router";
-import { LandingShotPlaceholder } from "./LandingShotPlaceholder";
+import type { ReactNode } from "react";
+import {
+  LandingMockReposPreview,
+  LandingMockSearchPreview,
+  LandingMockSpeedPreview,
+  LandingMockStarsPreview,
+} from "./mock/LandingMockPreviews";
 
 const features = [
   {
     title: "Repositories",
     body: "Pinned and recent repos in a clean grid. Jump straight into what you are shipping.",
     href: "/viewer" as const,
-    shot: "Repos grid UI",
+    preview: <LandingMockReposPreview className="min-h-35" />,
+    openLabel: "repositories",
   },
   {
     title: "Stars",
     body: "Your starred projects beside your own work. No more tab hopping.",
     href: "/viewer" as const,
-    shot: "Stars list UI",
+    preview: <LandingMockStarsPreview className="min-h-35" />,
+    openLabel: "stars",
   },
   {
-    title: "Local-first speed",
-    body: "Built for fast navigation on your machine. Less waiting on GitHub chrome.",
+    title: "Intelligent loading",
+    body: "A Relay-powered SPA that preloads what you need and skips full-page reloads between views.",
     href: "/viewer" as const,
-    shot: "Fast local navigation",
+    preview: <LandingMockSpeedPreview className="min-h-35" />,
+    openLabel: "dashboard",
   },
   {
-    title: "Desktop embeddings",
-    body: "Coming later: index repos and stars for smarter search. Same idea, deeper reach.",
+    title: "Natural language search",
+    body: "Coming later: ask for the starred repo you mean in plain English — local RAG over your stars, not keyword bingo.",
     href: "/viewer" as const,
-    shot: "Desktop search placeholder",
+    preview: <LandingMockSearchPreview className="min-h-35" />,
     badge: "Soon",
+    openLabel: "stars",
   },
-] as const;
+] as const satisfies ReadonlyArray<{
+  title: string;
+  body: string;
+  href: "/viewer";
+  preview: ReactNode;
+  openLabel: string;
+  badge?: string;
+}>;
 
 export function LandingFeatures() {
   return (
@@ -40,7 +57,7 @@ export function LandingFeatures() {
         <div className="max-w-2xl">
           <h2 className="landing-section-heading">Made for developers who live in repos</h2>
           <p className="landing-section-lead mx-0! text-left">
-            A quieter shell for browsing GitHub. Local-first so it feels instant.
+            A quieter shell for browsing GitHub. Fast SPA navigation without full-page reloads.
           </p>
         </div>
 
@@ -61,15 +78,15 @@ export function LandingFeatures() {
                 ) : null}
               </div>
               <p className="text-landing-fg-muted mt-3 flex-1 text-sm leading-7">{feature.body}</p>
-              <div className="mt-6 overflow-hidden rounded-xl">
-                <LandingShotPlaceholder label={feature.shot} aspect="wide" className="min-h-35" />
+              <div className="border-landing-border mt-6 overflow-hidden rounded-xl border">
+                {feature.preview}
               </div>
               <Link
                 to={feature.href}
                 className="text-landing-fg mt-5 inline-flex text-sm font-semibold hover:underline"
                 data-test={`landing-feature-${feature.title.toLowerCase().replace(/\s+/g, "-")}`}
               >
-                Open {feature.title === "Desktop embeddings" ? "repos" : feature.title.toLowerCase()}
+                Open {feature.openLabel}
               </Link>
             </article>
           ))}
