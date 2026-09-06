@@ -2,6 +2,7 @@ import { rootServerMiddleware } from "@/middleware/root.server";
 import { HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import viewTransitionsCss from "../styles/view-transitions.css?url";
 
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -57,6 +58,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: viewTransitionsCss },
       { rel: "icon", href: AppConfig.assets.iconSvg, type: "image/svg+xml" },
       { rel: "icon", href: AppConfig.assets.favicon, sizes: "48x48", type: "image/x-icon" },
       {
@@ -80,7 +82,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="wanna" suppressHydrationWarning>
+    <html lang="en" data-theme="wanna" data-style="angled" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

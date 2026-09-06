@@ -33,6 +33,7 @@ const config = defineConfig({
     tanstackStart({
       router: {
         routeToken: "layout",
+        routeFileIgnorePattern:"__generated__/*",
       },
       // sitemap: {
       //   enabled: true,

@@ -5,7 +5,8 @@ import {
   setViewerIsFollowing,
 } from "@/routes/_dashboard/$user/-components/user/follow-user-shared";
 import { useState } from "react";
-import { graphql, useMutation } from "react-relay";
+import { commitLocalUpdate, graphql, useMutation, useRelayEnvironment } from "react-relay";
+import { toast } from "sonner";
 import type { FollowBackAllButtonMutation } from "./__generated__/FollowBackAllButtonMutation.graphql";
 
 export type FollowBackTarget = {
@@ -14,16 +15,15 @@ export type FollowBackTarget = {
 };
 
 type FollowBackAllButtonProps = {
-  /** Users in this loaded batch who follow the viewer but are not followed yet. */
+  /** Loaded users who follow the viewer but are not followed yet. */
   targets: readonly FollowBackTarget[];
-  /** Which loaded page this control belongs to (for data-test). */
-  batchIndex?: number;
 };
 
 /**
- * Follows every eligible user in the current loaded batch (sequential).
+ * Follows every eligible loaded user (sequential). Count grows as more pages load.
  */
-export function FollowBackAllButton({ targets, batchIndex = 0 }: FollowBackAllButtonProps) {
+export function FollowBackAllButton({ targets }: FollowBackAllButtonProps) {
+  const environment = useRelayEnvironment();
   const [scopeDialogOpen, setScopeDialogOpen] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [commitFollow, isMutating] = useMutation<FollowBackAllButtonMutation>(FOLLOW_USER);
@@ -42,15 +42,48 @@ export function FollowBackAllButton({ targets, batchIndex = 0 }: FollowBackAllBu
         size="sm"
         variant="outline"
         disabled={pending}
-        data-test={`follow-back-all-${batchIndex}`}
+        data-test="follow-back-all"
         onClick={() => {
           const queue = [...targets];
           const total = queue.length;
+          const failures: { login: string; message: string }[] = [];
           setProgress({ done: 0, total });
+
+          const revertOptimistic = (userId: string) => {
+            commitLocalUpdate(environment, (store) => {
+              setViewerIsFollowing(store, userId, false);
+            });
+          };
+
+          const finish = () => {
+            setProgress(null);
+            if (failures.length === 0) return;
+            if (failures.length === total) {
+              toast.error(
+                `Failed to follow back ${failures.length} user${failures.length === 1 ? "" : "s"}`,
+                {
+                  description: failures
+                    .map((item) => `@${item.login}: ${item.message}`)
+                    .join("; "),
+                },
+              );
+              return;
+            }
+            toast.message("Follow back finished with mixed results", {
+              description: `${total - failures.length} followed, ${failures.length} failed. ${failures
+                .map((item) => `@${item.login}: ${item.message}`)
+                .join("; ")}`,
+            });
+          };
+
+          const recordFailure = (login: string, message: string, userId: string) => {
+            failures.push({ login, message });
+            revertOptimistic(userId);
+          };
 
           const runNext = (index: number) => {
             if (index >= queue.length) {
-              setProgress(null);
+              finish();
               return;
             }
             const target = queue[index]!;
@@ -66,19 +99,29 @@ export function FollowBackAllButton({ targets, batchIndex = 0 }: FollowBackAllBu
               },
               onCompleted: (_response, errors) => {
                 if (isMissingFollowScope(errors)) {
+                  revertOptimistic(target.id);
                   setScopeDialogOpen(true);
                   setProgress(null);
                   return;
+                }
+                if (errors?.length) {
+                  recordFailure(
+                    target.login,
+                    errors[0]?.message ?? "Follow request failed.",
+                    target.id,
+                  );
                 }
                 setProgress({ done: index + 1, total });
                 runNext(index + 1);
               },
               onError: (error) => {
                 if (isMissingFollowScope([error])) {
+                  revertOptimistic(target.id);
                   setScopeDialogOpen(true);
                   setProgress(null);
                   return;
                 }
+                recordFailure(target.login, error.message, target.id);
                 setProgress({ done: index + 1, total });
                 runNext(index + 1);
               },

@@ -1,3 +1,4 @@
+import { withThemeViewTransition } from "@/lib/tanstack/router/theme-view-transition";
 import { useTheme } from "@/lib/tanstack/router/use-theme";
 import { cn } from "@/lib/utils";
 import { Moon, Sun } from "lucide-react";
@@ -12,13 +13,7 @@ export function ThemeToggle({ className, showDevSelect = true }: ThemeToggleProp
 
   function toggleTheme() {
     const newTheme = theme === "light" ? "dark" : "light";
-    if (typeof document !== "undefined" && "startViewTransition" in document) {
-      try {
-        document.startViewTransition(() => updateTheme(newTheme));
-        return;
-      } catch {}
-    }
-    updateTheme(newTheme);
+    withThemeViewTransition(() => updateTheme(newTheme));
   }
 
   return (
@@ -26,7 +21,11 @@ export function ThemeToggle({ className, showDevSelect = true }: ThemeToggleProp
       {showDevSelect && import.meta.env.DEV ? (
         <select
           className="select select-bordered select-sm hidden max-w-xs md:inline-flex"
-          onChange={(e) => (document.documentElement.dataset.style = e.target.value)}
+          defaultValue="angled"
+          aria-label="Theme transition style"
+          onChange={(e) => {
+            document.documentElement.dataset.style = e.target.value;
+          }}
         >
           <option value="default">Default</option>
           <option value="vertical">Vertical</option>

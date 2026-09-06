@@ -18,6 +18,7 @@ import { Route as DashboardUserIndexRouteImport } from './routes/_dashboard/$use
 import { Route as DashboardViewerIndexRouteImport } from './routes/_dashboard/viewer/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DashboardUserReposIndexRouteImport } from './routes/_dashboard/$user/repos/index'
+import { Route as DashboardUserSearchIndexRouteImport } from './routes/_dashboard/$user/search/index'
 import { Route as DashboardUserStarsIndexRouteImport } from './routes/_dashboard/$user/stars/index'
 import { Route as DashboardUserReposRepoIndexRouteImport } from './routes/_dashboard/$user/repos/$repo/index'
 
@@ -65,6 +66,12 @@ const DashboardUserReposIndexRoute = DashboardUserReposIndexRouteImport.update({
   path: '/repos/',
   getParentRoute: () => DashboardUserLayoutRoute,
 } as any)
+const DashboardUserSearchIndexRoute =
+  DashboardUserSearchIndexRouteImport.update({
+    id: '/search/',
+    path: '/search/',
+    getParentRoute: () => DashboardUserLayoutRoute,
+  } as any)
 const DashboardUserStarsIndexRoute = DashboardUserStarsIndexRouteImport.update({
   id: '/stars/',
   path: '/stars/',
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/$user/': typeof DashboardUserIndexRoute
   '/viewer/': typeof DashboardViewerIndexRoute
   '/$user/repos/': typeof DashboardUserReposIndexRoute
+  '/$user/search/': typeof DashboardUserSearchIndexRoute
   '/$user/stars/': typeof DashboardUserStarsIndexRoute
   '/$user/repos/$repo/': typeof DashboardUserReposRepoIndexRoute
 }
@@ -97,6 +105,7 @@ export interface FileRoutesByTo {
   '/$user': typeof DashboardUserIndexRoute
   '/viewer': typeof DashboardViewerIndexRoute
   '/$user/repos': typeof DashboardUserReposIndexRoute
+  '/$user/search': typeof DashboardUserSearchIndexRoute
   '/$user/stars': typeof DashboardUserStarsIndexRoute
   '/$user/repos/$repo': typeof DashboardUserReposRepoIndexRoute
 }
@@ -111,6 +120,7 @@ export interface FileRoutesById {
   '/_dashboard/$user/': typeof DashboardUserIndexRoute
   '/_dashboard/viewer/': typeof DashboardViewerIndexRoute
   '/_dashboard/$user/repos/': typeof DashboardUserReposIndexRoute
+  '/_dashboard/$user/search/': typeof DashboardUserSearchIndexRoute
   '/_dashboard/$user/stars/': typeof DashboardUserStarsIndexRoute
   '/_dashboard/$user/repos/$repo/': typeof DashboardUserReposRepoIndexRoute
 }
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/$user/'
     | '/viewer/'
     | '/$user/repos/'
+    | '/$user/search/'
     | '/$user/stars/'
     | '/$user/repos/$repo/'
   fileRoutesByTo: FileRoutesByTo
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/$user'
     | '/viewer'
     | '/$user/repos'
+    | '/$user/search'
     | '/$user/stars'
     | '/$user/repos/$repo'
   id:
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
     | '/_dashboard/$user/'
     | '/_dashboard/viewer/'
     | '/_dashboard/$user/repos/'
+    | '/_dashboard/$user/search/'
     | '/_dashboard/$user/stars/'
     | '/_dashboard/$user/repos/$repo/'
   fileRoutesById: FileRoutesById
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUserReposIndexRouteImport
       parentRoute: typeof DashboardUserLayoutRoute
     }
+    '/_dashboard/$user/search/': {
+      id: '/_dashboard/$user/search/'
+      path: '/search'
+      fullPath: '/$user/search/'
+      preLoaderRoute: typeof DashboardUserSearchIndexRouteImport
+      parentRoute: typeof DashboardUserLayoutRoute
+    }
     '/_dashboard/$user/stars/': {
       id: '/_dashboard/$user/stars/'
       path: '/stars'
@@ -246,6 +266,7 @@ declare module '@tanstack/react-router' {
 interface DashboardUserLayoutRouteChildren {
   DashboardUserIndexRoute: typeof DashboardUserIndexRoute
   DashboardUserReposIndexRoute: typeof DashboardUserReposIndexRoute
+  DashboardUserSearchIndexRoute: typeof DashboardUserSearchIndexRoute
   DashboardUserStarsIndexRoute: typeof DashboardUserStarsIndexRoute
   DashboardUserReposRepoIndexRoute: typeof DashboardUserReposRepoIndexRoute
 }
@@ -253,6 +274,7 @@ interface DashboardUserLayoutRouteChildren {
 const DashboardUserLayoutRouteChildren: DashboardUserLayoutRouteChildren = {
   DashboardUserIndexRoute: DashboardUserIndexRoute,
   DashboardUserReposIndexRoute: DashboardUserReposIndexRoute,
+  DashboardUserSearchIndexRoute: DashboardUserSearchIndexRoute,
   DashboardUserStarsIndexRoute: DashboardUserStarsIndexRoute,
   DashboardUserReposRepoIndexRoute: DashboardUserReposRepoIndexRoute,
 }

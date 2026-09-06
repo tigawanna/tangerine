@@ -8,7 +8,10 @@ import {
 } from "../repos/RepoFilters";
 import { ReposTabPanel } from "../repos/ReposTabPanel";
 import { UserStarredRepos } from "../starred/UserStarredRepos";
-import { UserFollowersList } from "../followers/UserFollowersList";
+import {
+  FollowersFollowBackAll,
+  UserFollowersList,
+} from "../followers/UserFollowersList";
 import { UserFollowingList } from "../following/UserFollowingList";
 import { userQuery, userTabOptions, resolveUserSearch } from "../../layout";
 import type { layoutUserPageLoaderQuery } from "../../__generated__/layoutUserPageLoaderQuery.graphql";
@@ -115,6 +118,9 @@ export function UserPage() {
               <div role="tabpanel" className="mt-0 space-y-4" data-test="user-tabpanel-followers">
                 <TabFilterBar testId="followers-filters">
                   <PeopleSearchInput placeholder="Filter by name or login…" />
+                  <Suspense fallback={null}>
+                    <FollowersFollowBackAll followersKey={user} />
+                  </Suspense>
                 </TabFilterBar>
                 <Suspense fallback={<TabFallback label="followers" />}>
                   <UserFollowersList followersKey={user} />

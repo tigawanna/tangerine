@@ -1,6 +1,9 @@
 import { LoadMoreButton } from "@/lib/relay/LoadMoreButton";
 import type { layoutUserPageLoaderQuery } from "@/routes/_dashboard/$user/__generated__/layoutUserPageLoaderQuery.graphql";
-import { FollowBackAllButton } from "@/routes/_dashboard/$user/-components/user/FollowBackAllButton";
+import {
+  FollowBackAllButton,
+  type FollowBackTarget,
+} from "@/routes/_dashboard/$user/-components/user/FollowBackAllButton";
 import { defaultUserSearch, resolveUserSearch } from "@/routes/_dashboard/$user/layout";
 import { getRouteApi, Link } from "@tanstack/react-router";
 import { graphql, useFragment, usePaginationFragment } from "react-relay";
@@ -10,9 +13,6 @@ import type { UserCard_user$key } from "./__generated__/UserCard_user.graphql";
 
 const userRoute = getRouteApi("/_dashboard/$user/");
 
-/** Matches `loadNext(12)` / fragment default — one “Follow back all” per loaded page. */
-const FOLLOWERS_BATCH_SIZE = 12;
-
 interface UserFollowersListProps {
   followersKey: UserFollowersFragment$key;
 }
@@ -20,7 +20,6 @@ interface UserFollowersListProps {
 /**
  * Paginated followers list. `peopleQ` filters loaded cards client-side
  * (GitHub's followers connection has no search/order args).
- * Each loaded page of 12 gets a “Follow back all” for eligible users in that batch.
  */
 export function UserFollowersList({ followersKey }: UserFollowersListProps) {
   const { peopleQ } = resolveUserSearch(userRoute.useSearch());
@@ -48,17 +47,9 @@ export function UserFollowersList({ followersKey }: UserFollowersListProps) {
     );
   }
 
-  const batches: NonNullable<(typeof edges)[number]>[][] = [];
-  for (let i = 0; i < edges.length; i += FOLLOWERS_BATCH_SIZE) {
-    const slice = edges.slice(i, i + FOLLOWERS_BATCH_SIZE).filter((edge) => edge != null);
-    batches.push(slice);
-  }
+  const visible = edges.filter((edge) => edge?.node && matchesSearch(edge.node));
 
-  const anyVisible = batches.some((batch) =>
-    batch.some((edge) => edge.node && matchesSearch(edge.node)),
-  );
-
-  if (!anyVisible) {
+  if (visible.length === 0) {
     return (
       <div
         className="border-base-300 text-base-content/70 space-y-4 rounded-xl border border-dashed p-8 text-sm"
@@ -74,45 +65,52 @@ export function UserFollowersList({ followersKey }: UserFollowersListProps) {
   }
 
   return (
-    <div className="space-y-8" data-test="user-followers">
-      {batches.map((batch, batchIndex) => {
-        const visible = batch.filter((edge) => edge.node && matchesSearch(edge.node));
-        if (visible.length === 0) return null;
-
-        const followBackTargets = visible.flatMap((edge) => {
-          const node = edge.node;
-          if (!node) return [];
-          if (node.isViewer || node.viewerIsFollowing || !node.isFollowingViewer) return [];
-          return [{ id: node.id, login: node.login }];
-        });
-
-        return (
-          <section
-            key={`followers-batch-${batchIndex}`}
-            className="space-y-3"
-            data-test={`user-followers-batch-${batchIndex}`}
-          >
-            {followBackTargets.length > 0 ? (
-              <div className="flex justify-end">
-                <FollowBackAllButton targets={followBackTargets} batchIndex={batchIndex} />
-              </div>
-            ) : null}
-            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {visible.map((edge) => {
-                if (!edge.node) return null;
-                return (
-                  <li key={edge.cursor}>
-                    <UserCard user={edge.node} />
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        );
-      })}
+    <div className="space-y-4" data-test="user-followers">
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {visible.map((edge) => {
+          if (!edge?.node) return null;
+          return (
+            <li key={edge.cursor}>
+              <UserCard user={edge.node} />
+            </li>
+          );
+        })}
+      </ul>
       <LoadMoreButton frag={frag} />
     </div>
   );
+}
+
+/**
+ * Sticky-bar control: follows every eligible user in the currently loaded
+ * followers connection (grows as Load more fetches more pages).
+ */
+export function FollowersFollowBackAll({
+  followersKey,
+}: {
+  followersKey: UserFollowersFragment$key;
+}) {
+  const { peopleQ } = resolveUserSearch(userRoute.useSearch());
+  const frag = usePaginationFragment<layoutUserPageLoaderQuery, UserFollowersFragment$key>(
+    FollowersFragment,
+    followersKey,
+  );
+  const q = peopleQ.trim().toLowerCase();
+  const edges = frag.data.followers.edges ?? [];
+
+  const targets: FollowBackTarget[] = [];
+  for (const edge of edges) {
+    const node = edge?.node;
+    if (!node) continue;
+    if (q) {
+      const hay = `${node.login} ${node.name ?? ""}`.toLowerCase();
+      if (!hay.includes(q)) continue;
+    }
+    if (node.isViewer || node.viewerIsFollowing || !node.isFollowingViewer) continue;
+    targets.push({ id: node.id, login: node.login });
+  }
+
+  return <FollowBackAllButton targets={targets} />;
 }
 
 function UserCard({ user }: { user: UserCard_user$key }) {

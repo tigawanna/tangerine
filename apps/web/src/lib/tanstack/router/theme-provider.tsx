@@ -26,6 +26,19 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 const isBrowser = typeof window !== "undefined";
 
+function resolveTheme(theme: Theme, mediaQuery: MediaQueryList): ResolvedTheme {
+  if (theme === "system") {
+    return mediaQuery.matches ? "dark" : "light";
+  }
+  return theme;
+}
+
+function applyResolvedTheme(root: HTMLElement, resolved: ResolvedTheme) {
+  root.classList.remove("light", "dark");
+  root.classList.add(resolved);
+  root.setAttribute("data-theme", resolved);
+}
+
 export function ThemeProvider({
   children,
   defaultTheme = "system",
@@ -41,19 +54,9 @@ export function ThemeProvider({
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     function applyTheme() {
-      root.classList.remove("light", "dark");
-
-      if (theme === "system") {
-        const systemTheme = mediaQuery.matches ? "dark" : "light";
-        setResolvedTheme(systemTheme);
-        root.classList.add(systemTheme);
-        root.setAttribute("data-theme", systemTheme);
-        return;
-      }
-
-      setResolvedTheme(theme as ResolvedTheme);
-      root.classList.add(theme);
-      root.setAttribute("data-theme", theme);
+      const resolved = resolveTheme(theme, mediaQuery);
+      applyResolvedTheme(root, resolved);
+      setResolvedTheme(resolved);
     }
 
     mediaQuery.addEventListener("change", applyTheme);
@@ -68,6 +71,13 @@ export function ThemeProvider({
       resolvedTheme,
       setTheme: (newTheme: Theme) => {
         localStorage.setItem(storageKey, newTheme);
+        // Apply DOM classes synchronously so view transitions capture the new theme.
+        if (isBrowser) {
+          const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+          const resolved = resolveTheme(newTheme, mediaQuery);
+          applyResolvedTheme(document.documentElement, resolved);
+          setResolvedTheme(resolved);
+        }
         setTheme(newTheme);
       },
     }),

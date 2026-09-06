@@ -4,6 +4,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { withThemeViewTransition } from "@/lib/tanstack/router/theme-view-transition";
 import { useTheme } from "@/lib/tanstack/router/use-theme";
 import { Moon, Sun } from "lucide-react";
 
@@ -14,7 +15,7 @@ export function DashboardTheme() {
 
   function toggleTheme() {
     const newTheme = theme === "light" ? "dark" : "light";
-    updateTheme(newTheme);
+    withThemeViewTransition(() => updateTheme(newTheme));
   }
 
   return (

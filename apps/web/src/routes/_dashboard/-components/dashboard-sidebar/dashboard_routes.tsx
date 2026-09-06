@@ -1,6 +1,7 @@
 import type { SidebarItem } from "@/components/sidebar/types";
+import { defaultGithubSearch } from "@/routes/_dashboard/-components/search/github-search";
 import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
-import { Star, User, Users } from "lucide-react";
+import { Search, Star, User, Users } from "lucide-react";
 
 /**
  * Sidebar links for the profile in the URL.
@@ -33,6 +34,13 @@ export function dashboardPrimaryRoutes(user: string): SidebarItem[] {
       search: { ...defaultUserSearch, tab: "followers" },
       replace: true,
       icon: Users,
+    },
+    {
+      title: "Search",
+      href: "/$user/search",
+      params,
+      search: defaultGithubSearch,
+      icon: Search,
     },
   ];
 }

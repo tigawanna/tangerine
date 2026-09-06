@@ -5,7 +5,8 @@ import {
   setViewerIsFollowing,
 } from "@/routes/_dashboard/$user/-components/user/follow-user-shared";
 import { useState } from "react";
-import { graphql, useFragment, useMutation } from "react-relay";
+import { commitLocalUpdate, graphql, useFragment, useMutation, useRelayEnvironment } from "react-relay";
+import { toast } from "sonner";
 import type { FollowUserButton_user$key } from "./__generated__/FollowUserButton_user.graphql";
 import type { FollowUserButtonfollowMutation } from "./__generated__/FollowUserButtonfollowMutation.graphql";
 import type { FollowUserButtonunfollowMutation } from "./__generated__/FollowUserButtonunfollowMutation.graphql";
@@ -24,6 +25,7 @@ interface FollowUserButtonProps {
  */
 export function FollowUserButton({ user, size = "sm", className }: FollowUserButtonProps) {
   const data = useFragment(FollowUserButtonFragment, user);
+  const environment = useRelayEnvironment();
   const [scopeDialogOpen, setScopeDialogOpen] = useState(false);
   const [followMutation, isFollowPending] = useMutation<FollowUserButtonfollowMutation>(FOLLOW_USER);
   const [unfollowMutation, isUnfollowPending] =
@@ -34,6 +36,28 @@ export function FollowUserButton({ user, size = "sm", className }: FollowUserBut
   const following = data.viewerIsFollowing;
   const pending = isFollowPending || isUnfollowPending;
   const label = following ? "Unfollow" : data.isFollowingViewer ? "Follow back" : "Follow";
+
+  const revertOptimistic = (value: boolean) => {
+    commitLocalUpdate(environment, (store) => {
+      setViewerIsFollowing(store, data.id, value);
+    });
+  };
+
+  const handleMutationErrors = (
+    action: "follow" | "unfollow",
+    errors: ReadonlyArray<{ message: string }> | null | undefined,
+  ) => {
+    if (isMissingFollowScope(errors)) {
+      revertOptimistic(action === "follow" ? false : true);
+      setScopeDialogOpen(true);
+      return;
+    }
+    if (!errors?.length) return;
+    revertOptimistic(action === "follow" ? false : true);
+    toast.error(`Couldn’t ${action} @${data.login}`, {
+      description: errors[0]?.message ?? "Request failed.",
+    });
+  };
 
   return (
     <>
@@ -57,10 +81,18 @@ export function FollowUserButton({ user, size = "sm", className }: FollowUserBut
                 setViewerIsFollowing(store, data.id, false);
               },
               onCompleted: (_response, errors) => {
-                if (isMissingFollowScope(errors)) setScopeDialogOpen(true);
+                handleMutationErrors("unfollow", errors);
               },
               onError: (error) => {
-                if (isMissingFollowScope([error])) setScopeDialogOpen(true);
+                if (isMissingFollowScope([error])) {
+                  revertOptimistic(true);
+                  setScopeDialogOpen(true);
+                  return;
+                }
+                revertOptimistic(true);
+                toast.error(`Couldn’t unfollow @${data.login}`, {
+                  description: error.message,
+                });
               },
             });
             return;
@@ -74,10 +106,18 @@ export function FollowUserButton({ user, size = "sm", className }: FollowUserBut
               setViewerIsFollowing(store, data.id, true);
             },
             onCompleted: (_response, errors) => {
-              if (isMissingFollowScope(errors)) setScopeDialogOpen(true);
+              handleMutationErrors("follow", errors);
             },
             onError: (error) => {
-              if (isMissingFollowScope([error])) setScopeDialogOpen(true);
+              if (isMissingFollowScope([error])) {
+                revertOptimistic(false);
+                setScopeDialogOpen(true);
+                return;
+              }
+              revertOptimistic(false);
+              toast.error(`Couldn’t follow @${data.login}`, {
+                description: error.message,
+              });
             },
           });
         }}
