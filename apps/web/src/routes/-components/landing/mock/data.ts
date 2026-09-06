@@ -157,8 +157,9 @@ export type LandingMockPerson = {
   id: string;
   name: string;
   login: string;
+  bio: string;
   avatarUrl: string;
-  action: "Follow back" | "Following" | "Follow";
+  action: "Follow back" | "Unfollow" | "Follow" | "Following";
 };
 
 export const landingMockPeople = [
@@ -166,6 +167,7 @@ export const landingMockPeople = [
     id: "p1",
     name: "Ada Chen",
     login: "adachen",
+    bio: "Building CLI tools and warm UI kits.",
     avatarUrl: "https://api.dicebear.com/9.x/notionists/svg?seed=AdaChen&backgroundColor=c0aede",
     action: "Follow back",
   },
@@ -173,15 +175,25 @@ export const landingMockPeople = [
     id: "p2",
     name: "Marcus Lee",
     login: "marcuslee",
+    bio: "Relay, routers, and late-night deploys.",
     avatarUrl: "https://api.dicebear.com/9.x/notionists/svg?seed=MarcusLee&backgroundColor=b6e3f4",
-    action: "Following",
+    action: "Follow back",
   },
   {
     id: "p3",
     name: "Priya Nair",
     login: "priyanair",
+    bio: "Open source maintainer. Stars collector.",
     avatarUrl: "https://api.dicebear.com/9.x/notionists/svg?seed=PriyaNair&backgroundColor=ffd5dc",
-    action: "Follow",
+    action: "Unfollow",
+  },
+  {
+    id: "p4",
+    name: "Jonah Brooks",
+    login: "jbrooks",
+    bio: "Shipping local-first side projects.",
+    avatarUrl: "https://api.dicebear.com/9.x/notionists/svg?seed=JonahBrooks&backgroundColor=d1f4d1",
+    action: "Unfollow",
   },
 ] as const satisfies readonly LandingMockPerson[];
 

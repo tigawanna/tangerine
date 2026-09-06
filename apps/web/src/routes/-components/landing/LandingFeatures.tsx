@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
 import {
   LandingMockBulkDeletePreview,
+  LandingMockBulkFollowBackPreview,
   LandingMockGithubSearchPreview,
   LandingMockGraphPreview,
   LandingMockReposPreview,
@@ -36,7 +37,7 @@ const features = [
   },
   {
     title: "Ergonomic search",
-    body: "A keyboard-first search bar with a visual GitHub query editor — compose language, stars, owners, and more without memorizing qualifier syntax.",
+    body: "A keyboard-first search bar with a visual GitHub query editor. Compose language, stars, owners, and more without memorizing qualifier syntax.",
     href: "/viewer" as const,
     preview: <LandingMockGithubSearchPreview className="min-h-48 md:min-h-64" />,
     openLabel: "Try search",
@@ -49,6 +50,13 @@ const features = [
     openLabel: "Open repositories",
   },
   {
+    title: "Bulk follow back",
+    body: "Wake up to a pile of new followers you actually want to return the favor to. One Follow back all button handles the whole list so you are not tapping Follow twenty times.",
+    href: "/viewer" as const,
+    preview: <LandingMockBulkFollowBackPreview className="min-h-48 md:min-h-64" />,
+    openLabel: "Open followers",
+  },
+  {
     title: "Intelligent loading",
     body: "A Relay-powered SPA that preloads what you need and skips full-page reloads between views.",
     href: "/viewer" as const,
@@ -57,7 +65,7 @@ const features = [
   },
   {
     title: "Natural language search",
-    body: "Coming later: ask for the starred repo you mean in plain English — local RAG over your stars, not keyword bingo.",
+    body: "Coming later: ask for the starred repo you mean in plain English. Local RAG over your stars, not keyword bingo.",
     href: "/viewer" as const,
     preview: <LandingMockSearchPreview className="min-h-48 md:min-h-64" />,
     badge: "Soon",

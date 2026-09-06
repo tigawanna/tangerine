@@ -229,7 +229,7 @@ export function LandingMockSearchPreview({ className }: { className?: string }) 
         ))}
       </ul>
       <p className="text-base-content/40 mt-2 text-center text-[10px] tracking-wide uppercase">
-        Local RAG over your stars — soon
+        Local RAG over your stars · soon
       </p>
     </div>
   );
@@ -337,14 +337,11 @@ export function LandingMockGraphPreview({ className }: { className?: string }) {
         <p className="text-base-content/45 text-[10px] font-semibold tracking-wide uppercase">
           Keep following the thread
         </p>
-        <span className="bg-primary text-primary-content inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium">
-          <UserPlus className="size-3" />
-          Follow back all
-        </span>
+        <span className="text-base-content/40 text-[10px]">3 hops deep</span>
       </div>
 
       <ul className="space-y-2">
-        {landingMockPeople.map((person) => (
+        {landingMockPeople.slice(0, 3).map((person) => (
           <li
             key={person.id}
             className="border-base-300 bg-base-200/60 flex items-center gap-3 rounded-lg border px-2.5 py-2"
@@ -361,9 +358,69 @@ export function LandingMockGraphPreview({ className }: { className?: string }) {
             <span
               className={cn(
                 "shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold",
-                person.action === "Following"
-                  ? "border-base-300 text-base-content/55 border"
-                  : "bg-primary/15 text-primary",
+                person.action === "Follow back"
+                  ? "bg-primary/15 text-primary"
+                  : "border-base-300 text-base-content/55 border",
+              )}
+            >
+              {person.action === "Follow back" ? "Open" : "View"}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Bulk follow-back: one button for everyone who followed you overnight. */
+export function LandingMockBulkFollowBackPreview({ className }: { className?: string }) {
+  const followBackCount = landingMockPeople.filter((person) => person.action === "Follow back").length;
+
+  return (
+    <div
+      className={cn(
+        "bg-base-100 text-base-content pointer-events-none select-none overflow-hidden rounded-xl p-3",
+        className,
+      )}
+      data-test="landing-mock-bulk-follow-back-preview"
+      aria-hidden
+    >
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="border-base-300 bg-base-200/70 text-base-content/45 flex h-9 min-w-0 flex-1 items-center rounded-lg border px-3 text-xs">
+          Filter by name or login…
+        </div>
+        <span className="border-base-300 bg-base-200 text-base-content inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg border px-3 text-xs font-semibold">
+          <UserPlus className="size-3.5" />
+          Follow back all ({followBackCount})
+        </span>
+      </div>
+
+      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {landingMockPeople.map((person) => (
+          <li
+            key={person.id}
+            className="border-base-300 bg-base-200/60 flex flex-col gap-2 rounded-xl border p-3"
+          >
+            <div className="flex items-start gap-2.5">
+              <img
+                src={person.avatarUrl}
+                alt=""
+                className="border-base-300 size-10 shrink-0 rounded-full border object-cover"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-semibold">{person.name}</p>
+                <p className="text-base-content/50 truncate text-[11px]">@{person.login}</p>
+                <p className="text-base-content/55 mt-1 line-clamp-2 text-[11px] leading-4">
+                  {person.bio}
+                </p>
+              </div>
+            </div>
+            <span
+              className={cn(
+                "inline-flex w-full items-center justify-center rounded-lg px-2.5 py-1.5 text-[11px] font-semibold",
+                person.action === "Follow back"
+                  ? "bg-primary text-primary-content"
+                  : "border-base-300 text-base-content/60 border",
               )}
             >
               {person.action}
