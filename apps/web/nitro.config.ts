@@ -1,7 +1,15 @@
 import { defineConfig } from "nitro";
 import evlog from "evlog/nitro/v3";
 
+const isVercel = Boolean(process.env.VERCEL);
+const isProd = process.env.NODE_ENV === "production";
+
 export default defineConfig({
+  /**
+   * Vercel sets `VERCEL=1` during build/runtime. Explicit preset keeps the
+   * Build Output API layout stable for TanStack Start + Nitro.
+   */
+  preset: isVercel ? "vercel" : undefined,
   /**
    * libsql uses dynamic `require('@libsql/<platform>')` for local file DB.
    * Force-trace native bindings so Vercel serverless functions can load them when needed.
@@ -10,11 +18,12 @@ export default defineConfig({
   experimental: {
     asyncContext: true,
   },
-  plugins: ["./server/plugins/evlog-fs-drain.ts"],
+  /** Local FS drains are not available on Vercel Functions. */
+  plugins: isVercel || isProd ? [] : ["./server/plugins/evlog-fs-drain.ts"],
   modules: [
     evlog({
-      env: { service: "tigawanna-site" },
-      enabled: process.env.NODE_ENV !== "production",
+      env: { service: "tangerine" },
+      enabled: !isProd,
     }),
   ],
 });

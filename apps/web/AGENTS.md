@@ -19,6 +19,8 @@ Before editing files for a substantial task:
 
 **Auth:** GitHub OAuth only, from `@repo/auth`. Protect dashboards with `beforeLoad` + `redirect()` to `/auth`. Server singleton is `getAuth()` in `src/lib/auth.server.ts`. React client is `@/lib/auth-client`.
 
+**Deploy (Vercel):** Project Root Directory = `apps/web`. Framework preset = TanStack Start (`vercel.json`). Install runs from the monorepo root; build is `pnpm run build` in `apps/web`. Set the env vars from `.env.example` (especially `VITE_APP_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_TRUSTED_ORIGINS`, GitHub OAuth). GitHub callback: `{BETTER_AUTH_URL}/api/auth/callback/github`.
+
 **Relay (dashboard only):** `/_dashboard` is `ssr: false`. `beforeLoad` sets `githubLogin` + a **stable** Relay `Environment` on context. `/viewer` is the post-login entry and redirects to `/$user` with that login. Nested under `/$user`: profile index, `repos`, `stars`. Layout `loadQuery`; children `usePreloadedQuery`. Run `pnpm relay` after GraphQL edits.
 
 **Do:** `beforeLoad` + `redirect()` for auth. Route UI in `-components/`. Nest user-scoped pages under `/$user/...`. Sidebar hrefs include the active login.
