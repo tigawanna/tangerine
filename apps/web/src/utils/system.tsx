@@ -14,7 +14,7 @@ const assets = {
   icon: "/icon.png",
   iconSvg: "/icon.svg",
   ogImage: "/opengraph-image.jpg",
-  ogImageAlt: "Tangerine app preview",
+  ogImageAlt: "Tangerine GitHub dashboard preview",
 } as const;
 
 const links = {

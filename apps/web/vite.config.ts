@@ -33,25 +33,18 @@ const config = defineConfig({
     tanstackStart({
       router: {
         routeToken: "layout",
-        routeFileIgnorePattern:"__generated__/*",
+        routeFileIgnorePattern: "__generated__/*",
       },
-      // sitemap: {
-      //   enabled: true,
-      //   host: "https://www.tigawanna.vip",
-      // },
-      // prerender: {
-      //   enabled: true,
-      //   autoSubfolderIndex: true,
-      //   autoStaticPathsDiscovery: true,
-      //   crawlLinks: true,
-      //   concurrency: 14,
-      //   retryCount: 2,
-      //   retryDelay: 1000,
-      //   maxRedirects: 5,
-      //   failOnError: true,
-      //   // Skip OG image endpoint if crawled
-      //   filter: ({ path }) => !path.startsWith("/og"),
-      // },
+      prerender: {
+        enabled: true,
+        autoStaticPathsDiscovery: false,
+        crawlLinks: false,
+        concurrency: 4,
+        retryCount: 2,
+        retryDelay: 1000,
+        failOnError: true,
+      },
+      pages: [{ path: "/" }],
     }),
     nitro(),
     tailwindcss(),
