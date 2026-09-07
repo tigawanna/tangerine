@@ -24,6 +24,10 @@ export type CreateAuthOptions = {
  *
  * Better Auth stores the session and GitHub account in signed cookies
  * (`storeAccountCookie`) when `database` is omitted.
+ *
+ * For Turso / Drizzle-backed auth (Hono API), apps own their own
+ * `betterAuth({ database: drizzleAdapter(...), plugins })` and import
+ * shared pieces (`authEnvSchema`, org AC/roles, GitHub helpers) from this package.
  */
 export function createAuth(options: CreateAuthOptions) {
   const { secret, baseURL, trustedOrigins, github, adminEmail, plugins = [] } = options;

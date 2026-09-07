@@ -25,6 +25,7 @@ const config = defineConfig({
     ],
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@api": fileURLToPath(new URL("../api/src", import.meta.url)),
     },
   },
   plugins: [

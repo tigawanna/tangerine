@@ -18,7 +18,7 @@
     "test:watch": "vp test"
   },
   "dependencies": {
-    "better-auth": "^1.7.2",
+    "better-auth": "^1.7.3",
     "zod": "^4.5.4"
   },
   "devDependencies": {

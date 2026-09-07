@@ -1,4 +1,5 @@
 /* eslint-disable node/no-process-env */
+import { authEnvSchema } from "@repo/auth";
 import { config } from "dotenv";
 import { expand } from "dotenv-expand";
 import path from "node:path";
@@ -10,20 +11,26 @@ expand(
   }),
 );
 
-const EnvSchema = z.object({
-  NODE_ENV: z.string().default("development"),
-  PORT: z.coerce.number().default(5000),
-  LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
-  DB_LOG_LEVEL: z.enum(["info","silent"]).default("info"),
-  DATABASE_URL: z.url().optional(),
-  DATABASE_AUTH_TOKEN: z.string().optional(),
-  REDIS_PORT: z.string().optional(),
-  CRUD_BEARER_TOKEN: z.string().optional(),
-  FRONTEND_URL: z.string().optional(),
-  BREVO_API_KEY: z.string().optional(),
-  BREVO_USER: z.string().optional(),
-  EMAIL_FROM: z.string().optional(),
-});
+const EnvSchema = authEnvSchema
+  .extend({
+    NODE_ENV: z.string().default("development"),
+    PORT: z.coerce.number().default(5000),
+    LOG_LEVEL: z
+      .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
+      .default("info"),
+    DB_LOG_LEVEL: z.enum(["info", "silent"]).default("info"),
+    /** Turso / libsql URL (`libsql://…` or `file:local.db`). */
+    DATABASE_URL: z.string().min(1),
+    DATABASE_AUTH_TOKEN: z.string().optional(),
+    FRONTEND_URL: z.url().optional(),
+    CRUD_BEARER_TOKEN: z.string().optional(),
+  })
+  .transform((env) => ({
+    ...env,
+    BETTER_AUTH_TRUSTED_ORIGINS_LIST: env.BETTER_AUTH_TRUSTED_ORIGINS.split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean),
+  }));
 
 export type env = z.infer<typeof EnvSchema>;
 
@@ -35,9 +42,16 @@ if (error) {
   process.exit(1);
 }
 
-const envVariables = env!;
-export { envVariables };
+export const envVariables = env;
 
 export const isProductionEnv = envVariables.NODE_ENV === "production";
 
-export const AUTHORIZED_ORIGINS = [envVariables.FRONTEND_URL ?? ""];
+export const AUTHORIZED_ORIGINS = [
+  ...new Set(
+    [
+      ...envVariables.BETTER_AUTH_TRUSTED_ORIGINS_LIST,
+      envVariables.FRONTEND_URL,
+      envVariables.BETTER_AUTH_URL,
+    ].filter((origin): origin is string => Boolean(origin)),
+  ),
+];

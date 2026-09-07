@@ -1,6 +1,7 @@
 packages:
   - apps/web
   - apps/desktop
+  - apps/api
   - packages/*
 
 onlyBuiltDependencies:
@@ -22,6 +23,10 @@ catalog:
 overrides:
   vite: "catalog:"
   vitest: "catalog:"
+  "@better-auth/utils": "0.4.2"
+  better-auth: "1.7.3"
+  "@better-auth/core": "1.7.3"
+  "@better-auth/api-key": "1.7.3"
 peerDependencyRules:
   allowAny:
     - vite

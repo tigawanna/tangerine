@@ -1,8 +1,8 @@
 # `@repo/auth`
 
-Shared Better Auth factory for every app (TanStack Start, Deno desktop, CLI).
+Shared Better Auth pieces for every app (TanStack Start, Hono API, Deno desktop, CLI).
 
-GitHub OAuth only. No database — Better Auth keeps the session and GitHub account in signed cookies.
+GitHub OAuth only — no email/password. App-specific wiring (plugins, DB adapter, cookie plugin) stays in the app.
 
 ## Exports
 
@@ -14,12 +14,25 @@ GitHub OAuth only. No database — Better Auth keeps the session and GitHub acco
 | `@repo/auth/tanstack-start` | `tanstackStartCookies` (same better-auth instance as the factory) |
 | `@repo/auth/cli-credentials` | On-disk CLI tokens |
 
-## App wiring
+## Two app patterns
+
+### Cookie session (TanStack Start / desktop)
+
+No database — Better Auth keeps the session and GitHub account in signed cookies.
 
 1. Parse env with `authEnvSchema` (or `.extend()` / `.merge()` your app schema, then parse once).
 2. Call `createAuthFromEnv(env, extraPlugins)`.
 3. TanStack Start: import `tanstackStartCookies` from `@repo/auth/tanstack-start` and pass it **last**.
 4. Mount `auth.handler` at `/api/auth/$`.
+
+### DB-backed (Hono API + Turso)
+
+App owns `betterAuth({ database: drizzleAdapter(...), plugins: [...] })`. Import shared pieces:
+
+- `authEnvSchema` / GitHub helpers from `@repo/auth`
+- `ROLE` / role helpers for app-level admin checks
+
+Do **not** enable `emailAndPassword`. Use GitHub social + optional plugins (`admin`, `bearer`, `@better-auth/api-key`).
 
 ## GitHub App
 
