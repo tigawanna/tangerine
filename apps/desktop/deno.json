@@ -11,7 +11,7 @@
         "windows": "./public/icon.png"
       }
     },
-    "backend": "cef",
+    "backend": "webview",
     "output": {
       "linux": "./dist-desktop/tangerine",
       "macos": "./dist-desktop/Tangerine.app",
