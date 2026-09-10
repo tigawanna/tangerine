@@ -4,7 +4,7 @@ Blank Electron shell. Auth is Better Auth Electron against `apps/api` (GitHub OA
 secrets stay on the API). The system browser opens the web `/auth` page; deep link
 `com.tigawanna.tangerine://` returns the session to the main process.
 
-Shared monorepo rules: root [`AGENTS.md`](../../AGENTS.md).
+Shared monorepo rules: root [`AGENTS.md`](../../AGENTS.md). Auth deep dive: [`docs/auth.md`](../../docs/auth.md).
 
 Docs: [Better Auth Electron](https://better-auth.com/docs/integrations/electron) · [electron-vite](https://electron-vite.org/)
 

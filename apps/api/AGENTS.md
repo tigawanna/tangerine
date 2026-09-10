@@ -2,7 +2,7 @@
 
 Hono API on Node. Shared monorepo rules: root [`AGENTS.md`](../../AGENTS.md).
 
-Auth pieces (`authEnvSchema`, GitHub helpers, org AC/roles, Electron protocol constants) come from [`@repo/auth`](../../packages/auth/AGENTS.md). This app owns the Better Auth instance (Turso adapter + plugins), including the **Electron** plugin for desktop deep-link auth.
+Auth pieces (`authEnvSchema`, GitHub helpers, org AC/roles, Electron protocol constants) come from [`@repo/auth`](../../packages/auth/AGENTS.md). This app owns the Better Auth instance (Turso adapter + plugins), including the **Electron** plugin for desktop deep-link auth. Flows / gotchas: [`docs/auth.md`](../../docs/auth.md).
 
 ## Stack
 

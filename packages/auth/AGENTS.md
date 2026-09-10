@@ -4,6 +4,8 @@ Shared Better Auth pieces for every app (TanStack Start, Hono API, Electron desk
 
 GitHub OAuth only — no email/password. App-specific wiring (plugins, DB adapter, cookie plugin) stays in the app.
 
+**Flows, gotchas, best practices:** [`docs/auth.md`](../../docs/auth.md).
+
 ## Exports
 
 | Import | Use for |

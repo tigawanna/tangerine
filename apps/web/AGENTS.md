@@ -17,7 +17,7 @@ Before editing files for a substantial task:
 
 **Routes:** Folder + `index.tsx`. Thin file: `beforeLoad`, loader, compose. Prefix `-` to opt a folder out of the router.
 
-**Auth:** GitHub OAuth via **`apps/api`** Better Auth (no local `/api/auth` on web — same split as dishi `site`). Client: `@/lib/auth-client` with `baseURL: VITE_API_URL`. Session: `authClient.getSession()` / `getSession()` in `beforeLoad`. Desktop/Electron browser half: `electronProxyClient` + PKCE query + `loopback` / `ensureElectronRedirect`.
+**Auth:** GitHub OAuth via **`apps/api`** Better Auth (no local `/api/auth` on web — same split as dishi `site`). Client: `@/lib/auth-client` with `baseURL: VITE_API_URL`. Session: `authClient.getSession()` / `getSession()` in `beforeLoad`. Desktop/Electron browser half: `electronProxyClient` + PKCE query + `loopback` / `ensureElectronRedirect`. Deep dive: [`docs/auth.md`](../../docs/auth.md).
 
 **Logging (evlog):** Dev Nitro FS drain → monorepo [`.evlog/logs/`](../../.evlog/logs/) (`service: tangerine-web`). Client Vite plugin uses the same service name. **Read:** latest `.evlog/logs/YYYY-MM-DD.jsonl` (NDJSON); `rg '"service":"tangerine-web"' .evlog/logs/`.
 

@@ -19,7 +19,7 @@ Before editing files for a substantial task:
 
 # Deno Desktop
 
-Requires **Deno ≥ 2.9**. Config: [`deno.json`](./deno.json). Preload: [`deno/window.ts`](./deno/window.ts) + [`deno/auth.ts`](./deno/auth.ts).
+Requires **Deno ≥ 2.9**. Config: [`deno.json`](./deno.json). Preload: [`deno/window.ts`](./deno/window.ts) + [`deno/auth.ts`](./deno/auth.ts). Packaging / icons / `dist-desktop` glance: [`README.md`](./README.md).
 
 | Command | What it does |
 | --- | --- |
@@ -32,6 +32,8 @@ Requires **Deno ≥ 2.9**. Config: [`deno.json`](./deno.json). Preload: [`deno/w
 Do **not** point Deno’s `task.dev` at `deno desktop` — HMR invokes `deno task dev` → `pnpm run dev:vite` and must not recurse.
 
 ## OAuth (system browser + API)
+
+Full guide (architecture, env, gotchas, debugging): [`docs/auth.md`](../../docs/auth.md).
 
 Mirrors [Better Auth Electron](https://better-auth.com/docs/integrations/electron) without `@better-auth/electron` on the Deno side:
 
