@@ -35,7 +35,13 @@ function notifyRenderer(channel: string, payload: unknown): void {
 }
 
 function appOrigin(): string {
-  return (Deno.env.get("VITE_APP_URL") ?? "http://localhost:3070").replace(/\/$/, "");
+  const raw = Deno.env.get("VITE_APP_URL")?.trim();
+  if (!raw) {
+    throw new Error(
+      "Desktop auth: missing VITE_APP_URL. Set it in apps/desktop/.env and restart (preload does not hot-reload env).",
+    );
+  }
+  return raw.replace(/\/$/, "");
 }
 
 setAuthListeners({
@@ -59,7 +65,7 @@ win.bind("navigate", async (url: string) => {
   if (typeof url !== "string" || url.length === 0) {
     throw new TypeError("navigate(url) requires a non-empty string");
   }
-  win.navigate(url);
+  await win.navigate(url);
 });
 
 win.bind("openExternal", async (url: string) => {

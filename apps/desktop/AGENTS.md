@@ -19,7 +19,7 @@ Before editing files for a substantial task:
 
 # Deno Desktop
 
-Requires **Deno ≥ 2.9**. Config: [`deno.json`](./deno.json). Preload: [`deno/window.ts`](./deno/window.ts) + [`deno/auth.ts`](./deno/auth.ts). Packaging / icons / `dist-desktop` glance: [`README.md`](./README.md).
+Requires **Deno ≥ 2.9**. Config: [`deno.json`](./deno.json). Preload: [`deno/window.ts`](./deno/window.ts) + [`deno/auth/`](./deno/auth/) (barrel [`deno/auth.ts`](./deno/auth.ts)). Packaging / icons / `dist-desktop` glance: [`README.md`](./README.md).
 
 | Command | What it does |
 | --- | --- |
@@ -60,7 +60,7 @@ All local drains share monorepo [`.evlog/logs/`](../../.evlog/logs/):
 | `service` | Source |
 | --- | --- |
 | `tangerine-desktop` | TanStack Start / Nitro inside the desktop app |
-| `tangerine-desktop-runtime` | Deno preload OAuth (`deno/auth.ts`) |
+| `tangerine-desktop-runtime` | Deno preload OAuth (`deno/auth/`) |
 | `tangerine-api` / `tangerine-web` | sibling apps (same folder) |
 
 Filter by `service` / `action` (`desktop.auth.*`) when tracing OAuth. **Read:** latest monorepo `.evlog/logs/YYYY-MM-DD.jsonl` (NDJSON, one event per line); e.g. `rg 'tangerine-desktop|desktop.auth' .evlog/logs/`.

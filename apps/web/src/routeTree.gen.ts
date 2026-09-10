@@ -16,6 +16,7 @@ import { Route as DashboardUserLayoutRouteImport } from './routes/_dashboard/$us
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as DashboardUserIndexRouteImport } from './routes/_dashboard/$user/index'
 import { Route as DashboardViewerIndexRouteImport } from './routes/_dashboard/viewer/index'
+import { Route as AuthDesktopDoneIndexRouteImport } from './routes/auth/desktop-done/index'
 import { Route as DashboardUserReposIndexRouteImport } from './routes/_dashboard/$user/repos/index'
 import { Route as DashboardUserSearchIndexRouteImport } from './routes/_dashboard/$user/search/index'
 import { Route as DashboardUserStarsIndexRouteImport } from './routes/_dashboard/$user/stars/index'
@@ -55,6 +56,11 @@ const DashboardViewerIndexRoute = DashboardViewerIndexRouteImport.update({
   path: '/viewer/',
   getParentRoute: () => DashboardLayoutRoute,
 } as any)
+const AuthDesktopDoneIndexRoute = AuthDesktopDoneIndexRouteImport.update({
+  id: '/auth/desktop-done/',
+  path: '/auth/desktop-done/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardUserReposIndexRoute = DashboardUserReposIndexRouteImport.update({
   id: '/repos/',
   path: '/repos/',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/auth/': typeof AuthIndexRoute
   '/$user/': typeof DashboardUserIndexRoute
   '/viewer/': typeof DashboardViewerIndexRoute
+  '/auth/desktop-done/': typeof AuthDesktopDoneIndexRoute
   '/$user/repos/': typeof DashboardUserReposIndexRoute
   '/$user/search/': typeof DashboardUserSearchIndexRoute
   '/$user/stars/': typeof DashboardUserStarsIndexRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthIndexRoute
   '/$user': typeof DashboardUserIndexRoute
   '/viewer': typeof DashboardViewerIndexRoute
+  '/auth/desktop-done': typeof AuthDesktopDoneIndexRoute
   '/$user/repos': typeof DashboardUserReposIndexRoute
   '/$user/search': typeof DashboardUserSearchIndexRoute
   '/$user/stars': typeof DashboardUserStarsIndexRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/auth/': typeof AuthIndexRoute
   '/_dashboard/$user/': typeof DashboardUserIndexRoute
   '/_dashboard/viewer/': typeof DashboardViewerIndexRoute
+  '/auth/desktop-done/': typeof AuthDesktopDoneIndexRoute
   '/_dashboard/$user/repos/': typeof DashboardUserReposIndexRoute
   '/_dashboard/$user/search/': typeof DashboardUserSearchIndexRoute
   '/_dashboard/$user/stars/': typeof DashboardUserStarsIndexRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/$user/'
     | '/viewer/'
+    | '/auth/desktop-done/'
     | '/$user/repos/'
     | '/$user/search/'
     | '/$user/stars/'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/$user'
     | '/viewer'
+    | '/auth/desktop-done'
     | '/$user/repos'
     | '/$user/search'
     | '/$user/stars'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/auth/'
     | '/_dashboard/$user/'
     | '/_dashboard/viewer/'
+    | '/auth/desktop-done/'
     | '/_dashboard/$user/repos/'
     | '/_dashboard/$user/search/'
     | '/_dashboard/$user/stars/'
@@ -159,6 +171,7 @@ export interface RootRouteChildren {
   DashboardLayoutRoute: typeof DashboardLayoutRouteWithChildren
   OgRoute: typeof OgRoute
   AuthIndexRoute: typeof AuthIndexRoute
+  AuthDesktopDoneIndexRoute: typeof AuthDesktopDoneIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/viewer/'
       preLoaderRoute: typeof DashboardViewerIndexRouteImport
       parentRoute: typeof DashboardLayoutRoute
+    }
+    '/auth/desktop-done/': {
+      id: '/auth/desktop-done/'
+      path: '/auth/desktop-done'
+      fullPath: '/auth/desktop-done/'
+      preLoaderRoute: typeof AuthDesktopDoneIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_dashboard/$user/repos/': {
       id: '/_dashboard/$user/repos/'
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardLayoutRoute: DashboardLayoutRouteWithChildren,
   OgRoute: OgRoute,
   AuthIndexRoute: AuthIndexRoute,
+  AuthDesktopDoneIndexRoute: AuthDesktopDoneIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

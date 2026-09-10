@@ -74,7 +74,7 @@ Mirrors [Better Auth Electron](https://better-auth.com/docs/integrations/electro
 1. Preload generates PKCE (`state` + verifier), starts loopback on `127.0.0.1`.
 2. Opens `VITE_SIGN_IN_URL` (`apps/web` `/auth`) with `client_id`, `state`, `code_challenge`, `loopback`.
 3. User signs in on web against the API; web polls `transferUser` only after **Sign in** (sessionStorage gate).
-4. Web **fetches** `loopback?token=` (JSON `Accept`) — does not navigate the tab away (keeps paste fallback).
+4. Web **fetches** `loopback?token=` (JSON `Accept`). On success it navigates to `/auth/desktop-done` (“close this tab”) so the user does not click Sign in again. On failure it stays on `/auth` with the paste token.
 5. Preload `POST /api/auth/electron/token` with `{ token, state, code_verifier }`, persists session, notifies UI / navigates to `/viewer`.
 6. Fallback: paste the redirect token into the desktop auth screen.
 
@@ -165,9 +165,11 @@ Body is `{ accountId }` (Better Auth `account.id` for provider `github`), not Gi
 
 Dashboard and auth guards must use `bindings.getSession()` / `bindings.getGithubAccessToken()` when `hasDesktopBindings()`. ServerFns that read Start request cookies will always look logged-out inside the native shell.
 
-### 10. Gate desktop handoff until Sign in
+### 10. Gate desktop handoff until Sign in — and do not race GitHub
 
-Do not poll `transferUser` / fire loopback while the user is still picking scopes, or when a leftover web session exists. Use a sessionStorage flag set on Sign in click (`tangerine:awaiting-desktop-handoff`).
+Do not poll `transferUser` / fire loopback while the user is still picking scopes. Use a sessionStorage flag set on Sign in click (`tangerine:awaiting-desktop-handoff`).
+
+If a **web session already exists**, only run the loopback handoff — do **not** also start `signIn.social`. Otherwise transfer succeeds and clears the flag, then GitHub redirects back to `/auth` and you look “stuck” on Sign in again.
 
 ### 11. Fragments never hit HTTP loopback
 
@@ -192,7 +194,7 @@ Fresh `local.db` without auth tables → opaque social / token 500s. Run `pnpm -
 5. **Persist PKCE on disk** (`pkce.json`) so HMR / remounts do not lose the verifier; clear a state only after successful token exchange.
 6. **Idempotent exchange** — if PKCE is gone but `session.json` is valid, treat as already signed in.
 7. **Notify UI redundantly** after auth: CustomEvent + `win.navigate(/viewer)` + optional poll of `bindings.getSession()` while “Waiting for browser…”.
-8. **Fetch loopback from web**, don’t `location.assign` it — preserves paste UI and avoids CORS surprises (use `Accept: application/json`; avoid custom headers that force preflights).
+8. **Fetch loopback from web**, don’t `location.assign` the loopback URL — keeps paste UI on failure and avoids CORS surprises (`Accept: application/json`). On success, leave `/auth` for `/auth/desktop-done`.
 9. **Log without secrets** — `desktop.auth.*` / API paths in monorepo [`.evlog/logs/`](../.evlog/logs/). Never log tokens, verifiers, or full cookies.
 10. **Restart desktop** after preload or env edits before debugging “it still fails”.
 
@@ -234,7 +236,8 @@ Optional: `DENO_DESKTOP_DEVTOOLS=1` (CEF backend) for webview DevTools.
 | --- | --- |
 | API Better Auth | `apps/api/src/lib/auth.ts` |
 | Web sign-in + loopback handoff | `apps/web/src/routes/auth/-components/GitHubSignIn.tsx` |
-| Deno PKCE / loopback / jar | `apps/desktop/deno/auth.ts` |
+| Web “close this tab” after desktop handoff | `apps/web/src/routes/auth/desktop-done/index.tsx` |
+| Deno PKCE / loopback / jar | `apps/desktop/deno/auth/` (`auth.ts` re-exports) |
 | Deno window + bindings | `apps/desktop/deno/window.ts` |
 | Desktop UI auth / dashboard guards | `apps/desktop/src/routes/auth/index.tsx`, `.../_dashboard/layout.tsx` |
 | Protocol constants | `packages/auth/src/electron.ts` (`ELECTRON_PROTOCOL_SCHEME`, `ELECTRON_TRUSTED_ORIGIN`) |

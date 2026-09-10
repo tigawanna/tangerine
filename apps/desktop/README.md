@@ -31,7 +31,8 @@ apps/desktop/
 ├── deno.json              # desktop.app / icons / backend / output paths
 ├── deno/
 │   ├── window.ts          # preload: BrowserWindow + bindings
-│   └── auth.ts            # PKCE, loopback, session jar
+│   ├── auth.ts            # public re-exports
+│   └── auth/              # PKCE, loopback, session jar (split modules)
 ├── public/                # Vite public assets + app icons (source)
 │   ├── icon.png           # Linux (+ macOS today)
 │   └── favicon.ico        # Windows

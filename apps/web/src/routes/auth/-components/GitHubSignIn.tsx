@@ -123,6 +123,8 @@ export function GitHubSignIn({
         if (res.ok) {
           finishHandoff();
           toast.success("Signed in — return to Tangerine Desktop.");
+          // Hard navigate so a mid-flight social redirect cannot bounce us back to /auth.
+          window.location.replace("/auth/desktop-done");
           return true;
         }
         let detail = "";
@@ -195,9 +197,19 @@ export function GitHubSignIn({
   const { mutate: handleSignIn, isPending } = useMutation({
     mutationFn: async () => {
       if (loopback) {
+        // Existing web session: hand off to desktop only. Starting social here races —
+        // transferUser succeeds, clears the awaiting flag, then GitHub redirects back
+        // to /auth with nothing left to hand off (stuck on Sign in).
+        const existing = await authClient.getSession();
+        if (existing.data?.session) {
+          markAwaitingDesktopHandoff();
+          setAwaitingHandoff(true);
+          return { mode: "handoff-only" as const };
+        }
+        // Not signed in: flag survives the GitHub round-trip; handoff runs on return.
         markAwaitingDesktopHandoff();
-        setAwaitingHandoff(true);
       }
+
       const result = await authClient.signIn.social({
         provider: "github",
         callbackURL: loopback
