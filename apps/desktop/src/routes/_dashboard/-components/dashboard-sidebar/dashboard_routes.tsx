@@ -1,7 +1,7 @@
 import type { SidebarItem } from "@/components/sidebar/types";
 import { defaultGithubSearch } from "@/routes/_dashboard/-components/search/github-search";
 import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
-import { Search, Star, User, Users } from "lucide-react";
+import { Search, Settings, Sparkles, Star, User, Users } from "lucide-react";
 
 /**
  * Sidebar links for the profile in the URL.
@@ -42,7 +42,23 @@ export function dashboardPrimaryRoutes(user: string): SidebarItem[] {
       search: defaultGithubSearch,
       icon: Search,
     },
+    {
+      title: "Embed",
+      href: "/$user/embed",
+      params,
+      icon: Sparkles,
+    },
   ];
 }
 
-export const dashboard_account_routes = [] satisfies SidebarItem[];
+/** Account group — Settings lives under the viewed `$user` path. */
+export function dashboardAccountRoutes(user: string): SidebarItem[] {
+  return [
+    {
+      title: "Settings",
+      href: "/$user/settings",
+      params: { user },
+      icon: Settings,
+    },
+  ];
+}

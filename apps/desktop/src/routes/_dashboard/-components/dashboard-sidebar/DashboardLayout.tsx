@@ -1,6 +1,5 @@
 import { QueryActivityNprogress } from "@/components/navigation/nprogress/QueryActivityNprogress";
 import { SidebarLinks } from "@/components/sidebar/SidebarLinks";
-import type { SidebarItem } from "@/components/sidebar/types";
 import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
@@ -22,24 +21,20 @@ import { Suspense } from "react";
 import { DashboardSearchTrigger } from "../search/DashboardSearchTrigger";
 import { DashboardSidebarFooter } from "./DashboardSidebarFooter";
 import { DashboardSidebarHeader } from "./DashboardSidebarHeader";
-import { dashboardPrimaryRoutes } from "./dashboard_routes";
+import { dashboardAccountRoutes, dashboardPrimaryRoutes } from "./dashboard_routes";
 
 interface DashboardLayoutProps {
   sidebarLabel: string;
-  accountRoutes: SidebarItem[];
   accountLabel: string;
 }
 
-export function DashboardLayout({
-  sidebarLabel,
-  accountRoutes,
-  accountLabel,
-}: DashboardLayoutProps) {
+export function DashboardLayout({ sidebarLabel, accountLabel }: DashboardLayoutProps) {
   const { githubLogin } = useRouteContext({ from: "/_dashboard" });
   const params = useParams({ strict: false }) as { user?: string };
   /** Sidebar nav follows the profile in the URL; brand → landing, “My profile” → signed-in user. */
   const viewedUser = params.user?.trim() || githubLogin || "";
   const primaryRoutes = viewedUser ? dashboardPrimaryRoutes(viewedUser) : [];
+  const accountRoutes = viewedUser ? dashboardAccountRoutes(viewedUser) : [];
   const matchRoute = useMatchRoute();
   const onSearchPage = Boolean(matchRoute({ to: "/$user/search", fuzzy: true }));
 

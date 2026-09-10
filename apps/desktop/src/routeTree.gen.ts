@@ -16,8 +16,10 @@ import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as DashboardUserIndexRouteImport } from './routes/_dashboard/$user/index'
 import { Route as DashboardViewerIndexRouteImport } from './routes/_dashboard/viewer/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as DashboardUserEmbedIndexRouteImport } from './routes/_dashboard/$user/embed/index'
 import { Route as DashboardUserReposIndexRouteImport } from './routes/_dashboard/$user/repos/index'
 import { Route as DashboardUserSearchIndexRouteImport } from './routes/_dashboard/$user/search/index'
+import { Route as DashboardUserSettingsIndexRouteImport } from './routes/_dashboard/$user/settings/index'
 import { Route as DashboardUserStarsIndexRouteImport } from './routes/_dashboard/$user/stars/index'
 import { Route as DashboardUserReposRepoIndexRouteImport } from './routes/_dashboard/$user/repos/$repo/index'
 
@@ -55,6 +57,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardUserEmbedIndexRoute = DashboardUserEmbedIndexRouteImport.update({
+  id: '/embed/',
+  path: '/embed/',
+  getParentRoute: () => DashboardUserLayoutRoute,
+} as any)
 const DashboardUserReposIndexRoute = DashboardUserReposIndexRouteImport.update({
   id: '/repos/',
   path: '/repos/',
@@ -64,6 +71,12 @@ const DashboardUserSearchIndexRoute =
   DashboardUserSearchIndexRouteImport.update({
     id: '/search/',
     path: '/search/',
+    getParentRoute: () => DashboardUserLayoutRoute,
+  } as any)
+const DashboardUserSettingsIndexRoute =
+  DashboardUserSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
     getParentRoute: () => DashboardUserLayoutRoute,
   } as any)
 const DashboardUserStarsIndexRoute = DashboardUserStarsIndexRouteImport.update({
@@ -85,8 +98,10 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$user/': typeof DashboardUserIndexRoute
   '/viewer/': typeof DashboardViewerIndexRoute
+  '/$user/embed/': typeof DashboardUserEmbedIndexRoute
   '/$user/repos/': typeof DashboardUserReposIndexRoute
   '/$user/search/': typeof DashboardUserSearchIndexRoute
+  '/$user/settings/': typeof DashboardUserSettingsIndexRoute
   '/$user/stars/': typeof DashboardUserStarsIndexRoute
   '/$user/repos/$repo/': typeof DashboardUserReposRepoIndexRoute
 }
@@ -96,8 +111,10 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$user': typeof DashboardUserIndexRoute
   '/viewer': typeof DashboardViewerIndexRoute
+  '/$user/embed': typeof DashboardUserEmbedIndexRoute
   '/$user/repos': typeof DashboardUserReposIndexRoute
   '/$user/search': typeof DashboardUserSearchIndexRoute
+  '/$user/settings': typeof DashboardUserSettingsIndexRoute
   '/$user/stars': typeof DashboardUserStarsIndexRoute
   '/$user/repos/$repo': typeof DashboardUserReposRepoIndexRoute
 }
@@ -110,8 +127,10 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_dashboard/$user/': typeof DashboardUserIndexRoute
   '/_dashboard/viewer/': typeof DashboardViewerIndexRoute
+  '/_dashboard/$user/embed/': typeof DashboardUserEmbedIndexRoute
   '/_dashboard/$user/repos/': typeof DashboardUserReposIndexRoute
   '/_dashboard/$user/search/': typeof DashboardUserSearchIndexRoute
+  '/_dashboard/$user/settings/': typeof DashboardUserSettingsIndexRoute
   '/_dashboard/$user/stars/': typeof DashboardUserStarsIndexRoute
   '/_dashboard/$user/repos/$repo/': typeof DashboardUserReposRepoIndexRoute
 }
@@ -124,8 +143,10 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/$user/'
     | '/viewer/'
+    | '/$user/embed/'
     | '/$user/repos/'
     | '/$user/search/'
+    | '/$user/settings/'
     | '/$user/stars/'
     | '/$user/repos/$repo/'
   fileRoutesByTo: FileRoutesByTo
@@ -135,8 +156,10 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/$user'
     | '/viewer'
+    | '/$user/embed'
     | '/$user/repos'
     | '/$user/search'
+    | '/$user/settings'
     | '/$user/stars'
     | '/$user/repos/$repo'
   id:
@@ -148,8 +171,10 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/_dashboard/$user/'
     | '/_dashboard/viewer/'
+    | '/_dashboard/$user/embed/'
     | '/_dashboard/$user/repos/'
     | '/_dashboard/$user/search/'
+    | '/_dashboard/$user/settings/'
     | '/_dashboard/$user/stars/'
     | '/_dashboard/$user/repos/$repo/'
   fileRoutesById: FileRoutesById
@@ -212,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_dashboard/$user/embed/': {
+      id: '/_dashboard/$user/embed/'
+      path: '/embed'
+      fullPath: '/$user/embed/'
+      preLoaderRoute: typeof DashboardUserEmbedIndexRouteImport
+      parentRoute: typeof DashboardUserLayoutRoute
+    }
     '/_dashboard/$user/repos/': {
       id: '/_dashboard/$user/repos/'
       path: '/repos'
@@ -224,6 +256,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/$user/search/'
       preLoaderRoute: typeof DashboardUserSearchIndexRouteImport
+      parentRoute: typeof DashboardUserLayoutRoute
+    }
+    '/_dashboard/$user/settings/': {
+      id: '/_dashboard/$user/settings/'
+      path: '/settings'
+      fullPath: '/$user/settings/'
+      preLoaderRoute: typeof DashboardUserSettingsIndexRouteImport
       parentRoute: typeof DashboardUserLayoutRoute
     }
     '/_dashboard/$user/stars/': {
@@ -245,16 +284,20 @@ declare module '@tanstack/react-router' {
 
 interface DashboardUserLayoutRouteChildren {
   DashboardUserIndexRoute: typeof DashboardUserIndexRoute
+  DashboardUserEmbedIndexRoute: typeof DashboardUserEmbedIndexRoute
   DashboardUserReposIndexRoute: typeof DashboardUserReposIndexRoute
   DashboardUserSearchIndexRoute: typeof DashboardUserSearchIndexRoute
+  DashboardUserSettingsIndexRoute: typeof DashboardUserSettingsIndexRoute
   DashboardUserStarsIndexRoute: typeof DashboardUserStarsIndexRoute
   DashboardUserReposRepoIndexRoute: typeof DashboardUserReposRepoIndexRoute
 }
 
 const DashboardUserLayoutRouteChildren: DashboardUserLayoutRouteChildren = {
   DashboardUserIndexRoute: DashboardUserIndexRoute,
+  DashboardUserEmbedIndexRoute: DashboardUserEmbedIndexRoute,
   DashboardUserReposIndexRoute: DashboardUserReposIndexRoute,
   DashboardUserSearchIndexRoute: DashboardUserSearchIndexRoute,
+  DashboardUserSettingsIndexRoute: DashboardUserSettingsIndexRoute,
   DashboardUserStarsIndexRoute: DashboardUserStarsIndexRoute,
   DashboardUserReposRepoIndexRoute: DashboardUserReposRepoIndexRoute,
 }

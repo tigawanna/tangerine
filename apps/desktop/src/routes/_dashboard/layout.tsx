@@ -10,7 +10,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Suspense } from "react";
 import { RelayEnvironmentProvider } from "react-relay";
 import { DashboardLayout } from "./-components/dashboard-sidebar/DashboardLayout";
-import { dashboard_account_routes } from "./-components/dashboard-sidebar/dashboard_routes";
 
 export const Route = createFileRoute("/_dashboard")({
   ssr: false,
@@ -71,11 +70,7 @@ function DashboardShell() {
   return (
     <RelayEnvironmentProvider environment={relayEnvironment}>
       <Suspense fallback={<RouterPendingComponent />}>
-        <DashboardLayout
-          sidebarLabel="Menu"
-          accountRoutes={dashboard_account_routes}
-          accountLabel="Account"
-        />
+        <DashboardLayout sidebarLabel="Menu" accountLabel="Account" />
       </Suspense>
     </RelayEnvironmentProvider>
   );
