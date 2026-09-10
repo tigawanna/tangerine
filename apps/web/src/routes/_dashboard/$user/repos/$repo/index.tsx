@@ -1,9 +1,18 @@
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Button } from "@/components/ui/button";
 import { repoDetailQueryOptions } from "@/data-access-layer/github/repo-detail-query-options";
 import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
 import { getRelativeTimeString } from "@/utils/date-helpers";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, Copy, ExternalLink, Github, Lock } from "lucide-react";
+import { ArrowLeft, Copy, ExternalLink, FolderX, Github, Lock, TriangleAlert } from "lucide-react";
 import { RepoReadme } from "./-components/RepoReadme";
 
 export const Route = createFileRoute("/_dashboard/$user/repos/$repo/")({
@@ -24,40 +33,72 @@ function RepoDetailPage() {
   const readme = data.readme;
   const readmePath = data.readmePath;
 
-  const backToProfile = (
-    <Link
-      to="/$user"
-      params={{ user }}
-      search={defaultUserSearch}
-      className="text-base-content/60 hover:text-base-content inline-flex items-center gap-2 text-sm transition-colors"
-      data-test="repo-detail-back"
-    >
-      <ArrowLeft className="size-4" />
-      {user}
-    </Link>
+  const backActions = (
+    <div className="flex flex-wrap items-center justify-center gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => router.history.back()}
+        data-test="repo-detail-history-back"
+      >
+        <ArrowLeft />
+        Go back
+      </Button>
+      <Button asChild data-test="repo-detail-back">
+        <Link to="/$user" params={{ user }} search={defaultUserSearch}>
+          {user}&apos;s profile
+        </Link>
+      </Button>
+    </div>
   );
 
-  if (data.error || !repository) {
+  if (data.error) {
     return (
-      <div
-        className="border-error/30 bg-error/10 text-base-content space-y-4 rounded-xl border p-6"
+      <Empty
+        className="border-base-300 bg-base-200/20 min-h-80 border border-dashed"
         data-test="repo-detail-error"
       >
-        <p className="font-medium">Could not load this repository</p>
-        <p className="text-base-content/70 text-sm">{data.error ?? "Repository not found."}</p>
-        <div className="flex flex-wrap gap-4">
-          <button
-            type="button"
-            className="text-primary inline-flex items-center gap-2 text-sm font-medium hover:underline"
-            onClick={() => router.history.back()}
-            data-test="repo-detail-history-back"
-          >
-            <ArrowLeft className="size-4" />
-            Go back
-          </button>
-          {backToProfile}
-        </div>
-      </div>
+        <EmptyHeader>
+          <EmptyMedia variant="icon" className="bg-error/15 text-error rotate-3">
+            <TriangleAlert />
+          </EmptyMedia>
+          <EmptyTitle>Repo hiccup</EmptyTitle>
+          <EmptyDescription>
+            Couldn&apos;t load{" "}
+            <span className="font-mono">
+              {user}/{repo}
+            </span>
+            . {data.error}
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>{backActions}</EmptyContent>
+      </Empty>
+    );
+  }
+
+  if (!repository) {
+    return (
+      <Empty
+        className="border-base-300 bg-base-200/20 min-h-80 border border-dashed"
+        data-test="repo-detail-not-found"
+      >
+        <EmptyHeader>
+          <EmptyMedia variant="icon" className="bg-warning/15 text-warning -rotate-6">
+            <FolderX />
+          </EmptyMedia>
+          <EmptyTitle>
+            No <span className="font-mono">{repo}</span> here
+          </EmptyTitle>
+          <EmptyDescription>
+            GitHub has nothing at{" "}
+            <span className="font-mono">
+              {user}/{repo}
+            </span>
+            — typo, rename, or private to someone else.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>{backActions}</EmptyContent>
+      </Empty>
     );
   }
 
@@ -81,7 +122,16 @@ function RepoDetailPage() {
           <ArrowLeft className="size-4" />
           Back
         </button>
-        {backToProfile}
+        <Link
+          to="/$user"
+          params={{ user }}
+          search={defaultUserSearch}
+          className="text-base-content/60 hover:text-base-content inline-flex items-center gap-2 text-sm transition-colors"
+          data-test="repo-detail-back"
+        >
+          <ArrowLeft className="size-4" />
+          {user}
+        </Link>
       </div>
 
       {repository.openGraphImageUrl ? (

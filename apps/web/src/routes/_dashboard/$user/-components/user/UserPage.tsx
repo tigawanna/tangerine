@@ -13,10 +13,20 @@ import {
   UserFollowersList,
 } from "../followers/UserFollowersList";
 import { UserFollowingList } from "../following/UserFollowingList";
-import { userQuery, userTabOptions, resolveUserSearch } from "../../layout";
+import { userQuery, userTabOptions, resolveUserSearch, defaultUserSearch } from "../../layout";
 import type { layoutUserPageLoaderQuery } from "../../__generated__/layoutUserPageLoaderQuery.graphql";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getRouteApi } from "@tanstack/react-router";
+import { getRouteApi, Link, useRouteContext, useRouter } from "@tanstack/react-router";
+import { ArrowLeft, Search, UserRoundX } from "lucide-react";
 import { Activity, Suspense, startTransition } from "react";
 import { usePreloadedQuery } from "react-relay";
 
@@ -30,6 +40,9 @@ type ProfileTab = (typeof userTabOptions)[number];
  */
 export function UserPage() {
   const navigate = userRoute.useNavigate();
+  const { user: login } = userRoute.useParams();
+  const { githubLogin } = useRouteContext({ from: "/_dashboard" });
+  const router = useRouter();
   const { tab } = resolveUserSearch(userRoute.useSearch());
   const query = useOwnerQuery();
   const user = query.user;
@@ -43,16 +56,71 @@ export function UserPage() {
   const activeTab: ProfileTab = (tabs as readonly string[]).includes(tab) ? tab : "repos";
 
   if (!user && !owner) {
+    const homeLogin = githubLogin ?? undefined;
+
     return (
-      <div
-        className="border-error/30 bg-error/10 text-base-content mx-auto max-w-6xl rounded-xl border p-4"
+      <Empty
+        className="border-base-300 bg-base-200/20 mx-auto min-h-80 max-w-6xl border border-dashed"
         data-test="owner-not-found"
       >
-        <p className="font-medium">Profile not found</p>
-        <p className="text-base-content/70 mt-1 text-sm">
-          GitHub returned no user or organization for this login.
-        </p>
-      </div>
+        <EmptyHeader>
+          <EmptyMedia variant="icon" className="bg-warning/15 text-warning -rotate-6">
+            <UserRoundX />
+          </EmptyMedia>
+          <EmptyTitle>
+            No one named <span className="font-mono">@{login}</span>
+          </EmptyTitle>
+          <EmptyDescription>
+            GitHub has no user or org by that login — or it&apos;s tucked away where we can&apos;t
+            see it.
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent className="gap-4">
+          <div className="flex w-full max-w-xs flex-col gap-2">
+            {homeLogin ? (
+              <Button
+                asChild
+                size="lg"
+                className="w-full active:scale-[0.98]"
+                data-test="owner-not-found-home"
+              >
+                <Link to="/$user" params={{ user: homeLogin }} search={defaultUserSearch}>
+                  Take me home
+                </Link>
+              </Button>
+            ) : null}
+            {homeLogin ? (
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-base-300 bg-base-100/60 w-full active:scale-[0.98]"
+                data-test="owner-not-found-search"
+              >
+                <Link
+                  to="/$user/search"
+                  params={{ user: homeLogin }}
+                  search={{ q: login, type: "USER" }}
+                >
+                  <Search />
+                  Hunt for @{login}
+                </Link>
+              </Button>
+            ) : null}
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-base-content/55 hover:text-base-content"
+            onClick={() => router.history.back()}
+            data-test="owner-not-found-back"
+          >
+            <ArrowLeft />
+            Go back
+          </Button>
+        </EmptyContent>
+      </Empty>
     );
   }
 
