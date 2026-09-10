@@ -17,13 +17,15 @@ Before editing files for a substantial task:
 
 **Routes:** Folder + `index.tsx`. Thin file: `beforeLoad`, loader, compose. Prefix `-` to opt a folder out of the router.
 
-**Auth:** GitHub OAuth only, from `@repo/auth`. Protect dashboards with `beforeLoad` + `redirect()` to `/auth`. Server singleton is `getAuth()` in `src/lib/auth.server.ts` (TanStack Start cookie session for now). React client is `@/lib/auth-client`. Typed Hono API client is `@/lib/api/client` via `@api/*` paths.
+**Auth:** GitHub OAuth via **`apps/api`** Better Auth (no local `/api/auth` on web — same split as dishi `site`). Client: `@/lib/auth-client` with `baseURL: VITE_API_URL`. Session: `authClient.getSession()` / `getSession()` in `beforeLoad`. Desktop/Electron browser half: `electronProxyClient` + PKCE query + `loopback` / `ensureElectronRedirect`.
 
-**API:** `apps/api` is the Hono auth/data server (Turso). Point `VITE_API_URL` at it when cutting the browser client over; keep local same-origin auth until then. **Electron sign-in** requires `VITE_API_URL` → API (same Better Auth server as `electron()` + `electronProxyClient` on this client).
+**Logging (evlog):** Dev Nitro FS drain → monorepo [`.evlog/logs/`](../../.evlog/logs/) (`service: tangerine-web`). Client Vite plugin uses the same service name. **Read:** latest `.evlog/logs/YYYY-MM-DD.jsonl` (NDJSON); `rg '"service":"tangerine-web"' .evlog/logs/`.
 
-**Desktop OAuth (browser half):** `/auth` runs `ensureElectronRedirect`, preserves Electron PKCE query on `signIn.social`, and uses `electronProxyClient` with `ELECTRON_PROTOCOL_SCHEME`.
+**API:** Hono + Turso at `VITE_API_URL` (`:5000` locally). CORS + `trustedOrigins` must include `http://localhost:3064`. OAuth secrets and GitHub callback live only on the API: `{BETTER_AUTH_URL}/api/auth/callback/github`.
 
-**Deploy (Vercel):** Project Root Directory = `apps/web`. Framework preset = TanStack Start (`vercel.json`). Install runs from the monorepo root; build is `pnpm run build` in `apps/web`. Set the env vars from `.env.example` (especially `VITE_APP_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_TRUSTED_ORIGINS`, GitHub OAuth). GitHub callback: `{BETTER_AUTH_URL}/api/auth/callback/github`.
+**Desktop OAuth (browser half):** `/auth` preserves PKCE, uses `transferUser` + `loopback` for Deno Desktop (or `ensureElectronRedirect` for Electron scheme).
+
+**Deploy (Vercel):** Project Root Directory = `apps/web`. Set `VITE_APP_URL` + `VITE_API_URL` (production API). Auth env stays on the API service.
 
 **Relay (dashboard only):** `/_dashboard` is `ssr: false`. `beforeLoad` sets `githubLogin` + a **stable** Relay `Environment` on context. `/viewer` is the post-login entry and redirects to `/$user` with that login. Nested under `/$user`: profile index, `repos`, `stars`. Layout `loadQuery`; children `usePreloadedQuery`. Run `pnpm relay` after GraphQL edits.
 

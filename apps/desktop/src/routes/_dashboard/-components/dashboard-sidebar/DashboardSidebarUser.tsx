@@ -14,8 +14,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
+import { desktopOrBrowserSignOut, useDesktopOrBrowserUser } from "@/lib/desktop-session";
 import { resetGithubRelayEnvironment } from "@/lib/relay/create-environment";
+import { clearClientGithubAccessToken } from "@/lib/relay/github-access-token";
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronsUpDown, LogOut } from "lucide-react";
 
@@ -37,14 +38,13 @@ export function DashboardSidebarUser() {
   const { isMobile, state } = useSidebar();
   const isExpanded = state === "expanded" || isMobile;
   const navigate = useNavigate();
-  const sessionQuery = authClient.useSession();
-  const viewer = sessionQuery.data?.user;
+  const { user: viewer } = useDesktopOrBrowserUser();
 
   if (!viewer) {
     return null;
   }
 
-  const initials = getInitials(viewer.name);
+  const initials = getInitials(viewer.name ?? "");
 
   return (
     <SidebarMenu>
@@ -57,7 +57,7 @@ export function DashboardSidebarUser() {
               data-test="dashboard-sidebar-user"
             >
               <Avatar className="size-6 shrink-0 rounded-lg">
-                <AvatarImage src={viewer.image ?? undefined} alt={viewer.name} />
+                <AvatarImage src={viewer.image ?? undefined} alt={viewer.name ?? ""} />
                 <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               {isExpanded ? (
@@ -81,7 +81,7 @@ export function DashboardSidebarUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={viewer.image ?? undefined} alt={viewer.name} />
+                    <AvatarImage src={viewer.image ?? undefined} alt={viewer.name ?? ""} />
                     <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                   </Avatar>
                   <div className="grid min-w-0 flex-1 text-left text-sm leading-tight">
@@ -96,7 +96,8 @@ export function DashboardSidebarUser() {
               variant="destructive"
               data-test="dashboard-sidebar-logout"
               onClick={() => {
-                void authClient.signOut().then(() => {
+                void desktopOrBrowserSignOut().then(() => {
+                  clearClientGithubAccessToken();
                   resetGithubRelayEnvironment();
                   void navigate({ to: "/" });
                 });

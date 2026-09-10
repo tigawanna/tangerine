@@ -1,19 +1,28 @@
 # Tangerine Desktop (Deno Desktop)
 
-TanStack Start GitHub dashboard wrapped with [`deno desktop`](https://docs.deno.com/runtime/desktop/). Framework auto-detection picks up `@tanstack/react-start`.
+TanStack Start UI in a native window on **:3070**. **OAuth uses the system browser** against `apps/api` — secrets stay on the API.
 
-Requires **Deno ≥ 2.9**.
+Requires **Deno ≥ 2.9**. Also run `apps/api` + `apps/web` (`:3064`) for sign-in.
 
 ## Commands
 
+From repo root (API + desktop native shell):
+
 ```bash
-# From apps/desktop
-pnpm desktop:dev     # native window + Vite HMR (CEF)
-pnpm desktop:run     # native window against existing .output/ build
-pnpm desktop:build   # vp build + package into dist-desktop/
-pnpm dev             # browser-only on http://localhost:3065
+pnpm dev
 ```
 
-Copy `.env.example` → `.env` and point all origins at `http://localhost:3065`. GitHub OAuth callback: `http://localhost:3065/api/auth/callback/github`.
+Or from `apps/desktop`:
 
-See [`AGENTS.md`](./AGENTS.md) for OAuth / CEF notes.
+```bash
+pnpm dev             # deno desktop --hmr (native window)
+pnpm dev:vite        # browser-only Vite on :3070
+pnpm desktop:run     # against existing .output/
+pnpm desktop:build   # package into dist-desktop/
+```
+
+Web alone: `pnpm dev:web` · Everything: `pnpm dev:all`
+
+Copy `.env.example` → `.env`. Point `VITE_API_URL` at the API and `VITE_SIGN_IN_URL` at web `/auth`.
+
+See [`AGENTS.md`](./AGENTS.md) for the OAuth loopback / paste flow.

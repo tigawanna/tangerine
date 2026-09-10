@@ -30,7 +30,7 @@ const config = defineConfig({
   },
   plugins: [
     devtools(),
-    evlog({ service: "github", sourceLocation: "dev" }),
+    evlog({ service: "tangerine-desktop", sourceLocation: "dev" }),
     tanstackStart({
       router: {
         routeToken: "layout",

@@ -15,12 +15,27 @@ import { dashboard_account_routes } from "./-components/dashboard-sidebar/dashbo
 export const Route = createFileRoute("/_dashboard")({
   ssr: false,
   beforeLoad: async ({ context, location }) => {
-    const session = await getSession();
-    if (!session) {
-      throw redirect({ to: "/auth", search: { returnTo: location.pathname } });
+    const { hasDesktopBindings } = await import("@/lib/desktop-bindings");
+
+    let sessionUser: {
+      githubUsername?: string | null;
+    } | null = null;
+
+    if (hasDesktopBindings() && globalThis.bindings) {
+      const desktopSession = await globalThis.bindings.getSession();
+      if (!desktopSession) {
+        throw redirect({ to: "/auth", search: { returnTo: location.pathname } });
+      }
+      sessionUser = desktopSession.user;
+    } else {
+      const session = await getSession();
+      if (!session) {
+        throw redirect({ to: "/auth", search: { returnTo: location.pathname } });
+      }
+      sessionUser = session.user;
     }
 
-    const fromSession = session.user.githubUsername?.trim();
+    const fromSession = sessionUser.githubUsername?.trim();
     // Prefer session login so we skip `/get-access-token` on every nav.
     // Relay still resolves the token (cached) when it queries GitHub.
     const githubLogin =

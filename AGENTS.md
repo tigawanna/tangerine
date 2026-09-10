@@ -38,6 +38,7 @@ release. Add a tool name to select part of the graph. For example, run
 - [ ] Pre-commit already formats and lints. After big changes: `pnpm quality && pnpm check-types`.
 - [ ] Check if there are `vite.config.ts` tasks or `package.json` scripts necessary for validation, run via `vp run <script>`.
 - [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
+- [ ] Local tracing: shared NDJSON at [`.evlog/logs/`](.evlog/logs/) (`tangerine-api` / `tangerine-web` / `tangerine-desktop` / `tangerine-desktop-runtime`). Read the latest `YYYY-MM-DD.jsonl` (one JSON event per line); filter by `service`, `action`, `path`, or `level`. Example: `rg '"service":"tangerine-api"' .evlog/logs/$(date -u +%Y-%m-%d).jsonl`.
 
 <!--VITE PLUS END-->
 

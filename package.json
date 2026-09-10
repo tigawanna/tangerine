@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "build": "turbo run build --filter=web",
-    "dev": "turbo run dev --filter=web",
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:desktop:all": "turbo run dev --filter=api --filter=web --filter=desktop",
     "lint": "vp lint .",
     "lint:fix": "vp lint --fix .",
     "format": "vp fmt .",

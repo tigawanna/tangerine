@@ -16,7 +16,6 @@ import { Route as DashboardUserLayoutRouteImport } from './routes/_dashboard/$us
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as DashboardUserIndexRouteImport } from './routes/_dashboard/$user/index'
 import { Route as DashboardViewerIndexRouteImport } from './routes/_dashboard/viewer/index'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DashboardUserReposIndexRouteImport } from './routes/_dashboard/$user/repos/index'
 import { Route as DashboardUserSearchIndexRouteImport } from './routes/_dashboard/$user/search/index'
 import { Route as DashboardUserStarsIndexRouteImport } from './routes/_dashboard/$user/stars/index'
@@ -56,11 +55,6 @@ const DashboardViewerIndexRoute = DashboardViewerIndexRouteImport.update({
   path: '/viewer/',
   getParentRoute: () => DashboardLayoutRoute,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardUserReposIndexRoute = DashboardUserReposIndexRouteImport.update({
   id: '/repos/',
   path: '/repos/',
@@ -89,7 +83,6 @@ export interface FileRoutesByFullPath {
   '/og': typeof OgRoute
   '/$user': typeof DashboardUserLayoutRouteWithChildren
   '/auth/': typeof AuthIndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/$user/': typeof DashboardUserIndexRoute
   '/viewer/': typeof DashboardViewerIndexRoute
   '/$user/repos/': typeof DashboardUserReposIndexRoute
@@ -101,7 +94,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/og': typeof OgRoute
   '/auth': typeof AuthIndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/$user': typeof DashboardUserIndexRoute
   '/viewer': typeof DashboardViewerIndexRoute
   '/$user/repos': typeof DashboardUserReposIndexRoute
@@ -116,7 +108,6 @@ export interface FileRoutesById {
   '/og': typeof OgRoute
   '/_dashboard/$user': typeof DashboardUserLayoutRouteWithChildren
   '/auth/': typeof AuthIndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/_dashboard/$user/': typeof DashboardUserIndexRoute
   '/_dashboard/viewer/': typeof DashboardViewerIndexRoute
   '/_dashboard/$user/repos/': typeof DashboardUserReposIndexRoute
@@ -131,7 +122,6 @@ export interface FileRouteTypes {
     | '/og'
     | '/$user'
     | '/auth/'
-    | '/api/auth/$'
     | '/$user/'
     | '/viewer/'
     | '/$user/repos/'
@@ -143,7 +133,6 @@ export interface FileRouteTypes {
     | '/'
     | '/og'
     | '/auth'
-    | '/api/auth/$'
     | '/$user'
     | '/viewer'
     | '/$user/repos'
@@ -157,7 +146,6 @@ export interface FileRouteTypes {
     | '/og'
     | '/_dashboard/$user'
     | '/auth/'
-    | '/api/auth/$'
     | '/_dashboard/$user/'
     | '/_dashboard/viewer/'
     | '/_dashboard/$user/repos/'
@@ -171,7 +159,6 @@ export interface RootRouteChildren {
   DashboardLayoutRoute: typeof DashboardLayoutRouteWithChildren
   OgRoute: typeof OgRoute
   AuthIndexRoute: typeof AuthIndexRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -224,13 +211,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/viewer/'
       preLoaderRoute: typeof DashboardViewerIndexRouteImport
       parentRoute: typeof DashboardLayoutRoute
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_dashboard/$user/repos/': {
       id: '/_dashboard/$user/repos/'
@@ -301,7 +281,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardLayoutRoute: DashboardLayoutRouteWithChildren,
   OgRoute: OgRoute,
   AuthIndexRoute: AuthIndexRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

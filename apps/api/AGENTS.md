@@ -34,4 +34,10 @@ Include `com.tigawanna.tangerine:/` in `BETTER_AUTH_TRUSTED_ORIGINS` (or rely on
 
 ## Scripts
 
-`pnpm --filter api dev` · `db:gen` · `db:push` · `db:studio`
+`pnpm --filter api dev` · `auth:gen` · `db:gen` / `db:generate` · `db:push` · `db:migrate` · `db:studio`
+
+Do **not** hand-edit `src/db/schema/auth-schema.ts` — regenerate with `pnpm --filter api auth:gen`, then `db:gen` / `db:push` as needed.
+
+## Logging (evlog)
+
+Dev FS drain writes NDJSON to the **monorepo root** [`.evlog/logs/`](../../.evlog/logs/) with `service: tangerine-api`. Auth routes are force-kept. Restart `api` after changing drain config. **Read:** latest `YYYY-MM-DD.jsonl` (one event per line); `rg '"service":"tangerine-api"|/auth/' .evlog/logs/`.

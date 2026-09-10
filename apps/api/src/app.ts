@@ -1,15 +1,37 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { logger } from "hono/logger";
+import { initLogger } from "evlog";
+import { createFsDrain } from "evlog/fs";
+import { evlog, type EvlogVariables } from "evlog/hono";
 import { AUTHORIZED_ORIGINS, envVariables } from "./env";
+import { EVLOG_FS_DIR } from "./lib/evlog-dir";
 import { auth } from "./lib/auth";
 import { viewerRoute } from "./routes/viewer/route";
 import { homeRoute } from "./routes/home/route";
 import { adminRoute } from "./routes/admin/route";
 
-export const app = new Hono()
+const isProd = envVariables.NODE_ENV === "production";
+
+initLogger({
+  env: {
+    service: "tangerine-api",
+    environment: envVariables.NODE_ENV,
+  },
+});
+
+export const app = new Hono<EvlogVariables>()
   .basePath("/api")
-  .use("*", logger())
+  .use(
+    "*",
+    evlog({
+      // Local NDJSON for agent / offline tracing; skip on prod hosts without a writable FS.
+      drain: isProd ? undefined : createFsDrain({ dir: EVLOG_FS_DIR, maxFiles: 14 }),
+      keep: (ctx) => {
+        // Always retain auth + electron handoff traffic while debugging OAuth.
+        if (ctx.path?.includes("/auth")) ctx.shouldKeep = true;
+      },
+    }),
+  )
   .use(
     "*",
     cors({

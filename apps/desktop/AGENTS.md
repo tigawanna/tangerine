@@ -1,6 +1,8 @@
 # Desktop (Deno Desktop + TanStack Start)
 
-TanStack Start app packaged with [`deno desktop`](https://docs.deno.com/runtime/desktop/). Shared monorepo rules: root [`AGENTS.md`](../../AGENTS.md).
+TanStack Start UI packaged with [`deno desktop`](https://docs.deno.com/runtime/desktop/). Auth is **system-browser OAuth** against `apps/api` (Better Auth `electron()` plugin) — GitHub secrets stay on the API, not in the desktop binary.
+
+Shared monorepo rules: root [`AGENTS.md`](../../AGENTS.md).
 
 List / search / pagination: repo root [`docs/backstage-list-pattern.md`](../../docs/backstage-list-pattern.md).
 
@@ -17,39 +19,58 @@ Before editing files for a substantial task:
 
 # Deno Desktop
 
-Requires **Deno ≥ 2.9**. Config lives in [`deno.json`](./deno.json) (`desktop` block). Single window bootstrap: [`deno/window.ts`](./deno/window.ts) (passed as `--preload`).
+Requires **Deno ≥ 2.9**. Config: [`deno.json`](./deno.json). Preload: [`deno/window.ts`](./deno/window.ts) + [`deno/auth.ts`](./deno/auth.ts).
 
 | Command | What it does |
 | --- | --- |
-| `pnpm desktop:dev` | `deno desktop --hmr` — TanStack Start / Vite HMR in one native window |
-| `pnpm desktop:build` | `vp build` then package a redistributable binary into `dist-desktop/` |
-| `pnpm desktop:run` | Package + run without HMR (uses existing `.output/` if already built) |
-| `pnpm dev` | Browser-only Vite/Nitro on port **3065** (no native shell) |
+| `pnpm dev` (repo root) | Turbo: `api` + this app’s native `deno desktop --hmr` |
+| `pnpm dev` (this package) | Native window + Vite HMR on **:3070** |
+| `pnpm dev:vite` | Browser-only Vite on **:3070** (no native shell) |
+| `pnpm desktop:build` | `vp build` then package into `dist-desktop/` |
+| `pnpm desktop:run` | Run against existing `.output/` |
 
-Do **not** add a Deno `task` named `dev` that wraps `deno desktop` — framework HMR invokes `deno task dev` (Vite) and would recurse.
+Do **not** point Deno’s `task.dev` at `deno desktop` — HMR invokes `deno task dev` → `pnpm run dev:vite` and must not recurse.
 
-Optional: `DENO_DESKTOP_DEVTOOLS=1 pnpm desktop:dev` opens Deno + renderer DevTools.
+## OAuth (system browser + API)
 
-**OAuth (required for GitHub sign-in):** Better Auth stores the OAuth state in a cookie. That cookie and the GitHub callback must share the **same cookie jar** (the desktop window). Use the **CEF** backend (set in `deno.json`) so GitHub stays in-window — OS WebView on Linux often opens Chrome externally, which causes `State mismatch: auth state cookie not found`.
+Mirrors [Better Auth Electron](https://better-auth.com/docs/integrations/electron) without `@better-auth/electron` on the Deno side:
 
-Checklist:
-1. `VITE_APP_URL`, `VITE_API_URL`, `BETTER_AUTH_URL`, and `BETTER_AUTH_TRUSTED_ORIGINS` are all `http://localhost:3065` (same origin, no trailing slash).
-2. GitHub OAuth App callback is exactly `http://localhost:3065/api/auth/callback/github` (separate OAuth app from `apps/web` if web still uses `:3064`).
-3. Restart `pnpm desktop:dev` after env **or** `deno/window.ts` changes (preload + env are baked at desktop compile time).
-4. Sign-in uses `bindings.navigate` (see `GitHubSignIn` + `deno/window.ts`) so GitHub stays in-window. If Chrome still opens, the old desktop process was not restarted.
+1. Deno runtime generates PKCE and starts a loopback on `127.0.0.1` (prefers `DESKTOP_AUTH_LOOPBACK_PORT` / `17832`). **Deno Desktop may remap the port** — the URL always uses the real `onListen` port. PKCE is also written under `~/.config/tangerine-desktop/`.
+2. System browser opens `apps/web` `/auth` with `client_id`, `state`, `code_challenge`, and that loopback URL.
+3. Web preserves PKCE on `signIn.social`, talks to **`apps/api`** (`electron()` + `electronProxyClient`).
+4. After GitHub callback, web **fetches** the loopback URL with `?token=` (keeps the paste UI if the listener is down).
+5. Deno exchanges via `POST /api/auth/electron/token`, stores session cookies under `~/.config/tangerine-desktop/`.
+6. **Fallback:** paste the token shown on the web page.
 
-Do **not** construct a second `Deno.BrowserWindow` unless you intentionally want multi-window. The first construction adopts the implicit startup window.
+`desktop.app.deepLinks` registers `com.tigawanna.tangerine` for later OS routing. Deno does **not** yet deliver `open-url` to JS ([discussion #36796](https://github.com/denoland/deno/discussions/36796)), so do not rely on the custom scheme for the return path today.
 
-Framework detection picks up `@tanstack/react-start` automatically; `--preload` only configures the window. See [Frameworks](https://docs.deno.com/runtime/desktop/frameworks/) and [HMR](https://docs.deno.com/runtime/desktop/hmr/).
+### Checklist
+
+1. `apps/api` running with `electron()` and `BETTER_AUTH_TRUSTED_ORIGINS` including `com.tigawanna.tangerine:/` and `http://localhost:3064` / `3070`.
+2. `apps/web` running; `VITE_API_URL` → API; `/auth` has proxy + loopback support.
+3. Desktop `.env`: `VITE_APP_URL=http://localhost:3070`, `VITE_API_URL=http://localhost:5000` (API — token exchange), `VITE_SIGN_IN_URL=http://localhost:3064/auth`. Do **not** set `BETTER_AUTH_URL` to `:3070`. No GitHub secrets in desktop.
+4. Restart desktop after env or `deno/*` changes (preload + env baked at compile time).
+
+### Logging (evlog)
+
+All local drains share monorepo [`.evlog/logs/`](../../.evlog/logs/):
+
+| `service` | Source |
+| --- | --- |
+| `tangerine-desktop` | TanStack Start / Nitro inside the desktop app |
+| `tangerine-desktop-runtime` | Deno preload OAuth (`deno/auth.ts`) |
+| `tangerine-api` / `tangerine-web` | sibling apps (same folder) |
+
+Filter by `service` / `action` (`desktop.auth.*`) when tracing OAuth. **Read:** latest monorepo `.evlog/logs/YYYY-MM-DD.jsonl` (NDJSON, one event per line); e.g. `rg 'tangerine-desktop|desktop.auth' .evlog/logs/`.
+
+Optional: `DENO_DESKTOP_DEVTOOLS=1 pnpm desktop:dev`.
 
 # Conventions
 
 **Routes:** Folder + `index.tsx`. Thin file: `beforeLoad`, loader, compose. Prefix `-` to opt a folder out of the router.
 
-**Auth:** GitHub OAuth only, from `@repo/auth`. Protect dashboards with `beforeLoad` + `redirect()` to `/auth`. Server singleton is `getAuth()` in `src/lib/auth.server.ts`. React client is `@/lib/auth-client`. Desktop OAuth must use whatever origin the embedded server binds to (see `.env` / `BETTER_AUTH_*`).
+**Auth:** Desktop session lives in the Deno runtime (bindings), not CEF cookies. Dashboard `beforeLoad` / GitHub token use `bindings.*` when present. Browser `pnpm dev` still uses local Better Auth cookies.
 
-**Relay (dashboard only):** `/_dashboard` is `ssr: false`. `beforeLoad` sets `githubLogin` + a **stable** Relay `Environment` on context. `/viewer` is the post-login entry and redirects to `/$user` with that login. Nested under `/$user`: profile index, `repos`, `stars`. Layout `loadQuery`; children `usePreloadedQuery`. Run `pnpm relay` after GraphQL edits.
+**Relay (dashboard only):** `/_dashboard` is `ssr: false`. Nested under `/$user`: profile, `repos`, `stars`. Run `pnpm relay` after GraphQL edits.
 
-**Do:** `beforeLoad` + `redirect()` for auth. Route UI in `-components/`. Nest user-scoped pages under `/$user/...`. Sidebar hrefs include the active login.
-
-**Don't:** Put a top-level `/$user` sibling that steals `/repos` — nest those under `$user`. Create a new Relay `Environment` per navigation. Invent a `/u` prefix. Use Relay outside `/_dashboard`. Commit `dist-desktop/` or leftover `desktop/` build dumps.
+**Don't:** Bake GitHub client secrets into the desktop binary. Build OAuth solely on `deepLinks` until Deno delivers open-url. Commit `dist-desktop/`.

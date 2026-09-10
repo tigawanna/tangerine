@@ -1,21 +1,50 @@
 import { authClient, authClientErrorMessage } from "@/lib/auth-client";
+import { hasDesktopBindings } from "@/lib/desktop-bindings";
 
 let cachedToken: string | null = null;
 let inflight: Promise<string> | null = null;
 
 /**
- * Resolves the signed-in user's GitHub OAuth token from the Better Auth
- * account cookie. Dedupes concurrent callers and caches until sign-out /
- * explicit clear so dashboard navigations do not hammer `/get-access-token`.
+ * Better Auth account row `id` for the GitHub provider (not the GitHub user id).
+ * Required by `/get-access-token` when accounts live in the DB (apps/api).
+ */
+async function resolveGithubAccountRowId(): Promise<string> {
+  const listed = await authClient.listAccounts();
+  const accounts = listed.data;
+  if (!accounts?.length) {
+    const message =
+      authClientErrorMessage(listed.error) ??
+      listed.error?.message ??
+      "No linked accounts. Sign out and sign in with GitHub again.";
+    throw new Error(message);
+  }
+
+  const github = accounts.find((account) => account.providerId === "github");
+  if (!github?.id) {
+    throw new Error("GitHub account not linked. Sign out and sign in again.");
+  }
+
+  return github.id;
+}
+
+/**
+ * Resolves the signed-in user's GitHub OAuth token.
+ * Deno Desktop: via Deno cookie jar → apps/api.
+ * Browser: list accounts then getAccessToken by account row id.
  */
 export async function getClientGithubAccessToken(): Promise<string> {
   if (cachedToken) return cachedToken;
   if (inflight) return inflight;
 
   inflight = (async () => {
-    const result = await authClient.getAccessToken({
-      useAccountCookie: true,
-    });
+    if (hasDesktopBindings() && globalThis.bindings?.getGithubAccessToken) {
+      const accessToken = await globalThis.bindings.getGithubAccessToken();
+      cachedToken = accessToken;
+      return accessToken;
+    }
+
+    const accountId = await resolveGithubAccountRowId();
+    const result = await authClient.getAccessToken({ accountId });
 
     const accessToken = result.data?.accessToken;
     if (!accessToken) {

@@ -63,3 +63,7 @@ data/
 
 # Cloudflare Wrangler local secrets (never commit)
 .dev.vars
+
+# evlog local NDJSON drains (repo-root + per-app)
+.evlog/
+**/.evlog/

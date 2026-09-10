@@ -1,13 +1,14 @@
 {
   "nodeModulesDir": "manual",
   "tasks": {
-    "dev": "pnpm run dev",
+    "dev": "pnpm run dev:vite",
     "build": "pnpm run build"
   },
   "desktop": {
     "app": {
       "name": "Tangerine",
       "identifier": "com.tigawanna.tangerine",
+      "deepLinks": ["com.tigawanna.tangerine"],
       "icons": {
         "linux": "./public/icon.png",
         "macos": "./public/icon.png",

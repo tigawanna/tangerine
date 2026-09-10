@@ -22,7 +22,7 @@ export default defineConfig({
   plugins: isVercel || isProd ? [] : ["./server/plugins/evlog-fs-drain.ts"],
   modules: [
     evlog({
-      env: { service: "tangerine" },
+      env: { service: "tangerine-web" },
       enabled: !isProd,
     }),
   ],

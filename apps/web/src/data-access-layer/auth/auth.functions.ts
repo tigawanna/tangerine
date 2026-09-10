@@ -1,13 +1,16 @@
-import { getAuth } from "@/lib/auth.server";
-import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
+import { authClient, type BetterAuthSession } from "@/lib/auth-client";
 
-/** Current Better Auth session, or null on public/prerender requests. */
-export const getSession = createServerFn({ method: "GET" }).handler(async () => {
+export type Session = BetterAuthSession;
+
+/**
+ * Current session from apps/api (dishi-style: client → remote Better Auth).
+ * No local `/api/auth` mount on web.
+ */
+export async function getSession(): Promise<Session | null> {
   try {
-    const headers = getRequestHeaders();
-    return await getAuth().api.getSession({ headers });
+    const { data } = await authClient.getSession();
+    return data ?? null;
   } catch {
     return null;
   }
-});
+}

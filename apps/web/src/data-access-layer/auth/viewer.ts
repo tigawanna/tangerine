@@ -1,4 +1,3 @@
-import { getSession } from "@/data-access-layer/auth/auth.functions";
 import { authClient, type BetterAuthSession } from "@/lib/auth-client";
 import {
   getUserAppRole,
@@ -31,17 +30,17 @@ export function requireAppRole(user: ViewerUser | undefined, allowed: readonly A
   return role;
 }
 
+/**
+ * Session from apps/api via Better Auth client (same pattern as dishi `site`).
+ */
 export const viewerqueryOptions = queryOptions({
   queryKey: ["viewer"],
   queryFn: async () => {
-    const session = await getSession();
-    if (!session) {
-      return { data: null, error: null };
+    const { data, error } = await authClient.getSession();
+    if (error) {
+      return { data: null, error };
     }
-    return {
-      data: { user: session.user, session: session.session },
-      error: null,
-    };
+    return { data, error: null };
   },
 });
 

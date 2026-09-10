@@ -17,12 +17,15 @@ type AuthSignInScreenProps = {
     state?: string;
     code_challenge?: string;
   };
+  /** Deno Desktop loopback callback URL. */
+  loopback?: string;
 };
 
 export function AuthSignInScreen({
   returnTo,
   initialOptionalScopes = [],
   electronQuery,
+  loopback,
 }: AuthSignInScreenProps) {
   const Icon = AppConfig.icon;
 
@@ -99,6 +102,7 @@ export function AuthSignInScreen({
                 callbackURL={returnTo}
                 initialOptionalScopes={initialOptionalScopes}
                 electronQuery={electronQuery}
+                loopback={loopback}
               />
               <Link to="/" className="landing-cta-secondary w-full" data-test="auth-back-home">
                 <ArrowLeft className="size-4" aria-hidden />

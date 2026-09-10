@@ -12,7 +12,9 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "check-types": "tsc --noEmit",
+    "auth:gen": "pnpx auth@latest generate --output ./src/db/schema/auth-schema.ts",
     "db:gen": "drizzle-kit generate",
+    "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:migrate": "drizzle-kit migrate"
@@ -29,6 +31,7 @@
     "dotenv": "^16.6.1",
     "dotenv-expand": "^12.0.1",
     "drizzle-orm": "^0.45.1",
+    "evlog": "^2.28.0",
     "hono": "^4.11.3",
     "zod": "^4.5.4"
   },

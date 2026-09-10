@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vp dev --port 3065 --host",
-    "desktop:dev": "deno desktop --hmr --preload ./deno/window.ts --env-file=.env --backend=cef -A .",
+    "dev": "deno desktop --hmr --preload ./deno/window.ts --env-file=.env --backend=cef -A .",
+    "dev:vite": "vp dev --port 3070 --host",
+    "desktop:dev": "pnpm run dev",
     "desktop:run": "deno desktop --preload ./deno/window.ts --env-file=.env --backend=cef -A .",
     "desktop:build": "pnpm run build && deno desktop --preload ./deno/window.ts --env-file=.env --backend=cef -A -o ./dist-desktop/tangerine .",
     "build": "vp build",

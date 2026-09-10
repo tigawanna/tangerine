@@ -16,14 +16,17 @@ GitHub OAuth only — no email/password. App-specific wiring (plugins, DB adapte
 
 ## App patterns
 
-### Cookie session (TanStack Start / web)
+### Frontend → remote API (web / Deno Desktop UI)
 
-No database — Better Auth keeps the session and GitHub account in signed cookies.
+No Better Auth mount on the Start app. Same split as dishi `site`:
 
-1. Parse env with `authEnvSchema` (or `.extend()` / `.merge()` your app schema, then parse once).
-2. Call `createAuthFromEnv(env, extraPlugins)`.
-3. TanStack Start: import `tanstackStartCookies` from `@repo/auth/tanstack-start` and pass it **last**.
-4. Mount `auth.handler` at `/api/auth/$`.
+1. `createAuthClient({ baseURL: VITE_API_URL, basePath: "/api/auth", fetchOptions: { credentials: "include" } })`
+2. Session via `authClient.getSession()` (and Electron/Deno proxy plugins as needed)
+3. OAuth secrets + `electron()` + Turso live only on `apps/api`
+
+### Cookie session factory (optional / legacy)
+
+`createAuthFromEnv` + `tanstackStartCookies` still exist for apps that colocate auth. Prefer the remote API pattern for `apps/web`.
 
 ### DB-backed (Hono API + Turso)
 
@@ -35,9 +38,9 @@ App owns `betterAuth({ database: drizzleAdapter(...), plugins: [...] })`. Import
 
 Do **not** enable `emailAndPassword`. Use GitHub social + optional plugins (`admin`, `bearer`, `@better-auth/api-key`, `electron`).
 
-### Electron desktop
+### Electron / Deno desktop
 
-Auth **server** is `apps/api`. Desktop only holds the Better Auth Electron client + session storage in the main process. Web `/auth` uses `electronProxyClient` + `ensureElectronRedirect`. Scheme: `ELECTRON_PROTOCOL_SCHEME` (`com.tigawanna.tangerine`).
+Auth **server** is `apps/api`. Electron holds the Better Auth Electron client in main; Deno Desktop uses PKCE + loopback in the Deno runtime. Web `/auth` is the browser half (`electronProxyClient` + PKCE / `loopback`).
 
 ## GitHub App
 

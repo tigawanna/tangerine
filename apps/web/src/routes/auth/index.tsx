@@ -9,16 +9,22 @@ const authSearchSchema = z.object({
   returnTo: z.string().optional().default("/viewer"),
   /** Comma-separated optional scopes to pre-check (e.g. `user:follow,delete_repo`). */
   optScopes: z.string().optional(),
-  /** Better Auth Electron PKCE / client params (pass through to `signIn.social`). */
+  /** Better Auth Electron / Deno Desktop PKCE params (pass through to `signIn.social`). */
   client_id: z.string().optional(),
   state: z.string().optional(),
   code_challenge: z.string().optional(),
+  /**
+   * Deno Desktop loopback callback (`http://127.0.0.1:<port>/callback`).
+   * When set, redirect the Electron auth code here instead of the custom scheme
+   * (Deno does not deliver open-url events yet — see denoland/deno#36796).
+   */
+  loopback: z.url().optional(),
 });
 
 export const Route = createFileRoute("/auth/")({
   validateSearch: (search) => authSearchSchema.parse(search),
   beforeLoad: async ({ search }) => {
-    // Electron deep-link flow — stay on sign-in even if a web session exists.
+    // Electron / Deno desktop PKCE flow — stay on sign-in even if a web session exists.
     if (search.state && search.code_challenge) return;
 
     const session = await getSession();
@@ -39,7 +45,7 @@ export const Route = createFileRoute("/auth/")({
 });
 
 function AuthPage() {
-  const { returnTo, optScopes, client_id, state, code_challenge } = Route.useSearch();
+  const { returnTo, optScopes, client_id, state, code_challenge, loopback } = Route.useSearch();
   const electronQuery =
     client_id || state || code_challenge
       ? { client_id, state, code_challenge }
@@ -50,6 +56,7 @@ function AuthPage() {
       returnTo={returnTo}
       initialOptionalScopes={parseOptionalGithubScopes(optScopes)}
       electronQuery={electronQuery}
+      loopback={loopback}
     />
   );
 }

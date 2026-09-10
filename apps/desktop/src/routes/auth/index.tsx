@@ -14,6 +14,16 @@ const authSearchSchema = z.object({
 export const Route = createFileRoute("/auth/")({
   validateSearch: (search) => authSearchSchema.parse(search),
   beforeLoad: async ({ search }) => {
+    const { hasDesktopBindings } = await import("@/lib/desktop-bindings");
+
+    if (hasDesktopBindings() && globalThis.bindings) {
+      const desktopSession = await globalThis.bindings.getSession();
+      if (desktopSession) {
+        throw redirect({ href: search.returnTo });
+      }
+      return;
+    }
+
     const session = await getSession();
     if (session) {
       throw redirect({ href: search.returnTo });
