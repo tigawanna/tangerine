@@ -19,7 +19,9 @@ Before editing files for a substantial task:
 
 **Auth:** GitHub OAuth only, from `@repo/auth`. Protect dashboards with `beforeLoad` + `redirect()` to `/auth`. Server singleton is `getAuth()` in `src/lib/auth.server.ts` (TanStack Start cookie session for now). React client is `@/lib/auth-client`. Typed Hono API client is `@/lib/api/client` via `@api/*` paths.
 
-**API:** `apps/api` is the Hono auth/data server (Turso). Point `VITE_API_URL` at it when cutting the browser client over; keep local same-origin auth until then.
+**API:** `apps/api` is the Hono auth/data server (Turso). Point `VITE_API_URL` at it when cutting the browser client over; keep local same-origin auth until then. **Electron sign-in** requires `VITE_API_URL` → API (same Better Auth server as `electron()` + `electronProxyClient` on this client).
+
+**Desktop OAuth (browser half):** `/auth` runs `ensureElectronRedirect`, preserves Electron PKCE query on `signIn.social`, and uses `electronProxyClient` with `ELECTRON_PROTOCOL_SCHEME`.
 
 **Deploy (Vercel):** Project Root Directory = `apps/web`. Framework preset = TanStack Start (`vercel.json`). Install runs from the monorepo root; build is `pnpm run build` in `apps/web`. Set the env vars from `.env.example` (especially `VITE_APP_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_TRUSTED_ORIGINS`, GitHub OAuth). GitHub callback: `{BETTER_AUTH_URL}/api/auth/callback/github`.
 

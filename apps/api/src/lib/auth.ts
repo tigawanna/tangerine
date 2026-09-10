@@ -1,6 +1,8 @@
 import { apiKey } from "@better-auth/api-key";
+import { electron } from "@better-auth/electron";
 import {
   DEFAULT_GITHUB_SCOPES,
+  ELECTRON_TRUSTED_ORIGIN,
   ROLE,
 } from "@repo/auth";
 import { betterAuth } from "better-auth";
@@ -21,7 +23,7 @@ function createApiAuth() {
     secret: envVariables.BETTER_AUTH_SECRET,
     baseURL: envVariables.BETTER_AUTH_URL,
     basePath: "/api/auth",
-    trustedOrigins: AUTHORIZED_ORIGINS,
+    trustedOrigins: [...AUTHORIZED_ORIGINS, ELECTRON_TRUSTED_ORIGIN],
     database: drizzleAdapter(db, {
       provider: "sqlite",
       schema: {
@@ -63,6 +65,7 @@ function createApiAuth() {
     },
     plugins: [
       openAPI(),
+      electron(),
       apiKey({
         defaultPrefix: "tng_",
         apiKeyHeaders: ["x-api-key", "authorization"],

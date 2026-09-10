@@ -1,6 +1,6 @@
 packages:
   - apps/web
-  - apps/desktop
+  - apps/electron
   - apps/api
   - packages/*
 

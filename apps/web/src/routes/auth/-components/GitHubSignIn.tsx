@@ -8,19 +8,38 @@ import {
 } from "@repo/auth";
 import { useMutation } from "@tanstack/react-query";
 import { Github } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+type ElectronAuthQuery = {
+  client_id?: string;
+  state?: string;
+  code_challenge?: string;
+};
 
 type GitHubSignInProps = {
   callbackURL: string;
   /** Optional scopes pre-checked (e.g. from a missing-scope re-login). */
   initialOptionalScopes?: readonly GithubOptionalScopeId[];
+  /** PKCE / Electron deep-link params — preserve on `signIn.social`. */
+  electronQuery?: ElectronAuthQuery;
 };
 
-export function GitHubSignIn({ callbackURL, initialOptionalScopes = [] }: GitHubSignInProps) {
+export function GitHubSignIn({
+  callbackURL,
+  initialOptionalScopes = [],
+  electronQuery,
+}: GitHubSignInProps) {
   const [selected, setSelected] = useState<Set<GithubOptionalScopeId>>(
     () => new Set(initialOptionalScopes),
   );
+
+  useEffect(() => {
+    const id = authClient.ensureElectronRedirect();
+    return () => {
+      clearTimeout(id);
+    };
+  }, []);
 
   const { mutate: handleSignIn, isPending } = useMutation({
     mutationFn: async () => {
@@ -28,6 +47,7 @@ export function GitHubSignIn({ callbackURL, initialOptionalScopes = [] }: GitHub
         provider: "github",
         callbackURL,
         scopes: buildGithubOAuthScopes([...selected]),
+        fetchOptions: electronQuery ? { query: electronQuery } : undefined,
       });
       if (result.error) {
         throw new Error(authClientErrorMessage(result.error) ?? "GitHub sign-in failed.");

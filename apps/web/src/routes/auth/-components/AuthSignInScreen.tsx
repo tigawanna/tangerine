@@ -12,11 +12,17 @@ import { ArrowLeft } from "lucide-react";
 type AuthSignInScreenProps = {
   returnTo: string;
   initialOptionalScopes?: readonly GithubOptionalScopeId[];
+  electronQuery?: {
+    client_id?: string;
+    state?: string;
+    code_challenge?: string;
+  };
 };
 
 export function AuthSignInScreen({
   returnTo,
   initialOptionalScopes = [],
+  electronQuery,
 }: AuthSignInScreenProps) {
   const Icon = AppConfig.icon;
 
@@ -92,6 +98,7 @@ export function AuthSignInScreen({
               <GitHubSignIn
                 callbackURL={returnTo}
                 initialOptionalScopes={initialOptionalScopes}
+                electronQuery={electronQuery}
               />
               <Link to="/" className="landing-cta-secondary w-full" data-test="auth-back-home">
                 <ArrowLeft className="size-4" aria-hidden />

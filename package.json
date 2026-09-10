@@ -29,6 +29,7 @@
       "better-auth": "1.7.3",
       "@better-auth/core": "1.7.3",
       "@better-auth/api-key": "1.7.3",
+      "@better-auth/electron": "1.7.3",
       "@better-auth/utils": "0.4.2",
       "vite": "catalog:",
       "vitest": "catalog:",
@@ -37,6 +38,7 @@
     "onlyBuiltDependencies": [
       "@clerk/shared",
       "core-js",
+      "electron",
       "es5-ext",
       "esbuild",
       "futurescript",

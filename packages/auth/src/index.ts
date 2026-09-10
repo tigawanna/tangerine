@@ -10,6 +10,7 @@ export {
   type GithubBaseScope,
   type GithubOptionalScopeId,
 } from "./env";
+export { ELECTRON_PROTOCOL_SCHEME, ELECTRON_TRUSTED_ORIGIN } from "./electron";
 export { getGithubAccessToken } from "./github-token";
 export {
   ROLE,

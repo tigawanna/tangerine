@@ -6,7 +6,7 @@ export type CreateVanillaAuthClientOptions = {
 };
 
 /**
- * Framework-agnostic Better Auth client (Deno desktop, CLI, non-React apps).
+ * Framework-agnostic Better Auth client (Electron desktop, CLI, non-React apps).
  */
 export function createVanillaAuthClient(options: CreateVanillaAuthClientOptions) {
   return createAuthClient({

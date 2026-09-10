@@ -1,18 +1,27 @@
 import { createAuthClient } from "better-auth/react";
 import type { Auth } from "./create-auth";
 
-export type CreateReactAuthClientOptions = {
+type AuthClientOptions = NonNullable<Parameters<typeof createAuthClient>[0]>;
+
+export type CreateReactAuthClientOptions<
+  TPlugins extends AuthClientOptions["plugins"] = AuthClientOptions["plugins"],
+> = {
   baseURL: string;
   basePath?: string;
+  plugins?: TPlugins;
 };
 
 /**
  * React Better Auth client for TanStack Start / browser apps.
+ * Generic over `plugins` so client methods from plugins stay typed.
  */
-export function createReactAuthClient(options: CreateReactAuthClientOptions) {
+export function createReactAuthClient<
+  TPlugins extends AuthClientOptions["plugins"] = undefined,
+>(options: CreateReactAuthClientOptions<TPlugins>) {
   return createAuthClient({
     baseURL: options.baseURL,
     basePath: options.basePath ?? "/api/auth",
+    plugins: options.plugins as TPlugins,
   });
 }
 

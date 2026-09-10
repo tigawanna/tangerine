@@ -5,7 +5,7 @@ pnpm + Turbo monorepo. **Stack- and app-specific rules live in nested `AGENTS.md
 ## Apps
 
 - `apps/web` — TanStack Start (GitHub dashboard). See [`apps/web/AGENTS.md`](apps/web/AGENTS.md).
-- `apps/desktop` — same product shell via [`deno desktop`](https://docs.deno.com/runtime/desktop/) (single window + HMR). See [`apps/desktop/AGENTS.md`](apps/desktop/AGENTS.md).
+- `apps/electron` — Electron + electron-vite shell (Better Auth Electron → `apps/api`). See [`apps/electron/AGENTS.md`](apps/electron/AGENTS.md).
 - `apps/api` — Hono API + Turso + Better Auth. See [`apps/api/AGENTS.md`](apps/api/AGENTS.md).
 
 Shared libraries live in `packages/*`. Auth is [`packages/auth`](packages/auth/AGENTS.md) (GitHub-only Better Auth pieces; apps own wiring).

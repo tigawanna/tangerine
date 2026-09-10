@@ -9,11 +9,18 @@ const authSearchSchema = z.object({
   returnTo: z.string().optional().default("/viewer"),
   /** Comma-separated optional scopes to pre-check (e.g. `user:follow,delete_repo`). */
   optScopes: z.string().optional(),
+  /** Better Auth Electron PKCE / client params (pass through to `signIn.social`). */
+  client_id: z.string().optional(),
+  state: z.string().optional(),
+  code_challenge: z.string().optional(),
 });
 
 export const Route = createFileRoute("/auth/")({
   validateSearch: (search) => authSearchSchema.parse(search),
   beforeLoad: async ({ search }) => {
+    // Electron deep-link flow — stay on sign-in even if a web session exists.
+    if (search.state && search.code_challenge) return;
+
     const session = await getSession();
     if (session) {
       throw redirect({ href: search.returnTo });
@@ -32,12 +39,17 @@ export const Route = createFileRoute("/auth/")({
 });
 
 function AuthPage() {
-  const { returnTo, optScopes } = Route.useSearch();
+  const { returnTo, optScopes, client_id, state, code_challenge } = Route.useSearch();
+  const electronQuery =
+    client_id || state || code_challenge
+      ? { client_id, state, code_challenge }
+      : undefined;
 
   return (
     <AuthSignInScreen
       returnTo={returnTo}
       initialOptionalScopes={parseOptionalGithubScopes(optScopes)}
+      electronQuery={electronQuery}
     />
   );
 }
