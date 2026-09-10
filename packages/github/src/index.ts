@@ -56,6 +56,10 @@ export {
   type RepoPageVariables,
   type RepoLanguagesQueryResult,
   type RepoStargazersQueryResult,
+  type RepoCommit,
+  type RepoBranch,
+  type RepoBranchesPayload,
+  type RepoPageInfo,
 } from "./queries/repo-page";
 export {
   UserReposQuery,
@@ -89,12 +93,6 @@ export {
   FOLLOW_USER_MUTATION,
   UNFOLLOW_USER_MUTATION,
 } from "./queries/user-mutations";
-export {
-  AddStarMutation,
-  RemoveStarMutation,
-  ADD_STAR_MUTATION,
-  REMOVE_STAR_MUTATION,
-} from "./queries/repo-mutations";
 export { graphql, readFragment } from "./graphql";
 export type { FragmentOf, ResultOf, VariablesOf } from "./graphql";
 export {
@@ -140,6 +138,12 @@ export type {
   RepoExtraction,
   GitTreeEntry,
 } from "./types";
+export type { RepoReadme } from "./queries/repo-contents";
+export type {
+  DeleteReposFailureCode,
+  DeleteReposResult,
+  DeleteReposTarget,
+} from "./queries/repo-mutations";
 export {
   buildRepoSearchText,
   extractRepoTags,

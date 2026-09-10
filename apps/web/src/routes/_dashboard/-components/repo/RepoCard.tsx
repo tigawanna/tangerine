@@ -6,6 +6,7 @@ import { graphql, useFragment } from "react-relay";
 import { Copy, Github, Lock, Star } from "lucide-react";
 import { VscVscodeInsiders } from "react-icons/vsc";
 import type { RepoCard_repository$key } from "./__generated__/RepoCard_repository.graphql";
+import { RepoCardStarButton } from "./RepoCardStarButton";
 
 interface RepoCardProps {
   /** Relay fragment key — preferred for dashboard lists. */
@@ -30,11 +31,14 @@ type RepoCardView = {
   isPrivate: boolean;
   isFork: boolean;
   stargazerCount: number;
+  viewerHasStarred: boolean | null;
   forkCount: number;
   openGraphImageUrl: string | null;
   ownerLogin: string;
   branch: string | null;
   languages: Array<{ id: string; name: string; color: string | null }>;
+  /** True when `id` is a GraphQL node id that can be starred. */
+  canStar: boolean;
 };
 
 /**
@@ -62,10 +66,12 @@ function fromGithubNode(repo: GithubRepoNode): RepoCardView {
     isPrivate: repo.isPrivate,
     isFork: repo.isFork,
     stargazerCount: repo.stargazerCount,
+    viewerHasStarred: null,
     forkCount: repo.forkCount,
     openGraphImageUrl: repo.openGraphImageUrl,
     ownerLogin: repo.owner?.login ?? repo.nameWithOwner.split("/")[0] ?? "",
     branch: repo.defaultBranchRef?.name ?? null,
+    canStar: false,
     languages:
       languages.length > 0
         ? languages.map((lang) => ({
@@ -128,10 +134,12 @@ function RelayRepoCard({
     isPrivate: fragData.isPrivate ?? fragData.visibility === "PRIVATE",
     isFork: fragData.isFork,
     stargazerCount: fragData.stargazerCount,
+    viewerHasStarred: fragData.viewerHasStarred,
     forkCount: fragData.forkCount,
     openGraphImageUrl: fragData.openGraphImageUrl ?? null,
     ownerLogin: fragData.owner.login,
     branch: fragData.defaultBranchRef?.name ?? null,
+    canStar: true,
     languages:
       fragData.languages?.nodes
         ?.filter((lang): lang is NonNullable<typeof lang> => lang != null)
@@ -287,10 +295,19 @@ function RepoCardSurface({
         ) : null}
 
         <div className="border-base-300/80 text-base-content/45 mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 border-t pt-3 text-xs">
-          <span className="inline-flex items-center gap-1">
-            <Star className="size-3.5" aria-hidden />
-            {view.stargazerCount}
-          </span>
+          {view.canStar && view.viewerHasStarred != null ? (
+            <RepoCardStarButton
+              id={view.id}
+              name={view.name}
+              stargazerCount={view.stargazerCount}
+              viewerHasStarred={view.viewerHasStarred}
+            />
+          ) : (
+            <span className="inline-flex items-center gap-1">
+              <Star className="size-3.5" aria-hidden />
+              {view.stargazerCount}
+            </span>
+          )}
           <span className="inline-flex items-center gap-1" title="Forks">
             <Copy className="size-3.5" aria-hidden />
             {view.forkCount}
@@ -319,6 +336,7 @@ const RepoCardFragment = graphql`
     isPrivate
     isFork
     stargazerCount
+    viewerHasStarred
     forkCount
     openGraphImageUrl
     owner {

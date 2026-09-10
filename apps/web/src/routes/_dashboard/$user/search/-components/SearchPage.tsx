@@ -20,7 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Spinner } from "@/components/ui/spinner";
 import {
   GITHUB_SEARCH_INPUT_ID,
   githubSearchTypes,
@@ -31,10 +30,9 @@ import {
 } from "@/routes/_dashboard/-components/search/github-search";
 import { GithubSearchFiltersDialog } from "./GithubSearchFiltersDialog";
 import { SearchList, SearchResultsFallback } from "./SearchList";
-import { useDebouncedValue } from "@tanstack/react-pacer";
 import { getRouteApi } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 
 const searchRoute = getRouteApi("/_dashboard/$user/search/");
 
@@ -44,17 +42,25 @@ const searchRoute = getRouteApi("/_dashboard/$user/search/");
  * boundary that `usePreloadedQuery` trips.
  */
 export function SearchPage() {
-  const { inputValue, onInputChange, isDebouncing, committed, type, setType, patchQuery } =
+  const { inputValue, onInputChange, commitSearch, committed, type, setType, patchQuery } =
     useGithubSearchQuery();
   const { user } = searchRoute.useParams();
   const queryRef = searchRoute.useLoaderData();
   const scoped = hasUserScope(inputValue, user);
   const hasQuery = committed.trim().length > 0;
 
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    commitSearch();
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6" data-test="github-search-page">
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <form
+          className="flex flex-col gap-3 sm:flex-row sm:items-center"
+          onSubmit={handleSubmit}
+        >
           <InputGroup className="github-search-vt h-11 min-w-0 flex-1 rounded-xl">
             <InputGroupAddon align="inline-start">
               <Search className="size-4" aria-hidden />
@@ -72,7 +78,6 @@ export function SearchPage() {
               }}
             />
             <InputGroupAddon align="inline-end" className="gap-1">
-              {isDebouncing ? <Spinner className="text-base-content/45" /> : null}
               {inputValue ? (
                 <InputGroupButton
                   size="icon-xs"
@@ -87,6 +92,11 @@ export function SearchPage() {
               ) : null}
             </InputGroupAddon>
           </InputGroup>
+
+          <Button type="submit" className="h-11 shrink-0" data-test="github-search-submit">
+            <Search />
+            Search
+          </Button>
 
           <Select
             value={type}
@@ -107,7 +117,7 @@ export function SearchPage() {
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </form>
 
         <div className="flex flex-wrap items-center gap-2">
           <Button
@@ -145,8 +155,8 @@ export function SearchPage() {
             </EmptyMedia>
             <EmptyTitle>Search GitHub</EmptyTitle>
             <EmptyDescription>
-              Type a query, then wait a moment — results load below without replacing this input.
-              Press <Kbd>⌘K</Kbd> anytime to focus search.
+              Type a query, then press <Kbd>Enter</Kbd> or Search — results load below without
+              replacing this input. Press <Kbd>⌘K</Kbd> anytime to focus search.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -161,28 +171,23 @@ function useGithubSearchQuery() {
   const committed = search.q;
   const type = search.type;
   const [inputValue, setInputValue] = useState(committed);
-  const [debouncedValue] = useDebouncedValue(inputValue, { wait: 400 });
-  const isDebouncing = inputValue !== debouncedValue;
 
   useEffect(() => {
     setInputValue(committed);
   }, [committed]);
 
-  useEffect(() => {
-    // Wait until debounce has caught up to the live input. Instant patches
-    // (scope chip / clear) update input + URL together; without this guard the
-    // stale empty debounce value would navigate and wipe `q` a tick later.
-    if (debouncedValue !== inputValue) return;
-    if (debouncedValue === committed) return;
+  function commitSearch(next = inputValue) {
+    const q = next.trim();
+    if (q === committed) return;
     void navigate({
       to: ".",
       search: (prev) => ({
         ...prev,
-        q: debouncedValue || undefined,
+        q: q || undefined,
       }),
       replace: true,
     });
-  }, [committed, debouncedValue, inputValue, navigate]);
+  }
 
   function patchQuery(next: string) {
     setInputValue(next);
@@ -210,7 +215,7 @@ function useGithubSearchQuery() {
   return {
     inputValue,
     onInputChange: setInputValue,
-    isDebouncing,
+    commitSearch,
     committed,
     type,
     setType,

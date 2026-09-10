@@ -13,6 +13,7 @@ local.db
 .workflow-vitest
 .wrangler
 .output
+.old
 .vinxi
 todos.json
 /.swc

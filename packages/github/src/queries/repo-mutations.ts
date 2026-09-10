@@ -1,43 +1,24 @@
-import { print } from "graphql";
+import { RequestError } from "octokit";
 import type { GitHubClient } from "../client";
-import { graphql, type ResultOf } from "../graphql";
 import { splitRepoFullName } from "../utils/repo";
 
-export const AddStarMutation = graphql(`
-  mutation AddStar($starrableId: ID!) {
-    addStar(input: { starrableId: $starrableId }) {
-      starrable {
-        __typename
-        ... on Repository {
-          id
-          stargazerCount
-          viewerHasStarred
-        }
-      }
-    }
-  }
-`);
+export type DeleteReposTarget = {
+  id: string;
+  nameWithOwner: string;
+};
 
-export const RemoveStarMutation = graphql(`
-  mutation RemoveStar($starrableId: ID!) {
-    removeStar(input: { starrableId: $starrableId }) {
-      starrable {
-        __typename
-        ... on Repository {
-          id
-          stargazerCount
-          viewerHasStarred
-        }
-      }
-    }
-  }
-`);
+export type DeleteReposFailureCode =
+  | "missing_delete_repo_scope"
+  | "forbidden"
+  | "not_found"
+  | "unknown";
 
-export type AddStarMutationResult = ResultOf<typeof AddStarMutation>;
-export type RemoveStarMutationResult = ResultOf<typeof RemoveStarMutation>;
-
-export const ADD_STAR_MUTATION = print(AddStarMutation);
-export const REMOVE_STAR_MUTATION = print(RemoveStarMutation);
+export type DeleteReposResult = {
+  successful: Array<{ id: string; name: string }>;
+  failed: Array<{ repo: string; issue: string; code: DeleteReposFailureCode }>;
+  /** True when at least one failure looks like a missing `delete_repo` OAuth scope. */
+  needsDeleteRepoScope: boolean;
+};
 
 /**
  * Deletes a repository by `owner/repo` full name.
@@ -45,6 +26,65 @@ export const REMOVE_STAR_MUTATION = print(RemoveStarMutation);
 export async function deleteRepo(this: GitHubClient, fullName: string) {
   const { owner, repo } = splitRepoFullName(fullName);
   await this.octokit.rest.repos.delete({ owner, repo });
+}
+
+/**
+ * Deletes many repositories; collects per-repo successes/failures.
+ * Requires the GitHub `delete_repo` OAuth scope.
+ */
+export async function deleteRepos(
+  this: GitHubClient,
+  repos: readonly DeleteReposTarget[],
+): Promise<DeleteReposResult> {
+  const successful: DeleteReposResult["successful"] = [];
+  const failed: DeleteReposResult["failed"] = [];
+
+  await Promise.all(
+    repos.map(async (repo) => {
+      try {
+        await this.deleteRepo(repo.nameWithOwner);
+        successful.push({ id: repo.id, name: repo.nameWithOwner });
+      } catch (error: unknown) {
+        failed.push({
+          repo: repo.nameWithOwner,
+          ...describeDeleteFailure(error),
+        });
+      }
+    }),
+  );
+
+  return {
+    successful,
+    failed,
+    needsDeleteRepoScope: failed.some((item) => item.code === "missing_delete_repo_scope"),
+  };
+}
+
+/**
+ * Maps Octokit / unknown errors into a toast-friendly issue + machine-readable code.
+ */
+function describeDeleteFailure(error: unknown): {
+  issue: string;
+  code: DeleteReposFailureCode;
+} {
+  if (error instanceof RequestError) {
+    if (error.status === 403) {
+      // List UI only selects ADMIN repos, so 403 here is almost always a missing
+      // `delete_repo` OAuth scope on an older session.
+      return {
+        code: "missing_delete_repo_scope",
+        issue: "Missing delete_repo scope — sign in again to grant it.",
+      };
+    }
+    if (error.status === 404) {
+      return { code: "not_found", issue: "Not found or no access" };
+    }
+    return { code: "unknown", issue: error.message || `HTTP ${error.status}` };
+  }
+  if (error instanceof Error) {
+    return { code: "unknown", issue: error.message };
+  }
+  return { code: "unknown", issue: "Unknown error" };
 }
 
 /**
@@ -90,32 +130,4 @@ export async function applyRepoMetadata(
     repo,
     names: input.topics,
   });
-}
-
-/**
- * Stars a repository (or other starrable) by node id.
- */
-export async function addStar(this: GitHubClient, starrableId: string) {
-  const result = await this.graphql<AddStarMutationResult>(ADD_STAR_MUTATION, {
-    variables: { starrableId },
-  });
-  const starrable = result.addStar?.starrable;
-  if (starrable?.__typename !== "Repository") {
-    return null;
-  }
-  return starrable;
-}
-
-/**
- * Removes a star from a repository (or other starrable) by node id.
- */
-export async function removeStar(this: GitHubClient, starrableId: string) {
-  const result = await this.graphql<RemoveStarMutationResult>(REMOVE_STAR_MUTATION, {
-    variables: { starrableId },
-  });
-  const starrable = result.removeStar?.starrable;
-  if (starrable?.__typename !== "Repository") {
-    return null;
-  }
-  return starrable;
 }

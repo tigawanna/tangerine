@@ -37,7 +37,7 @@ export function DeleteRepositories({
   const environment = useRelayEnvironment();
 
   const mutation = useMutation({
-    mutationFn: () => deleteGithubRepos({ data: { repos: selected } }),
+    mutationFn: () => deleteGithubRepos(selected),
     onSuccess: (data) => {
       for (const item of data.successful) {
         environment.applyUpdate({

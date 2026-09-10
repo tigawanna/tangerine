@@ -2,6 +2,12 @@ import type { GitHubClient } from "../client";
 import type { GitTreeEntry } from "../types";
 import { decodeBase64Content, isNotFoundError } from "./helpers";
 
+/** Decoded repository README from the GitHub REST API. */
+export type RepoReadme = {
+  content: string;
+  path: string;
+};
+
 /**
  * Returns a recursive git tree for a repository branch.
  */
@@ -37,7 +43,7 @@ export async function getRepoFileContent(
   repo: string,
   path: string,
   ref: string,
-) {
+): Promise<string | null> {
   try {
     const response = await this.octokit.rest.repos.getContent({
       owner,
@@ -66,7 +72,11 @@ export async function getRepoFileContent(
 /**
  * Returns the repository README (any common filename) via the GitHub REST API.
  */
-export async function getRepoReadme(this: GitHubClient, owner: string, repo: string) {
+export async function getRepoReadme(
+  this: GitHubClient,
+  owner: string,
+  repo: string,
+): Promise<RepoReadme | null> {
   try {
     const response = await this.octokit.rest.repos.getReadme({ owner, repo });
 

@@ -20,10 +20,9 @@ import {
 } from "./queries/repo-page";
 import { getRepoFileContent, getRepoReadme, getRepoTree } from "./queries/repo-contents";
 import {
-  addStar,
   applyRepoMetadata,
   deleteRepo,
-  removeStar,
+  deleteRepos,
   setRepoVisibility,
 } from "./queries/repo-mutations";
 
@@ -91,10 +90,9 @@ export class GitHubClient {
   getRepoFileContent = getRepoFileContent;
   getRepoReadme = getRepoReadme;
   deleteRepo = deleteRepo;
+  deleteRepos = deleteRepos;
   setRepoVisibility = setRepoVisibility;
   applyRepoMetadata = applyRepoMetadata;
-  addStar = addStar;
-  removeStar = removeStar;
 }
 
 export { RequestError };

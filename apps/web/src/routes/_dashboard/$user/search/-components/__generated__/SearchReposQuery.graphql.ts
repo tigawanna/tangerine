@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2dda4a94da171a7c4c859b4f71c76aec>>
+ * @generated SignedSource<<c33e5bd56482636584c7fe9c51ae4c90>>
  * @lightSyntaxTransform
  */
 
@@ -269,6 +269,13 @@ return {
                         "alias": null,
                         "args": null,
                         "kind": "ScalarField",
+                        "name": "viewerHasStarred",
+                        "storageKey": null
+                      },
+                      {
+                        "alias": null,
+                        "args": null,
+                        "kind": "ScalarField",
                         "name": "forkCount",
                         "storageKey": null
                       },
@@ -381,12 +388,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "286d82d15e52584fb97c45159cab6355",
+    "cacheID": "6af90625a274fc7673e8a437da273bc0",
     "id": null,
     "metadata": {},
     "name": "SearchReposQuery",
     "operationKind": "query",
-    "text": "query SearchReposQuery(\n  $query: String!\n) {\n  search(first: 24, query: $query, type: REPOSITORY) {\n    repositoryCount\n    edges {\n      cursor\n      node {\n        __typename\n        ...RepoCard_repository\n        ... on Node {\n          __isNode: __typename\n          id\n        }\n      }\n    }\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n"
+    "text": "query SearchReposQuery(\n  $query: String!\n) {\n  search(first: 24, query: $query, type: REPOSITORY) {\n    repositoryCount\n    edges {\n      cursor\n      node {\n        __typename\n        ...RepoCard_repository\n        ... on Node {\n          __isNode: __typename\n          id\n        }\n      }\n    }\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  viewerHasStarred\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n"
   }
 };
 })();

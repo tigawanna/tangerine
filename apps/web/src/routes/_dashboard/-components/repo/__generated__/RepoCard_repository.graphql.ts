@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e30b572ddbedf4c531febfadfb2ae133>>
+ * @generated SignedSource<<7c5d92b20441f6b36f8075b2eafc409a>>
  * @lightSyntaxTransform
  */
 
@@ -43,6 +43,7 @@ export type RepoCard_repository$data = {
   readonly pushedAt: string | null | undefined;
   readonly stargazerCount: number;
   readonly url: string;
+  readonly viewerHasStarred: boolean;
   readonly visibility: RepositoryVisibility;
   readonly " $fragmentType": "RepoCard_repository";
 };
@@ -153,6 +154,13 @@ return {
       "alias": null,
       "args": null,
       "kind": "ScalarField",
+      "name": "viewerHasStarred",
+      "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
       "name": "forkCount",
       "storageKey": null
     },
@@ -244,6 +252,6 @@ return {
 };
 })();
 
-(node as any).hash = "17a886cc83870e4d444780648f8903ae";
+(node as any).hash = "0d6d84ef8069f049e785249fe62b224f";
 
 export default node;

@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<b561a692efa6893db75f029aef61dcb0>>
+ * @generated SignedSource<<e623220adecea935f6f2d563a2be79b3>>
  * @lightSyntaxTransform
  */
 
@@ -288,6 +288,13 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "viewerHasStarred",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "forkCount",
                             "storageKey": null
                           },
@@ -454,12 +461,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "59f4daa3aab691dfe9110eee694e4e9c",
+    "cacheID": "c67d9138adaf882ec2691286ee2b214f",
     "id": null,
     "metadata": {},
     "name": "UserReposPaginationQuery",
     "operationKind": "query",
-    "text": "query UserReposPaginationQuery(\n  $after: String\n  $first: Int = 24\n  $isFork: Boolean = false\n  $orderBy: RepositoryOrder = {field: PUSHED_AT, direction: DESC}\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...UserRepos_repositories_2NdkU6\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserRepos_repositories_2NdkU6 on RepositoryOwner {\n  __isRepositoryOwner: __typename\n  repositories(first: $first, after: $after, orderBy: $orderBy, isFork: $isFork) {\n    edges {\n      cursor\n      node {\n        id\n        name\n        nameWithOwner\n        viewerPermission\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n"
+    "text": "query UserReposPaginationQuery(\n  $after: String\n  $first: Int = 24\n  $isFork: Boolean = false\n  $orderBy: RepositoryOrder = {field: PUSHED_AT, direction: DESC}\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...UserRepos_repositories_2NdkU6\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  viewerHasStarred\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserRepos_repositories_2NdkU6 on RepositoryOwner {\n  __isRepositoryOwner: __typename\n  repositories(first: $first, after: $after, orderBy: $orderBy, isFork: $isFork) {\n    edges {\n      cursor\n      node {\n        id\n        name\n        nameWithOwner\n        viewerPermission\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n    totalCount\n  }\n  id\n}\n"
   }
 };
 })();

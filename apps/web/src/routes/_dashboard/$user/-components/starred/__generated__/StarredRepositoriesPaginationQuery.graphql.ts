@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<4ee54e92fe9775d40356cc40340d4735>>
+ * @generated SignedSource<<05e3967651d083a0c62961152796cefd>>
  * @lightSyntaxTransform
  */
 
@@ -306,6 +306,13 @@ return {
                             "alias": null,
                             "args": null,
                             "kind": "ScalarField",
+                            "name": "viewerHasStarred",
+                            "storageKey": null
+                          },
+                          {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
                             "name": "forkCount",
                             "storageKey": null
                           },
@@ -465,12 +472,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "999e27d3e7173ff5584e8b9c2555613a",
+    "cacheID": "8dd554bc1f6a6fe1f0b2027e33b7e06f",
     "id": null,
     "metadata": {},
     "name": "StarredRepositoriesPaginationQuery",
     "operationKind": "query",
-    "text": "query StarredRepositoriesPaginationQuery(\n  $afterStarredRepo: String\n  $firstStarredRepos: Int = 24\n  $orderByStarredRepos: StarOrder = {field: STARRED_AT, direction: DESC}\n  $ownedByViewer: Boolean = false\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...UserStarredRepos_repositories_3BRI8l\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserStarredRepos_repositories_3BRI8l on User {\n  starredRepositories(first: $firstStarredRepos, after: $afterStarredRepo, orderBy: $orderByStarredRepos, ownedByViewer: $ownedByViewer) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
+    "text": "query StarredRepositoriesPaginationQuery(\n  $afterStarredRepo: String\n  $firstStarredRepos: Int = 24\n  $orderByStarredRepos: StarOrder = {field: STARRED_AT, direction: DESC}\n  $ownedByViewer: Boolean = false\n  $id: ID!\n) {\n  node(id: $id) {\n    __typename\n    ...UserStarredRepos_repositories_3BRI8l\n    id\n  }\n}\n\nfragment RepoCard_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  pushedAt\n  diskUsage\n  url\n  visibility\n  isPrivate\n  isFork\n  stargazerCount\n  viewerHasStarred\n  forkCount\n  openGraphImageUrl\n  owner {\n    __typename\n    login\n    url\n    avatarUrl\n    id\n  }\n  primaryLanguage {\n    id\n    name\n    color\n  }\n  languages(first: 3) {\n    nodes {\n      id\n      name\n      color\n    }\n  }\n  defaultBranchRef {\n    name\n    id\n  }\n}\n\nfragment UserStarredRepos_repositories_3BRI8l on User {\n  starredRepositories(first: $firstStarredRepos, after: $afterStarredRepo, orderBy: $orderByStarredRepos, ownedByViewer: $ownedByViewer) {\n    totalCount\n    edges {\n      cursor\n      node {\n        id\n        ...RepoCard_repository\n        __typename\n      }\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n"
   }
 };
 })();

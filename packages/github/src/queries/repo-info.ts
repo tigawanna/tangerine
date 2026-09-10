@@ -7,33 +7,55 @@ import { mapEnrichmentRepoNode } from "../utils/repo";
 export const OneRepoQuery = graphql(`
   query OneRepo($owner: String!, $repo: String!, $firstTopics: Int!, $firstLangs: Int!) {
     repository(name: $repo, owner: $owner) {
-      createdAt
-      forkCount
       id
+      name
+      nameWithOwner
+      description
+      url
       homepageUrl
+      openGraphImageUrl
+      createdAt
+      updatedAt
+      pushedAt
+      diskUsage
+      visibility
+      forkCount
+      stargazerCount
+      viewerHasStarred
+      viewerCanAdminister
+      forkingAllowed
       isPrivate
       isFork
       isEmpty
-      description
       isTemplate
+      isArchived
+      isDisabled
+      isLocked
+      isUserConfigurationRepository
+      hasDiscussionsEnabled
+      hasIssuesEnabled
+      hasProjectsEnabled
+      hasWikiEnabled
+      primaryLanguage {
+        id
+        name
+        color
+      }
       repositoryTopics(first: $firstTopics) {
         edges {
           node {
+            id
             topic {
               name
             }
           }
         }
       }
-      name
-      nameWithOwner
-      openGraphImageUrl
-      updatedAt
-      url
       languages(first: $firstLangs) {
         edges {
           size
           node {
+            id
             color
             name
           }
