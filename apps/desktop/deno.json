@@ -1,0 +1,24 @@
+{
+  "nodeModulesDir": "manual",
+  "tasks": {
+    "dev": "pnpm run dev",
+    "build": "pnpm run build"
+  },
+  "desktop": {
+    "app": {
+      "name": "Tangerine",
+      "identifier": "com.tigawanna.tangerine",
+      "icons": {
+        "linux": "./public/icon.png",
+        "macos": "./public/icon.png",
+        "windows": "./public/favicon.ico"
+      }
+    },
+    "backend": "cef",
+    "output": {
+      "linux": "./dist-desktop/tangerine",
+      "macos": "./dist-desktop/Tangerine.app",
+      "windows": "./dist-desktop/Tangerine"
+    }
+  }
+}

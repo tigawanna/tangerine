@@ -1,0 +1,98 @@
+import { QueryActivityNprogress } from "@/components/navigation/nprogress/QueryActivityNprogress";
+import { SidebarLinks } from "@/components/sidebar/SidebarLinks";
+import type { SidebarItem } from "@/components/sidebar/types";
+import { Separator } from "@/components/ui/separator";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { RouterPendingComponent } from "@/lib/tanstack/router/RouterPendingComponent";
+import { TSRBreadCrumbs } from "@/lib/tanstack/router/TSRBreadCrumbs";
+import { AppConfig } from "@/utils/system";
+import { Outlet, useMatchRoute, useParams, useRouteContext } from "@tanstack/react-router";
+import { Suspense } from "react";
+import { DashboardSearchTrigger } from "../search/DashboardSearchTrigger";
+import { DashboardSidebarFooter } from "./DashboardSidebarFooter";
+import { DashboardSidebarHeader } from "./DashboardSidebarHeader";
+import { dashboardPrimaryRoutes } from "./dashboard_routes";
+
+interface DashboardLayoutProps {
+  sidebarLabel: string;
+  accountRoutes: SidebarItem[];
+  accountLabel: string;
+}
+
+export function DashboardLayout({
+  sidebarLabel,
+  accountRoutes,
+  accountLabel,
+}: DashboardLayoutProps) {
+  const { githubLogin } = useRouteContext({ from: "/_dashboard" });
+  const params = useParams({ strict: false }) as { user?: string };
+  /** Sidebar nav follows the profile in the URL; brand → landing, “My profile” → signed-in user. */
+  const viewedUser = params.user?.trim() || githubLogin || "";
+  const primaryRoutes = viewedUser ? dashboardPrimaryRoutes(viewedUser) : [];
+  const matchRoute = useMatchRoute();
+  const onSearchPage = Boolean(matchRoute({ to: "/$user/search", fuzzy: true }));
+
+  return (
+    <SidebarProvider defaultOpen={false} className="h-svh overflow-hidden">
+      <QueryActivityNprogress />
+      <Sidebar collapsible="icon">
+        <SidebarHeader>
+          <DashboardSidebarHeader githubLogin={githubLogin ?? undefined} />
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup className="bg-base-300">
+            <SidebarGroupLabel className="text-sm font-semibold tracking-wide">
+              {sidebarLabel}
+            </SidebarGroupLabel>
+            <SidebarLinks links={primaryRoutes} />
+          </SidebarGroup>
+          {accountRoutes.length > 0 ? (
+            <SidebarGroup className="bg-base-300">
+              <SidebarGroupLabel className="text-sm font-semibold tracking-wide">
+                {accountLabel}
+              </SidebarGroupLabel>
+              <SidebarLinks links={accountRoutes} />
+            </SidebarGroup>
+          ) : null}
+        </SidebarContent>
+        <SidebarFooter className="gap-3 pb-3">
+          <DashboardSidebarFooter />
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+      <SidebarInset className="bg-base-100 min-h-0">
+        <header className="bg-base-100 sticky top-0 z-30 flex h-16 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+          <div className="flex shrink-0 items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" data-test="dashboard-sidebar-trigger" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <TSRBreadCrumbs />
+          </div>
+          {viewedUser ? (
+            <div className="min-w-0 flex-1 px-2">
+              <DashboardSearchTrigger user={viewedUser} visible={!onSearchPage} />
+            </div>
+          ) : null}
+          <div className="ml-auto hidden shrink-0 items-center gap-3 px-4 sm:flex">
+            <span className="text-base-content/60 text-sm">{AppConfig.name}</span>
+          </div>
+        </header>
+        <div className="@container/main flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-auto p-6">
+          <Suspense fallback={<RouterPendingComponent />}>
+            <Outlet />
+          </Suspense>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}

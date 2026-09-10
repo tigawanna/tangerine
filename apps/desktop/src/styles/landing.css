@@ -1,0 +1,551 @@
+/* Workspace packages resolve under node_modules and are ignored by Tailwind by default */
+@source "../../../../packages/ui/src";
+
+@theme {
+  /* Brand accents: warm brown / amber */
+  --color-landing-burgundy: #5c3d24;
+  --color-landing-amber: #f7b538;
+  --color-landing-orange: #db7c26;
+  --color-landing-ember: #c45c1a;
+  --color-landing-flame: #a86b2f;
+
+  /* Semantic surfaces: dark-first defaults, flipped by .dark / .light */
+  --color-landing-surface: #1a140f;
+  --color-landing-surface-alt: #221a13;
+  --color-landing-surface-raised: #2c2118;
+  --color-landing-fg: #f4ebe2;
+  --color-landing-fg-muted: #cbb5a0;
+  --color-landing-border: color-mix(in oklch, #f4ebe2 14%, transparent);
+  --color-landing-emphasis: #4a3220;
+  --color-landing-emphasis-fg: #f4ebe2;
+
+  --color-landing-void: #2a1e14;
+  --color-landing-deep: #16100c;
+  --color-landing-ink: #f4ebe2;
+  --color-landing-paper: #1a140f;
+  --color-landing-paper-warm: #221a13;
+  --color-landing-muted: #cbb5a0;
+  --color-landing-sage: #f4ebe2;
+  --color-landing-sage-light: #faf6f2;
+  --color-landing-cream: #f7b538;
+  --color-landing-cream-warm: #f4ebe2;
+  --color-landing-cream-highlight: #f7b538;
+  --color-landing-olive: #db7c26;
+  --color-landing-sage-bg: #c45c1a;
+  --color-landing-panel: #2c2118;
+  --color-landing-panel-alt: #3a2a1c;
+  --color-landing-panel-mid: #4a3220;
+  --color-landing-dark-mid: #2a1e14;
+  --color-landing-cream-bg: #221a13;
+  --color-landing-cream-dark: #16100c;
+  --color-landing-footer: #16100c;
+  --color-landing-word-start: #cbb5a0;
+  --color-landing-face-1: #2a1e14;
+  --color-landing-face-2: #5c3d24;
+  --color-landing-face-3: #a86b2f;
+  --color-landing-face-4: #c45c1a;
+
+  --font-landing-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-landing-body: "Figtree", ui-sans-serif, system-ui, sans-serif;
+}
+
+.dark {
+  --color-landing-surface: #1a140f;
+  --color-landing-surface-alt: #221a13;
+  --color-landing-surface-raised: #2c2118;
+  --color-landing-fg: #f4ebe2;
+  --color-landing-fg-muted: #cbb5a0;
+  --color-landing-border: color-mix(in oklch, #f4ebe2 14%, transparent);
+  --color-landing-emphasis: #4a3220;
+  --color-landing-emphasis-fg: #f4ebe2;
+
+  --color-landing-paper: #1a140f;
+  --color-landing-paper-warm: #221a13;
+  --color-landing-ink: #f4ebe2;
+  --color-landing-muted: #cbb5a0;
+  --color-landing-sage: #f4ebe2;
+  --color-landing-panel: #2c2118;
+  --color-landing-panel-alt: #3a2a1c;
+  --color-landing-void: #2a1e14;
+  --color-landing-deep: #16100c;
+  --color-landing-footer: #16100c;
+}
+
+.light {
+  --color-landing-surface: #faf6f2;
+  --color-landing-surface-alt: #f3ebe4;
+  --color-landing-surface-raised: #ffffff;
+  --color-landing-fg: #4a3220;
+  --color-landing-fg-muted: #6b4e38;
+  --color-landing-border: color-mix(in oklch, #4a3220 12%, transparent);
+  --color-landing-emphasis: #5c3d24;
+  --color-landing-emphasis-fg: #f4ebe2;
+
+  --color-landing-paper: #faf6f2;
+  --color-landing-paper-warm: #f3ebe4;
+  --color-landing-ink: #4a3220;
+  --color-landing-muted: #6b4e38;
+  --color-landing-sage: #4a3220;
+  --color-landing-panel: #ffffff;
+  --color-landing-panel-alt: #f3ebe4;
+  --color-landing-void: #faf6f2;
+  --color-landing-deep: #16100c;
+  --color-landing-footer: #e4ddd2;
+}
+
+/*
+  Bridge landing browns into DaisyUI base tokens.
+  ThemeProvider sets data-theme=light|dark (not "wanna"), so dashboard
+  surfaces stay on the same warm ladder as the landing page.
+*/
+[data-theme="light"],
+:root.light {
+  --color-base-100: #faf6f2;
+  --color-base-200: #ffffff;
+  --color-base-300: #f3ebe4;
+  --color-base-content: #4a3220;
+  --color-primary: #c45c1a;
+  --color-primary-content: #faf6f2;
+  --color-secondary: #f3ebe4;
+  --color-secondary-content: #4a3220;
+  --color-accent: #f7b538;
+  --color-accent-content: #2a1e14;
+  --color-neutral: #f3ebe4;
+  --color-neutral-content: #6b4e38;
+}
+
+[data-theme="dark"],
+:root.dark {
+  --color-base-100: #1a140f;
+  --color-base-200: #2c2118;
+  --color-base-300: #3a2a1c;
+  --color-base-content: #f4ebe2;
+  --color-primary: #f7b538;
+  --color-primary-content: #1a140f;
+  --color-secondary: #221a13;
+  --color-secondary-content: #f4ebe2;
+  --color-accent: #db7c26;
+  --color-accent-content: #1a140f;
+  --color-neutral: #221a13;
+  --color-neutral-content: #cbb5a0;
+}
+
+@utility landing-card {
+  @apply relative rounded-2xl border border-landing-amber/15 bg-landing-panel shadow-xl shadow-black/30;
+}
+
+@utility landing-section-heading {
+  @apply text-balance font-landing-display text-3xl leading-[1.1] font-bold tracking-[-0.03em] text-landing-fg md:text-4xl lg:text-5xl;
+}
+
+@utility landing-section-lead {
+  @apply mx-auto mt-4 max-w-2xl text-base leading-7 text-landing-fg-muted md:text-lg md:leading-8;
+}
+
+@utility landing-void-surface {
+  @apply bg-landing-void text-landing-sage;
+}
+
+@theme inline {
+  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1
+    var(--delay, 0ms);
+
+  @keyframes cell-ripple {
+    0% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0.4;
+    }
+  }
+}
+
+.landing-page {
+  font-family: var(--font-landing-body);
+  color: var(--color-landing-fg);
+  background: var(--color-landing-surface);
+}
+
+.landing-page h1,
+.landing-page h2,
+.landing-page h3,
+.landing-page .landing-display {
+  font-family: var(--font-landing-display);
+  text-wrap: balance;
+}
+
+.landing-page p {
+  text-wrap: pretty;
+}
+
+.landing-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.landing-cta:focus-visible {
+  outline: 2px solid;
+  outline-offset: 2px;
+}
+
+.landing-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  background: var(--color-landing-amber);
+  color: #16100c;
+  box-shadow: 0 8px 24px color-mix(in oklch, var(--color-landing-amber) 28%, transparent);
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.landing-cta-primary:hover {
+  transform: translateY(-2px);
+  background: #ffc24a;
+  box-shadow: 0 12px 28px color-mix(in oklch, var(--color-landing-amber) 36%, transparent);
+}
+
+.landing-cta-primary.landing-cta-compact {
+  padding: 0.5rem 1.1rem;
+  font-size: 0.8125rem;
+  box-shadow: none;
+}
+
+.landing-cta-ghost.landing-cta-compact,
+.landing-cta-secondary.landing-cta-compact {
+  padding: 0.5rem 1rem;
+}
+
+.landing-cta-primary:focus-visible {
+  outline: 2px solid var(--color-landing-amber);
+  outline-offset: 2px;
+}
+
+.landing-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-landing-border);
+  background: transparent;
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-landing-fg);
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.landing-cta-secondary:hover {
+  border-color: color-mix(in oklch, var(--color-landing-fg) 24%, transparent);
+  background: color-mix(in oklch, var(--color-landing-fg) 4%, transparent);
+}
+
+.landing-cta-secondary:focus-visible {
+  outline: 2px solid var(--color-landing-fg);
+  outline-offset: 2px;
+}
+
+.landing-cta-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: transparent;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-landing-fg-muted);
+  transition: color 200ms ease;
+}
+
+.landing-cta-ghost:hover {
+  color: var(--color-landing-fg);
+}
+
+.landing-cta-ghost:focus-visible {
+  outline: 2px solid var(--color-landing-fg);
+  outline-offset: 2px;
+}
+
+.landing-glow {
+  position: absolute;
+  inset: auto;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.landing-glow-hero {
+  top: 12%;
+  left: 50%;
+  width: min(720px, 90vw);
+  height: 280px;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(circle at 20% 40%, #f7b538 0%, transparent 55%),
+    radial-gradient(circle at 55% 30%, #db7c26 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, #c45c1a 0%, transparent 55%),
+    radial-gradient(circle at 45% 70%, #a86b2f 0%, transparent 50%);
+  opacity: 0.28;
+}
+
+.landing-browser {
+  border-radius: 1rem;
+  border: 1px solid var(--color-landing-border);
+  background: var(--color-landing-surface-raised);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.35),
+    0 4px 16px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.light .landing-browser {
+  box-shadow:
+    0 24px 60px rgba(74, 50, 32, 0.08),
+    0 4px 16px rgba(74, 50, 32, 0.04);
+}
+
+.landing-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-landing-border);
+  background: color-mix(in oklch, var(--color-landing-fg) 2.5%, transparent);
+}
+
+.landing-browser-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--color-landing-fg) 18%, transparent);
+}
+
+.landing-browser-dot:nth-child(1) {
+  background: var(--color-landing-flame);
+}
+
+.landing-browser-dot:nth-child(2) {
+  background: var(--color-landing-orange);
+}
+
+.landing-browser-dot:nth-child(3) {
+  background: var(--color-landing-amber);
+}
+
+.landing-shot-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 12rem;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--color-landing-fg) 3%, transparent) 0%,
+      color-mix(in oklch, var(--color-landing-fg) 6%, transparent) 100%
+    );
+  color: var(--color-landing-fg-muted);
+  border: 1px dashed color-mix(in oklch, var(--color-landing-fg) 12%, transparent);
+}
+
+.landing-feature-tile {
+  border-radius: 1.25rem;
+  border: 1px solid var(--color-landing-border);
+  background: var(--color-landing-surface-raised);
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+  transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.light .landing-feature-tile {
+  box-shadow: 0 4px 20px rgba(74, 50, 32, 0.05);
+}
+
+.landing-feature-tile:hover {
+  transform: translateY(-4px);
+}
+
+.landing-audience-card {
+  border-radius: 1.5rem;
+  padding: 2rem;
+  background: var(--color-landing-surface-alt);
+}
+
+.landing-audience-card-emphasis {
+  background: var(--color-landing-surface-alt);
+  color: var(--color-landing-fg);
+}
+
+.landing-audience-card-raised {
+  background: var(--color-landing-surface-alt);
+  color: var(--color-landing-fg);
+  border: none;
+}
+
+.landing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-landing-border);
+  background: var(--color-landing-surface-raised);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-landing-fg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Slow gear rotation for brand loading marks — mechanical, not a UI spinner. */
+@keyframes landing-brand-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.landing-brand-spin {
+  animation: landing-brand-spin 10s linear infinite;
+  will-change: transform;
+}
+
+@keyframes landing-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-hero-enter {
+  animation: landing-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.landing-hero-enter-delay-1 {
+  animation-delay: 80ms;
+}
+
+.landing-hero-enter-delay-2 {
+  animation-delay: 160ms;
+}
+
+.landing-hero-enter-delay-3 {
+  animation-delay: 240ms;
+}
+
+.landing-proof-float {
+  animation: landing-float 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-enter,
+  .landing-proof-float,
+  .landing-feature-tile,
+  .landing-brand-spin {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .landing-cta-primary:hover,
+  .landing-feature-tile:hover {
+    transform: none;
+  }
+}
+
+@keyframes landing-reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(48px) scale(0.97);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes landing-reveal-fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-scroll-reveal {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .landing-scroll-reveal {
+      animation: landing-reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 34%;
+    }
+
+    .landing-scroll-reveal-fade {
+      animation-name: landing-reveal-fade;
+    }
+
+    .landing-scroll-reveal-delay-short {
+      animation-range: entry 18% cover 40%;
+    }
+
+    .landing-scroll-reveal-delay-medium {
+      animation-range: entry 26% cover 46%;
+    }
+
+    .landing-scroll-reveal-delay-long {
+      animation-range: entry 34% cover 52%;
+    }
+  }
+}
