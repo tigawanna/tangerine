@@ -24,6 +24,7 @@ import {
   deleteRepo,
   deleteRepos,
   setRepoVisibility,
+  updateRepoSettings,
 } from "./queries/repo-mutations";
 
 type GraphqlResult<T> = T & {
@@ -93,6 +94,7 @@ export class GitHubClient {
   deleteRepos = deleteRepos;
   setRepoVisibility = setRepoVisibility;
   applyRepoMetadata = applyRepoMetadata;
+  updateRepoSettings = updateRepoSettings;
 }
 
 export { RequestError };

@@ -505,6 +505,9 @@ describe("GitHubClient", () => {
   });
 
   it("updates repository visibility", async () => {
+    octokitMocks.updateRepo.mockResolvedValue({
+      data: { name: "demo", full_name: "octocat/demo" },
+    });
     const client = createGitHubClient("ghp_test_token");
     await client.setRepoVisibility("octocat/demo", "private");
 
@@ -517,6 +520,9 @@ describe("GitHubClient", () => {
   });
 
   it("applies repository metadata and topics", async () => {
+    octokitMocks.updateRepo.mockResolvedValue({
+      data: { name: "demo", full_name: "octocat/demo" },
+    });
     const client = createGitHubClient("ghp_test_token");
     await client.applyRepoMetadata("octocat/demo", {
       description: "Updated description",
@@ -528,12 +534,45 @@ describe("GitHubClient", () => {
       owner: "octocat",
       repo: "demo",
       description: "Updated description",
-      homepage: undefined,
+      homepage: "",
     });
     expect(octokitMocks.replaceAllTopics).toHaveBeenCalledWith({
       owner: "octocat",
       repo: "demo",
       names: ["react", "api"],
+    });
+  });
+
+  it("updates repository settings and renames via REST", async () => {
+    octokitMocks.updateRepo.mockResolvedValue({
+      data: { name: "renamed", full_name: "octocat/renamed" },
+    });
+    const client = createGitHubClient("ghp_test_token");
+    const result = await client.updateRepoSettings("octocat/demo", {
+      name: "renamed",
+      hasIssues: false,
+      allowSquashMerge: true,
+      topics: ["docs"],
+    });
+
+    expect(result).toEqual({
+      name: "renamed",
+      nameWithOwner: "octocat/renamed",
+      renamed: true,
+    });
+    expect(octokitMocks.updateRepo).toHaveBeenCalledWith(
+      expect.objectContaining({
+        owner: "octocat",
+        repo: "demo",
+        name: "renamed",
+        has_issues: false,
+        allow_squash_merge: true,
+      }),
+    );
+    expect(octokitMocks.replaceAllTopics).toHaveBeenCalledWith({
+      owner: "octocat",
+      repo: "renamed",
+      names: ["docs"],
     });
   });
 });

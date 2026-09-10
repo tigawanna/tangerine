@@ -88,6 +88,38 @@ function describeDeleteFailure(error: unknown): {
 }
 
 /**
+ * Fields accepted by `PATCH /repos/{owner}/{repo}` (+ topics endpoint).
+ * Booleans/strings are partial — only provided keys are sent.
+ */
+export type UpdateRepoSettingsInput = {
+  name?: string;
+  description?: string | null;
+  homepage?: string | null;
+  topics?: string[];
+  visibility?: "public" | "private";
+  hasIssues?: boolean;
+  hasProjects?: boolean;
+  hasWiki?: boolean;
+  /** GitHub REST accepts this; may be missing from older Octokit OpenAPI types. */
+  hasDiscussions?: boolean;
+  isTemplate?: boolean;
+  archived?: boolean;
+  allowSquashMerge?: boolean;
+  allowMergeCommit?: boolean;
+  allowRebaseMerge?: boolean;
+  allowAutoMerge?: boolean;
+  deleteBranchOnMerge?: boolean;
+  allowUpdateBranch?: boolean;
+  webCommitSignoffRequired?: boolean;
+};
+
+export type UpdateRepoSettingsResult = {
+  name: string;
+  nameWithOwner: string;
+  renamed: boolean;
+};
+
+/**
  * Updates repository visibility between public and private.
  */
 export async function setRepoVisibility(
@@ -95,13 +127,7 @@ export async function setRepoVisibility(
   fullName: string,
   visibility: "public" | "private",
 ) {
-  const { owner, repo } = splitRepoFullName(fullName);
-  await this.octokit.rest.repos.update({
-    owner,
-    repo,
-    private: visibility === "private",
-    visibility,
-  });
+  await this.updateRepoSettings(fullName, { visibility });
 }
 
 /**
@@ -116,18 +142,73 @@ export async function applyRepoMetadata(
     topics: string[];
   },
 ) {
+  await this.updateRepoSettings(fullName, {
+    description: input.description,
+    homepage: input.homepage,
+    topics: input.topics,
+  });
+}
+
+/**
+ * Patches repository settings via REST and optionally replaces topics.
+ */
+export async function updateRepoSettings(
+  this: GitHubClient,
+  fullName: string,
+  input: UpdateRepoSettingsInput,
+): Promise<UpdateRepoSettingsResult> {
   const { owner, repo } = splitRepoFullName(fullName);
 
-  await this.octokit.rest.repos.update({
-    owner,
-    repo,
-    description: input.description,
-    homepage: input.homepage || undefined,
-  });
+  const patch: Record<string, unknown> = {};
+  if (input.name !== undefined) patch.name = input.name;
+  if (input.description !== undefined) patch.description = input.description ?? "";
+  if (input.homepage !== undefined) patch.homepage = input.homepage || "";
+  if (input.visibility !== undefined) {
+    patch.private = input.visibility === "private";
+    patch.visibility = input.visibility;
+  }
+  if (input.hasIssues !== undefined) patch.has_issues = input.hasIssues;
+  if (input.hasProjects !== undefined) patch.has_projects = input.hasProjects;
+  if (input.hasWiki !== undefined) patch.has_wiki = input.hasWiki;
+  if (input.hasDiscussions !== undefined) patch.has_discussions = input.hasDiscussions;
+  if (input.isTemplate !== undefined) patch.is_template = input.isTemplate;
+  if (input.archived !== undefined) patch.archived = input.archived;
+  if (input.allowSquashMerge !== undefined) patch.allow_squash_merge = input.allowSquashMerge;
+  if (input.allowMergeCommit !== undefined) patch.allow_merge_commit = input.allowMergeCommit;
+  if (input.allowRebaseMerge !== undefined) patch.allow_rebase_merge = input.allowRebaseMerge;
+  if (input.allowAutoMerge !== undefined) patch.allow_auto_merge = input.allowAutoMerge;
+  if (input.deleteBranchOnMerge !== undefined) {
+    patch.delete_branch_on_merge = input.deleteBranchOnMerge;
+  }
+  if (input.allowUpdateBranch !== undefined) patch.allow_update_branch = input.allowUpdateBranch;
+  if (input.webCommitSignoffRequired !== undefined) {
+    patch.web_commit_signoff_required = input.webCommitSignoffRequired;
+  }
 
-  await this.octokit.rest.repos.replaceAllTopics({
-    owner,
-    repo,
-    names: input.topics,
-  });
+  let nextName = repo;
+  let nextFullName = fullName;
+
+  if (Object.keys(patch).length > 0) {
+    const { data } = await this.octokit.rest.repos.update({
+      owner,
+      repo,
+      ...patch,
+    } as Parameters<GitHubClient["octokit"]["rest"]["repos"]["update"]>[0]);
+    nextName = data.name;
+    nextFullName = data.full_name;
+  }
+
+  if (input.topics !== undefined) {
+    await this.octokit.rest.repos.replaceAllTopics({
+      owner,
+      repo: nextName,
+      names: input.topics,
+    });
+  }
+
+  return {
+    name: nextName,
+    nameWithOwner: nextFullName,
+    renamed: nextName !== repo,
+  };
 }

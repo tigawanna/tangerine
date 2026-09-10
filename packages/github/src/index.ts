@@ -143,6 +143,8 @@ export type {
   DeleteReposFailureCode,
   DeleteReposResult,
   DeleteReposTarget,
+  UpdateRepoSettingsInput,
+  UpdateRepoSettingsResult,
 } from "./queries/repo-mutations";
 export {
   buildRepoSearchText,

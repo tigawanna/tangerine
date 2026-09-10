@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<81441c06d953507137d705abdbfc842e>>
+ * @generated SignedSource<<2418b42d917c0d6e0d058171b3bb79d3>>
  * @lightSyntaxTransform
  */
 
@@ -446,6 +446,69 @@ return {
           },
           {
             "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "viewerCanAdminister",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "viewerPermission",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "squashMergeAllowed",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "mergeCommitAllowed",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "rebaseMergeAllowed",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "autoMergeAllowed",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "deleteBranchOnMerge",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "allowUpdateBranch",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "webCommitSignoffRequired",
+            "storageKey": null
+          },
+          {
+            "alias": null,
             "args": (v10/*:: as any*/),
             "concreteType": "RefConnection",
             "kind": "LinkedField",
@@ -661,12 +724,12 @@ return {
     ]
   },
   "params": {
-    "cacheID": "42958ec52991244b8eb0ffa42f5dc267",
+    "cacheID": "c0910aa3d96c6fa0dcd7b53bb041951a",
     "id": null,
     "metadata": {},
     "name": "RepoDetailPageQuery",
     "operationKind": "query",
-    "text": "query RepoDetailPageQuery(\n  $owner: String!\n  $name: String!\n) {\n  repository(owner: $owner, name: $name) {\n    defaultBranchRef {\n      name\n      id\n    }\n    ...RepoGeneralInfo_repository\n    ...Branches_refs\n    id\n  }\n}\n\nfragment Branches_refs on Repository {\n  refs(refPrefix: \"refs/heads/\", orderBy: {direction: DESC, field: TAG_COMMIT_DATE}, first: 5) {\n    totalCount\n    edges {\n      node {\n        name\n        id\n        target {\n          __typename\n          ...Commits_history\n          id\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n  id\n}\n\nfragment Commits_history on Commit {\n  history(first: 5) {\n    totalCount\n    edges {\n      node {\n        oid\n        abbreviatedOid\n        committedDate\n        authoredDate\n        message\n        url\n        author {\n          name\n          email\n        }\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n\nfragment RepoGeneralInfo_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  url\n  homepageUrl\n  openGraphImageUrl\n  pushedAt\n  updatedAt\n  diskUsage\n  forkCount\n  stargazerCount\n  viewerHasStarred\n  isPrivate\n  isArchived\n  isFork\n  isLocked\n  isDisabled\n  isTemplate\n  isUserConfigurationRepository\n  hasIssuesEnabled\n  hasDiscussionsEnabled\n  hasProjectsEnabled\n  hasWikiEnabled\n  repositoryTopics(first: 20) {\n    nodes {\n      id\n      topic {\n        name\n        id\n      }\n    }\n  }\n  languages(first: 20) {\n    totalSize\n    edges {\n      size\n      node {\n        id\n        name\n        color\n      }\n    }\n  }\n}\n"
+    "text": "query RepoDetailPageQuery(\n  $owner: String!\n  $name: String!\n) {\n  repository(owner: $owner, name: $name) {\n    defaultBranchRef {\n      name\n      id\n    }\n    ...RepoGeneralInfo_repository\n    ...Branches_refs\n    id\n  }\n}\n\nfragment Branches_refs on Repository {\n  refs(refPrefix: \"refs/heads/\", orderBy: {direction: DESC, field: TAG_COMMIT_DATE}, first: 5) {\n    totalCount\n    edges {\n      node {\n        name\n        id\n        target {\n          __typename\n          ...Commits_history\n          id\n        }\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n  id\n}\n\nfragment Commits_history on Commit {\n  history(first: 5) {\n    totalCount\n    edges {\n      node {\n        oid\n        abbreviatedOid\n        committedDate\n        authoredDate\n        message\n        url\n        author {\n          name\n          email\n        }\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n      hasPreviousPage\n      startCursor\n    }\n  }\n  id\n}\n\nfragment EditRepoSettings_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  homepageUrl\n  viewerCanAdminister\n  viewerPermission\n  isPrivate\n  isArchived\n  isTemplate\n  hasIssuesEnabled\n  hasDiscussionsEnabled\n  hasProjectsEnabled\n  hasWikiEnabled\n  squashMergeAllowed\n  mergeCommitAllowed\n  rebaseMergeAllowed\n  autoMergeAllowed\n  deleteBranchOnMerge\n  allowUpdateBranch\n  webCommitSignoffRequired\n  repositoryTopics(first: 20) {\n    nodes {\n      id\n      topic {\n        name\n        id\n      }\n    }\n  }\n}\n\nfragment RepoGeneralInfo_repository on Repository {\n  id\n  name\n  nameWithOwner\n  description\n  url\n  homepageUrl\n  openGraphImageUrl\n  pushedAt\n  updatedAt\n  diskUsage\n  forkCount\n  stargazerCount\n  viewerHasStarred\n  isPrivate\n  isArchived\n  isFork\n  isLocked\n  isDisabled\n  isTemplate\n  isUserConfigurationRepository\n  hasIssuesEnabled\n  hasDiscussionsEnabled\n  hasProjectsEnabled\n  hasWikiEnabled\n  repositoryTopics(first: 20) {\n    nodes {\n      id\n      topic {\n        name\n        id\n      }\n    }\n  }\n  languages(first: 20) {\n    totalSize\n    edges {\n      size\n      node {\n        id\n        name\n        color\n      }\n    }\n  }\n  ...EditRepoSettings_repository\n}\n"
   }
 };
 })();

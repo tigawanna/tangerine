@@ -10,6 +10,7 @@ import {
   Lock,
 } from "lucide-react";
 import { graphql, useFragment } from "react-relay";
+import { EditRepoSettings } from "./EditRepoSettings";
 import { StarRepoButton } from "./StarRepoButton";
 import type { RepoGeneralInfo_repository$key } from "./__generated__/RepoGeneralInfo_repository.graphql";
 
@@ -110,7 +111,10 @@ export function RepoGeneralInfo({ repository: repositoryKey }: RepoGeneralInfoPr
           ))}
         </div>
 
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{repository.name}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{repository.name}</h1>
+          <EditRepoSettings repository={repository} />
+        </div>
         <p className="text-base-content/70 max-w-2xl text-base leading-7">
           {repository.description ?? "No description"}
         </p>
@@ -307,5 +311,6 @@ export const RepoGeneralInfoFragment = graphql`
         }
       }
     }
+    ...EditRepoSettings_repository
   }
 `;
