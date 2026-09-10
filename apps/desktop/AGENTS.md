@@ -28,8 +28,21 @@ Requires **Deno ≥ 2.9**. Config: [`deno.json`](./deno.json). Preload: [`deno/w
 | `pnpm dev:vite` | Browser-only Vite on **:3070** (no native shell) |
 | `pnpm desktop:build` | `vp build` then package into `dist-desktop/` |
 | `pnpm desktop:run` | Run against existing `.output/` |
+| `pnpm db:setup` | Push Drizzle schema + create vector ANN index |
 
 Do **not** point Deno’s `task.dev` at `deno desktop` — HMR invokes `deno task dev` → `pnpm run dev:vite` and must not recurse.
+
+## Local DB (Turso / libSQL)
+
+Embedded **libSQL** via `@libsql/client` + Drizzle (`dialect: "turso"`) — not better-sqlite3. Needed for `F32_BLOB` vector columns / `libsql_vector_idx`.
+
+| Piece | Path |
+| --- | --- |
+| Client | [`src/db/client.ts`](./src/db/client.ts) |
+| Schema | [`src/db/schema/`](./src/db/schema/) (`project_repo_artifacts`, `project_enrichment_outputs`, `project_embeddings`) |
+| Default file | `DATABASE_URL` or `~/.config/tangerine-desktop/tangerine.db` |
+
+`pnpm db:push` then `pnpm db:ensure-vector` (or `pnpm db:setup`). Auth session cookies stay in JSON under `~/.config/tangerine-desktop/`; API auth tables remain on `apps/api`.
 
 ## OAuth (system browser + API)
 

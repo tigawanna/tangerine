@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardLayoutRouteImport } from './routes/_dashboard/layout'
-import { Route as OgRouteImport } from './routes/og'
 import { Route as DashboardUserLayoutRouteImport } from './routes/_dashboard/$user/layout'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as DashboardUserIndexRouteImport } from './routes/_dashboard/$user/index'
@@ -29,11 +28,6 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const DashboardLayoutRoute = DashboardLayoutRouteImport.update({
   id: '/_dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OgRoute = OgRouteImport.update({
-  id: '/og',
-  path: '/og',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardUserLayoutRoute = DashboardUserLayoutRouteImport.update({
@@ -86,7 +80,6 @@ const DashboardUserReposRepoIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/og': typeof OgRoute
   '/$user': typeof DashboardUserLayoutRouteWithChildren
   '/auth/': typeof AuthIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -99,7 +92,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/og': typeof OgRoute
   '/auth': typeof AuthIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$user': typeof DashboardUserIndexRoute
@@ -113,7 +105,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_dashboard': typeof DashboardLayoutRouteWithChildren
-  '/og': typeof OgRoute
   '/_dashboard/$user': typeof DashboardUserLayoutRouteWithChildren
   '/auth/': typeof AuthIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -128,7 +119,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/og'
     | '/$user'
     | '/auth/'
     | '/api/auth/$'
@@ -141,7 +131,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/og'
     | '/auth'
     | '/api/auth/$'
     | '/$user'
@@ -154,7 +143,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_dashboard'
-    | '/og'
     | '/_dashboard/$user'
     | '/auth/'
     | '/api/auth/$'
@@ -169,7 +157,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardLayoutRoute: typeof DashboardLayoutRouteWithChildren
-  OgRoute: typeof OgRoute
   AuthIndexRoute: typeof AuthIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -188,13 +175,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof DashboardLayoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/og': {
-      id: '/og'
-      path: '/og'
-      fullPath: '/og'
-      preLoaderRoute: typeof OgRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_dashboard/$user': {
@@ -299,7 +279,6 @@ const DashboardLayoutRouteWithChildren = DashboardLayoutRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardLayoutRoute: DashboardLayoutRouteWithChildren,
-  OgRoute: OgRoute,
   AuthIndexRoute: AuthIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

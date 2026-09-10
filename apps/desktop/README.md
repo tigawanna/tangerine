@@ -19,8 +19,9 @@ Auth deep dive: [`docs/auth.md`](../../docs/auth.md) · agent notes: [`AGENTS.md
 | `pnpm dev:vite` | Browser-only Vite (no native window) |
 | `pnpm desktop:build` | `vp build` then package → `dist-desktop/` |
 | `pnpm desktop:run` | Run packaged / existing `.output/` |
+| `pnpm db:setup` | Push Turso/libSQL schema + vector ANN index |
 
-Copy `.env.example` → `.env`. Set `VITE_API_URL` → API, `VITE_SIGN_IN_URL` → web `/auth`.
+Copy `.env.example` → `.env`. Set `VITE_API_URL` → API, `VITE_SIGN_IN_URL` → web `/auth`. For local vectors: `DATABASE_URL=file:local.db` then `pnpm db:setup`.
 
 ---
 
@@ -122,7 +123,7 @@ Set in `deno.json` → `desktop.backend`, or override with `--backend=cef|webvie
 
 **Auth does not depend on CEF** — OAuth is system browser + Deno preload. Same `bindings` / `navigate` / `executeJs` on both.
 
-Our `package.json` scripts currently force `--backend=cef`; `deno.json` may say `webview` — the CLI flag wins for that command.
+Scripts follow `deno.json` (`webview` by default). Override with `--backend=cef` when you need bundled Chromium / DevTools.
 
 ---
 
