@@ -6,6 +6,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { TigawannaCredit } from "@tigawanna/credit";
+import "@tigawanna/credit/styles.css";
 
 /**
  * Closed fill under the former snake curve — same silhouette, no text, no motion.
@@ -16,6 +18,7 @@ const FOOTER_WAVE_PATH =
 
 const footerContacts = [
   { label: "GitHub", href: AppConfig.links.github, copyValue: AppConfig.links.github },
+  { label: "X", href: AppConfig.links.x, copyValue: AppConfig.links.x },
   { label: "LinkedIn", href: AppConfig.links.linkedin, copyValue: AppConfig.links.linkedin },
   { label: "Dev.to", href: AppConfig.links.devto, copyValue: AppConfig.links.devto },
   { label: "Email", href: AppConfig.links.emailTo, copyValue: AppConfig.links.email },
@@ -135,6 +138,10 @@ export function LandingFooter() {
             &copy; {currentYear} {AppConfig.name}
           </p>
           <p>Built from Nairobi with TypeScript</p>
+        </div>
+
+        <div className="mt-8 flex justify-center md:justify-end">
+          <TigawannaCredit position="inline" />
         </div>
       </div>
     </footer>

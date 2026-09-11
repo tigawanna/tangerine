@@ -170,8 +170,8 @@ importers:
         specifier: ^1.168.35
         version: 1.168.35(@tanstack/react-router@1.170.32(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@voidzero-dev/vite-plus-core@0.3.1(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(tsx@4.23.13)(typescript@6.0.3)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.7)(rollup@4.63.1)
       '@tigawanna/credit':
-        specifier: ^0.1.2
-        version: 0.1.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: file:/home/dennis/Desktop/code/fullstack/tigawanna/packages/credit
+        version: file:../tigawanna/packages/credit(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@uiw/react-md-editor':
         specifier: ^4.1.2
         version: 4.1.2(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -475,8 +475,8 @@ importers:
         specifier: ^1.168.35
         version: 1.168.35(@tanstack/react-router@1.170.32(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@voidzero-dev/vite-plus-core@0.3.1(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(tsx@4.23.13)(typescript@6.0.3)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.7)(rollup@4.63.1)
       '@tigawanna/credit':
-        specifier: ^0.1.2
-        version: 0.1.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: file:/home/dennis/Desktop/code/fullstack/tigawanna/packages/credit
+        version: file:../tigawanna/packages/credit(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@uiw/react-md-editor':
         specifier: ^4.1.2
         version: 4.1.2(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -754,6 +754,9 @@ importers:
       '@repo/site-constants':
         specifier: workspace:*
         version: link:../site-constants
+      '@tigawanna/credit':
+        specifier: file:/home/dennis/Desktop/code/fullstack/tigawanna/packages/credit
+        version: file:../tigawanna/packages/credit(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       animejs:
         specifier: ^4.5.0
         version: 4.5.0
@@ -4336,8 +4339,8 @@ packages:
     peerDependencies:
       '@testing-library/dom': '>=7.21.4'
 
-  '@tigawanna/credit@0.1.2':
-    resolution: {integrity: sha512-fGlYOlFZ0yeoZ8PA1TlKniLOwOR/yD5R2c6PY9ngEVbF18Xa0hMgQrn4+e7D2tHcKNEaluF8crI1kPF2fWscqA==}
+  '@tigawanna/credit@file:../tigawanna/packages/credit':
+    resolution: {directory: ../tigawanna/packages/credit, type: directory}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^19.0.0
@@ -12195,7 +12198,13 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.1
 
-  '@tigawanna/credit@0.1.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@tigawanna/credit@file:../tigawanna/packages/credit(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+    dependencies:
+      '@stylexjs/stylex': 0.19.0
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+
+  '@tigawanna/credit@file:../tigawanna/packages/credit(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@stylexjs/stylex': 0.19.0
       react: 19.2.8

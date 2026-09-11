@@ -1,4 +1,5 @@
 import { QueryActivityNprogress } from "@/components/navigation/nprogress/QueryActivityNprogress";
+import { EmbeddingBootstrapHost } from "@/components/embeddings/EmbeddingBootstrapHost";
 import { SidebarLinks } from "@/components/sidebar/SidebarLinks";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -41,6 +42,7 @@ export function DashboardLayout({ sidebarLabel, accountLabel }: DashboardLayoutP
   return (
     <SidebarProvider defaultOpen={false} className="h-svh overflow-hidden">
       <QueryActivityNprogress />
+      <EmbeddingBootstrapHost />
       <Sidebar collapsible="icon">
         <SidebarHeader>
           <DashboardSidebarHeader githubLogin={githubLogin ?? undefined} />

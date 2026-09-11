@@ -50,7 +50,7 @@ export const GEMMA_DTYPE_OPTIONS = [
   },
 ] as const satisfies readonly GemmaDtypeOption[];
 
-export const DEFAULT_GEMMA_DTYPE: GemmaDtypeId = "q8";
+export const DEFAULT_GEMMA_DTYPE: GemmaDtypeId = "q4";
 
 export function isGemmaDtypeId(value: string): value is GemmaDtypeId {
   return GEMMA_DTYPE_OPTIONS.some((option) => option.id === value);

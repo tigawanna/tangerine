@@ -1,72 +1,51 @@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
-  getGemmaLoadStatus,
-  getGemmaModelSettings,
   openGemmaPath,
+  resumeEmbeddingBootstrapFn,
+  cancelEmbeddingBootstrapFn,
   selectGemmaModel,
-  type GemmaLoadStatusResult,
   type GemmaModelSettingsResult,
 } from "@/data-access-layer/embeddings/embed.functions";
+import {
+  gemmaLoadStatusQueryOptions,
+  gemmaModelSettingsQueryOptions,
+  gemmaQueryKeys,
+} from "@/data-access-layer/embeddings/gemma-query-options";
 import { cn } from "@/lib/utils";
-import { FolderOpen } from "lucide-react";
-import { useEffect, useState } from "react";
-
-type VariantSort = "size" | "exists";
-
-type VariantRow = GemmaModelSettingsResult["cache"]["variants"][number];
-
-function formatBytes(bytes: number): string {
-  if (bytes <= 0) return "0 B";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(0)} KB`;
-  if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
-  return `${(bytes / 1024 ** 3).toFixed(2)} GB`;
-}
-
-/** Ready first, then partial downloads, then missing; tie-break by size ascending. */
-function compareByExists(a: VariantRow, b: VariantRow): number {
-  const rank = (v: VariantRow) => (v.ready ? 0 : v.onDiskBytes > 0 ? 1 : 2);
-  const byRank = rank(a) - rank(b);
-  if (byRank !== 0) return byRank;
-  return a.approxBytes - b.approxBytes;
-}
-
-function compareBySize(a: VariantRow, b: VariantRow): number {
-  return a.approxBytes - b.approxBytes;
-}
-
-function sortVariants(variants: VariantRow[], sort: VariantSort): VariantRow[] {
-  const copy = [...variants];
-  copy.sort(sort === "exists" ? compareByExists : compareBySize);
-  return copy;
-}
-
-function variantFolder(variant: VariantRow): string {
-  const first = variant.paths[0];
-  if (!first) return "";
-  return first.replace(/[/\\][^/\\]+$/, "") || first;
-}
+import { unwrapUnknownError } from "@/utils/errors";
+import { formatBytes } from "@/utils/format-bytes";
+import { sortVariants, variantFolder, type VariantSort } from "@/utils/gemma-model-variants";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, Cpu, FolderOpen, RefreshCw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 /** Single-line truncated path; full path on hover. */
 function PathLine({
   path,
+  detail,
   className,
   "data-test": dataTest,
 }: {
   path: string;
+  /** Optional multi-line tooltip body (defaults to `path`). */
+  detail?: string[];
   className?: string;
   "data-test"?: string;
 }) {
+  const tipLines = detail && detail.length > 0 ? detail : [path];
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <code
           data-test={dataTest}
           className={cn(
-            "block min-w-0 cursor-default truncate font-mono text-[11px] leading-relaxed text-muted-foreground",
+            "block w-full min-w-0 cursor-default overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[11px] leading-none text-muted-foreground",
             className,
           )}
         >
@@ -75,11 +54,125 @@ function PathLine({
       </TooltipTrigger>
       <TooltipContent
         side="top"
-        className="max-w-[min(90vw,36rem)] break-all text-left font-mono text-[11px]"
+        className="max-w-[min(90vw,36rem)] space-y-1 break-all text-left font-mono text-[11px]"
       >
-        {path}
+        {tipLines.map((line) => (
+          <p key={line}>{line}</p>
+        ))}
       </TooltipContent>
     </Tooltip>
+  );
+}
+
+function ModelSectionHeader({
+  sort,
+  onSortChange,
+  sortDisabled,
+}: {
+  sort: VariantSort;
+  onSortChange: (value: VariantSort) => void;
+  sortDisabled?: boolean;
+}) {
+  return (
+    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-lg font-semibold tracking-tight">Embedding model</h2>
+        <p className="text-sm text-muted-foreground">
+          Local EmbeddingGemma ONNX weights. Switching starts a download only when that variant is
+          not already on disk.
+        </p>
+      </div>
+      <ToggleGroup
+        type="single"
+        variant="outline"
+        size="sm"
+        value={sort}
+        disabled={sortDisabled}
+        onValueChange={(value) => {
+          if (value === "size" || value === "exists") onSortChange(value);
+        }}
+        data-test="settings-model-sort"
+        className="shrink-0"
+      >
+        <ToggleGroupItem value="exists" data-test="settings-model-sort-exists">
+          On disk
+        </ToggleGroupItem>
+        <ToggleGroupItem value="size" data-test="settings-model-sort-size">
+          Size
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </header>
+  );
+}
+
+function ModelSettingsSkeleton() {
+  return (
+    <div className="flex flex-col gap-4" data-test="settings-model-loading" aria-busy="true">
+      <dl className="grid gap-3 text-sm sm:grid-cols-[8rem_minmax(0,1fr)]">
+        {["Cache", "Preference", "Active"].map((label) => (
+          <div key={label} className="contents">
+            <dt className="text-muted-foreground">{label}</dt>
+            <dd className="flex min-w-0 items-center gap-2">
+              <Skeleton className="h-4 w-full max-w-md" />
+              {label === "Cache" ? <Skeleton className="h-8 w-28 shrink-0" /> : null}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <ul className="flex flex-col gap-3">
+        {Array.from({ length: 3 }, (_, i) => (
+          <li key={i} className="flex flex-col gap-3 rounded-lg border border-border p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Skeleton className="h-5 w-16" />
+                  <Skeleton className="h-4 w-14" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-64 max-w-full" />
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </div>
+            <Skeleton className="h-3 w-80 max-w-full" />
+            <Skeleton className="h-3 w-56 max-w-full" />
+          </li>
+        ))}
+      </ul>
+      <p className="sr-only">Loading model settings…</p>
+    </div>
+  );
+}
+
+function ModelSettingsError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div
+      className="flex flex-col gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-5"
+      role="alert"
+      data-test="settings-model-error"
+    >
+      <div className="flex gap-3">
+        <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden />
+        <div className="flex min-w-0 flex-col gap-1">
+          <p className="text-sm font-medium text-destructive">Couldn’t load model settings</p>
+          <p className="text-sm text-muted-foreground">{message}</p>
+        </div>
+      </div>
+      <div className="pl-7">
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          data-test="settings-model-retry"
+          onClick={onRetry}
+        >
+          <RefreshCw className="size-3.5" />
+          Try again
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -87,89 +180,103 @@ function PathLine({
  * EmbeddingGemma model picker: shows cache paths, download progress, and dtype switch.
  */
 export function SettingsModelSection() {
-  const [settings, setSettings] = useState<GemmaModelSettingsResult | null>(null);
-  const [load, setLoad] = useState<GemmaLoadStatusResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [switching, setSwitching] = useState(false);
+  const queryClient = useQueryClient();
   const [sort, setSort] = useState<VariantSort>("exists");
-  const [openingPath, setOpeningPath] = useState<string | null>(null);
 
-  async function refreshSettings() {
-    const next = await getGemmaModelSettings();
-    setSettings(next);
-    setLoad(next.load);
-  }
+  const settingsQuery = useQuery({
+    ...gemmaModelSettingsQueryOptions,
+    refetchInterval: (query) => {
+      const bootstrap = query.state.data?.bootstrap;
+      if (
+        bootstrap?.overall.phase === "running" ||
+        bootstrap?.runtime.phase === "downloading" ||
+        bootstrap?.model.phase === "downloading"
+      ) {
+        return 400;
+      }
+      return false;
+    },
+  });
+
+  const selectMutation = useMutation({
+    mutationFn: (dtype: GemmaModelSettingsResult["activeDtype"]) =>
+      selectGemmaModel({ data: { dtype } }),
+    onSuccess: (status, dtype) => {
+      queryClient.setQueryData(gemmaQueryKeys.load, status);
+      queryClient.setQueryData(gemmaQueryKeys.settings, (prev: GemmaModelSettingsResult | undefined) =>
+        prev ? { ...prev, activeDtype: dtype, load: status } : prev,
+      );
+    },
+  });
+
+  const bootstrapMutation = useMutation({
+    mutationFn: (action: "start" | "cancel") =>
+      action === "cancel" ? cancelEmbeddingBootstrapFn() : resumeEmbeddingBootstrapFn(),
+    onSuccess: (bootstrap) => {
+      queryClient.setQueryData(gemmaQueryKeys.bootstrap, bootstrap);
+      queryClient.setQueryData(gemmaQueryKeys.settings, (prev: GemmaModelSettingsResult | undefined) =>
+        prev ? { ...prev, bootstrap } : prev,
+      );
+      if (bootstrap.overall.phase === "cancelled") {
+        toast.message("Embedding download cancelled");
+      }
+    },
+  });
+
+  const loadQuery = useQuery({
+    ...gemmaLoadStatusQueryOptions,
+    enabled: settingsQuery.isSuccess,
+    initialData: settingsQuery.data?.load,
+    initialDataUpdatedAt: settingsQuery.dataUpdatedAt,
+    refetchInterval: (query) => {
+      if (selectMutation.isPending || query.state.data?.phase === "loading") return 250;
+      return false;
+    },
+  });
+
+  const openMutation = useMutation({
+    mutationFn: (path: string) => openGemmaPath({ data: { path } }),
+  });
+
+  const load = loadQuery.data ?? settingsQuery.data?.load ?? null;
+  const prevLoadPhase = useRef(load?.phase);
 
   useEffect(() => {
-    void refreshSettings().catch((caught: unknown) => {
-      setError(caught instanceof Error ? caught.message : "Failed to load model settings");
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!switching && load?.phase !== "loading") return;
-
-    let cancelled = false;
-    const id = window.setInterval(() => {
-      void getGemmaLoadStatus()
-        .then((status) => {
-          if (cancelled) return;
-          setLoad(status);
-          if (status.phase === "ready" || status.phase === "error") {
-            setSwitching(false);
-            void refreshSettings();
-          }
-        })
-        .catch(() => {
-          // ignore poll errors
-        });
-    }, 250);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(id);
-    };
-  }, [switching, load?.phase]);
-
-  async function handleSelect(dtype: GemmaModelSettingsResult["activeDtype"]) {
-    if (switching) return;
-    setError(null);
-    setSwitching(true);
-    try {
-      const status = await selectGemmaModel({ data: { dtype } });
-      setLoad(status);
-      setSettings((prev) => (prev ? { ...prev, activeDtype: dtype, load: status } : prev));
-    } catch (caught) {
-      setSwitching(false);
-      setError(caught instanceof Error ? caught.message : "Failed to switch model");
+    const phase = load?.phase;
+    const prev = prevLoadPhase.current;
+    prevLoadPhase.current = phase;
+    if (prev === "loading" && (phase === "ready" || phase === "error")) {
+      void queryClient.invalidateQueries({ queryKey: gemmaQueryKeys.settings });
     }
-  }
+  }, [load?.phase, queryClient]);
 
-  async function handleOpen(path: string) {
-    if (!path || openingPath) return;
-    setError(null);
-    setOpeningPath(path);
-    try {
-      await openGemmaPath({ data: { path } });
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Failed to open folder");
-    } finally {
-      setOpeningPath(null);
-    }
-  }
+  const settings = settingsQuery.data;
+  const switching = selectMutation.isPending || load?.phase === "loading";
+  const openingPath = openMutation.isPending ? (openMutation.variables ?? null) : null;
+  const loadError =
+    settingsQuery.error != null ? unwrapUnknownError(settingsQuery.error).message : null;
+  const actionError = selectMutation.error ?? openMutation.error;
+  const inlineError = actionError != null ? unwrapUnknownError(actionError).message : null;
 
   if (!settings) {
-    if (error) {
-      return (
-        <p className="text-sm text-destructive" role="alert" data-test="settings-model-error">
-          {error}
-        </p>
-      );
-    }
     return (
-      <p className="text-sm text-muted-foreground" data-test="settings-model-loading">
-        Loading model settings…
-      </p>
+      <section className="flex flex-col gap-4" data-test="settings-model-section">
+        <ModelSectionHeader
+          sort={sort}
+          onSortChange={setSort}
+          sortDisabled
+        />
+        {loadError ? (
+          <ModelSettingsError
+            message={loadError}
+            onRetry={() => {
+              void settingsQuery.refetch();
+            }}
+          />
+        ) : (
+          <ModelSettingsSkeleton />
+        )}
+      </section>
     );
   }
 
@@ -178,33 +285,7 @@ export function SettingsModelSection() {
 
   return (
     <section className="flex flex-col gap-4" data-test="settings-model-section">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold tracking-tight">Embedding model</h2>
-          <p className="text-sm text-muted-foreground">
-            Local EmbeddingGemma ONNX weights. Switching starts a download only when that
-            variant is not already on disk.
-          </p>
-        </div>
-        <ToggleGroup
-          type="single"
-          variant="outline"
-          size="sm"
-          value={sort}
-          onValueChange={(value) => {
-            if (value === "size" || value === "exists") setSort(value);
-          }}
-          data-test="settings-model-sort"
-          className="shrink-0"
-        >
-          <ToggleGroupItem value="exists" data-test="settings-model-sort-exists">
-            On disk
-          </ToggleGroupItem>
-          <ToggleGroupItem value="size" data-test="settings-model-sort-size">
-            Size
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </header>
+      <ModelSectionHeader sort={sort} onSortChange={setSort} />
 
       <dl className="grid gap-2 text-sm sm:grid-cols-[8rem_minmax(0,1fr)]">
         <dt className="text-muted-foreground">Cache</dt>
@@ -222,7 +303,7 @@ export function SettingsModelSection() {
             disabled={openingPath === settings.cache.modelDir}
             data-test="settings-model-open-cache"
             onClick={() => {
-              void handleOpen(settings.cache.modelDir);
+              openMutation.mutate(settings.cache.modelDir);
             }}
           >
             <FolderOpen className="size-3.5" />
@@ -254,18 +335,127 @@ export function SettingsModelSection() {
       ) : null}
 
       {load?.phase === "error" ? (
-        <p className="text-sm text-destructive" role="alert">
-          {load.error ?? "Model load failed"}
-        </p>
+        <div
+          className="flex gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm"
+          role="alert"
+        >
+          <AlertCircle className="mt-0.5 size-3.5 shrink-0 text-destructive" aria-hidden />
+          <p className="text-destructive">{load.error ?? "Model load failed"}</p>
+        </div>
       ) : null}
 
-      {error ? (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
+      {inlineError ? (
+        <div
+          className="flex gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm"
+          role="alert"
+        >
+          <AlertCircle className="mt-0.5 size-3.5 shrink-0 text-destructive" aria-hidden />
+          <p className="text-destructive">{inlineError}</p>
+        </div>
       ) : null}
 
       <ul className="flex flex-col gap-3">
+        <li
+          className={cn(
+            "flex flex-col gap-2 rounded-lg border border-border p-4",
+            settings.bootstrap.runtime.phase === "ready" && "border-primary/40 bg-primary/5",
+          )}
+          data-test="settings-model-runtime"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex min-w-0 flex-col gap-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <Cpu className="size-4 text-muted-foreground" aria-hidden />
+                <span className="font-medium">ONNX Runtime</span>
+                <span className="text-xs text-muted-foreground">
+                  ~{formatBytes(settings.bootstrap.runtime.approxBytes)}
+                </span>
+                {settings.bootstrap.runtime.phase === "ready" ? (
+                  <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs text-primary">
+                    {settings.bootstrap.runtime.source === "bundled" ? "Bundled" : "On disk"}
+                  </span>
+                ) : settings.bootstrap.runtime.phase === "downloading" ? (
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                    Downloading {Math.round(settings.bootstrap.runtime.progress)}%
+                  </span>
+                ) : settings.bootstrap.runtime.phase === "cancelled" ? (
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                    Cancelled
+                  </span>
+                ) : settings.bootstrap.runtime.phase === "error" ? (
+                  <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-xs text-destructive">
+                    Error
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                    Not installed
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Native inference engine. Downloaded on first use so the app install stays small.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              {settings.bootstrap.runtime.path.startsWith("/") ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={openingPath === settings.bootstrap.runtime.path}
+                  data-test="settings-model-open-runtime"
+                  onClick={() => {
+                    openMutation.mutate(settings.bootstrap.runtime.path);
+                  }}
+                >
+                  <FolderOpen className="size-3.5" />
+                  Open
+                </Button>
+              ) : null}
+              {settings.bootstrap.runtime.phase === "downloading" ||
+              settings.bootstrap.overall.phase === "running" ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={bootstrapMutation.isPending}
+                  data-test="settings-model-cancel-bootstrap"
+                  onClick={() => {
+                    bootstrapMutation.mutate("cancel");
+                  }}
+                >
+                  Cancel
+                </Button>
+              ) : settings.bootstrap.runtime.phase !== "ready" ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={bootstrapMutation.isPending}
+                  data-test="settings-model-install-runtime"
+                  onClick={() => {
+                    bootstrapMutation.mutate("start");
+                  }}
+                >
+                  {settings.bootstrap.runtime.phase === "cancelled" ||
+                  settings.bootstrap.runtime.phase === "error"
+                    ? "Resume"
+                    : "Download"}
+                </Button>
+              ) : null}
+            </div>
+          </div>
+          {settings.bootstrap.runtime.phase === "downloading" ? (
+            <Progress value={settings.bootstrap.runtime.progress} />
+          ) : null}
+          {settings.bootstrap.runtime.error ? (
+            <p className="text-xs text-destructive">{settings.bootstrap.runtime.error}</p>
+          ) : null}
+          <div className="min-w-0 overflow-hidden">
+            <PathLine path={settings.bootstrap.runtime.path} />
+          </div>
+        </li>
+
         {variants.map((variant) => {
           const selected = settings.activeDtype === variant.id;
           const isDownloadingThis = downloading && load?.dtype === variant.id;
@@ -314,7 +504,7 @@ export function SettingsModelSection() {
                     disabled={!folder || openingPath === folder}
                     data-test={`settings-model-open-${variant.id}`}
                     onClick={() => {
-                      void handleOpen(folder);
+                      openMutation.mutate(folder);
                     }}
                   >
                     <FolderOpen className="size-3.5" />
@@ -327,7 +517,7 @@ export function SettingsModelSection() {
                     disabled={switching || (selected && load?.phase === "ready")}
                     data-test={`settings-model-select-${variant.id}`}
                     onClick={() => {
-                      void handleSelect(variant.id);
+                      selectMutation.mutate(variant.id);
                     }}
                   >
                     {isDownloadingThis
@@ -345,12 +535,12 @@ export function SettingsModelSection() {
                 </div>
               </div>
 
-              <div className="flex min-w-0 flex-col gap-1">
-                {variant.paths.map((path) => (
-                  <PathLine key={path} path={path} />
-                ))}
+              <div className="min-w-0 overflow-hidden">
+                {folder ? (
+                  <PathLine path={folder} detail={variant.paths} />
+                ) : null}
                 {variant.missing.length > 0 ? (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="mt-1 truncate text-xs text-muted-foreground">
                     Missing: {variant.missing.join(", ")}
                   </p>
                 ) : null}

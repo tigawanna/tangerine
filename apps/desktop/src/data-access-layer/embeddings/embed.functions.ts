@@ -1,6 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import {
+  cancelEmbeddingBootstrap,
+  getEmbeddingBootstrapStatus,
+  resumeEmbeddingBootstrap,
+  startEmbeddingBootstrap,
+  type EmbeddingBootstrapStatus,
+} from "./embedding-bootstrap";
 import { gemmaPrefsFilePath, readGemmaPrefs, writeGemmaPrefs } from "./gemma-prefs";
+import { ensureOrtModulePath } from "./ort-runtime";
 
 /** Max chars accepted by `embedText` (payload / paste comfort). */
 export const EMBED_TEXT_MAX_CHARS = 20_000;
@@ -48,6 +56,7 @@ export type GemmaModelSettingsResult = {
   activeDtype: "q4" | "q8" | "fp16" | "fp32";
   prefsPath: string;
   load: GemmaLoadStatusResult;
+  bootstrap: EmbeddingBootstrapStatus;
   cache: {
     cacheRoot: string;
     modelDir: string;
@@ -65,6 +74,8 @@ export type GemmaModelSettingsResult = {
   };
 };
 
+export type { EmbeddingBootstrapStatus };
+
 /** Poll while an embed / model switch is in flight. */
 export const getGemmaLoadStatus = createServerFn({ method: "GET" }).handler(
   async (): Promise<GemmaLoadStatusResult> => {
@@ -73,21 +84,44 @@ export const getGemmaLoadStatus = createServerFn({ method: "GET" }).handler(
   },
 );
 
+/** First-run / settings: ORT runtime + Q4 bootstrap status. */
+export const getEmbeddingBootstrap = createServerFn({ method: "GET" }).handler(
+  async (): Promise<EmbeddingBootstrapStatus> => getEmbeddingBootstrapStatus(),
+);
+
+/** Kick off ORT (if needed) + Q4 model download. Idempotent. */
+export const startEmbeddingBootstrapFn = createServerFn({ method: "POST" }).handler(
+  async (): Promise<EmbeddingBootstrapStatus> => startEmbeddingBootstrap(),
+);
+
+/** Cancel bootstrap downloads and suppress auto-start until resume. */
+export const cancelEmbeddingBootstrapFn = createServerFn({ method: "POST" }).handler(
+  async (): Promise<EmbeddingBootstrapStatus> => cancelEmbeddingBootstrap(),
+);
+
+/** Clear dismissed flag and start bootstrap again. */
+export const resumeEmbeddingBootstrapFn = createServerFn({ method: "POST" }).handler(
+  async (): Promise<EmbeddingBootstrapStatus> => resumeEmbeddingBootstrap(),
+);
+
 /**
- * Settings page: active dtype, cache inventory, live load progress.
+ * Settings page: active dtype, cache inventory, live load progress, bootstrap.
  * Cache paths are resolved via filesystem (not package.json exports).
  */
 export const getGemmaModelSettings = createServerFn({ method: "GET" }).handler(
   async (): Promise<GemmaModelSettingsResult> => {
     const prefs = readGemmaPrefs();
+    ensureOrtModulePath();
     const { getGemmaModelSettingsSnapshot, setActiveGemmaDtype } = await import(
       "@repo/gemma-embedding/server"
     );
     setActiveGemmaDtype(prefs.dtype);
     const snapshot = getGemmaModelSettingsSnapshot();
+    const bootstrap = await getEmbeddingBootstrapStatus();
     return {
       ...snapshot,
       prefsPath: gemmaPrefsFilePath(),
+      bootstrap,
     };
   },
 );
@@ -99,7 +133,8 @@ export const getGemmaModelSettings = createServerFn({ method: "GET" }).handler(
 export const selectGemmaModel = createServerFn({ method: "POST" })
   .inputValidator(selectModelInput)
   .handler(async ({ data }): Promise<GemmaLoadStatusResult> => {
-    writeGemmaPrefs({ dtype: data.dtype });
+    ensureOrtModulePath();
+    writeGemmaPrefs({ ...readGemmaPrefs(), dtype: data.dtype });
     const { beginServerGemmaDtypeSwitch } = await import("@repo/gemma-embedding/server");
     return beginServerGemmaDtypeSwitch(data.dtype);
   });
@@ -118,12 +153,14 @@ export const openGemmaPath = createServerFn({ method: "POST" })
     const { getGemmaModelCacheDir, getTransformersCacheRoot } = await import(
       "@repo/gemma-embedding/server"
     );
+    const { ortInstallRoot } = await import("./ort-runtime");
 
     const allowedRoots = [
       getTransformersCacheRoot(),
       getGemmaModelCacheDir(),
       dirname(gemmaPrefsFilePath()),
       resolve(homedir(), ".config", "tangerine-desktop"),
+      dirname(ortInstallRoot()),
     ].map((root) => resolve(root));
 
     const requested = resolve(data.path);
@@ -142,7 +179,6 @@ export const openGemmaPath = createServerFn({ method: "POST" })
 
     let target = requested;
     if (!existsSync(target)) {
-      // Create empty model dir so “Open” still works before first download.
       if (target === resolve(getGemmaModelCacheDir()) || target.endsWith(`${sep}onnx`)) {
         mkdirSync(target, { recursive: true });
       } else {
@@ -165,7 +201,6 @@ export const openGemmaPath = createServerFn({ method: "POST" })
       target = real;
     } catch (caught) {
       if (caught instanceof Error && caught.message.includes("outside")) throw caught;
-      // realpath fails on some missing edges — keep target
     }
 
     const openTarget = (() => {
@@ -188,7 +223,6 @@ export const openGemmaPath = createServerFn({ method: "POST" })
         rejectPromise(err);
       });
       child.unref();
-      // Don't wait for the file manager to exit.
       resolvePromise();
     });
 
@@ -203,6 +237,7 @@ export const embedText = createServerFn({ method: "POST" })
   .inputValidator(embedTextInput)
   .handler(async ({ data }): Promise<EmbedTextResult> => {
     const prefs = readGemmaPrefs();
+    ensureOrtModulePath();
     const { getEmbeddingModelId, getServerGemmaEmbedding } = await import(
       "@repo/gemma-embedding/server"
     );

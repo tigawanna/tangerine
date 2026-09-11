@@ -1,6 +1,7 @@
 import { AppConfig } from "../../config/system";
 import { ExternalLink, Layers, ShieldCheck, Workflow } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { LandingSection, OrganicDivider, ScrollReveal, SectionEyebrow } from "../../primitives";
 
 export function LandingShowcase() {
@@ -37,6 +38,15 @@ export function LandingShowcase() {
               >
                 GitHub
                 <FaGithub />
+              </a>
+              <a
+                href={AppConfig.links.x}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline gap-2"
+              >
+                X
+                <FaXTwitter />
               </a>
               <a
                 href={AppConfig.links.linkedin}

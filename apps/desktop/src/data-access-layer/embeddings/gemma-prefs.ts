@@ -9,6 +9,11 @@ import {
 
 export type DesktopGemmaPrefs = {
   dtype: GemmaDtypeId;
+  /**
+   * User cancelled or dismissed first-run embedding component downloads.
+   * When true, dashboard will not auto-start runtime + Q4 prefetch.
+   */
+  bootstrapDismissed?: boolean;
 };
 
 function prefsPath(): string {
@@ -16,26 +21,45 @@ function prefsPath(): string {
 }
 
 /**
- * Reads persisted EmbeddingGemma dtype preference (falls back to default).
+ * Reads persisted EmbeddingGemma prefs (falls back to defaults).
  */
 export function readGemmaPrefs(): DesktopGemmaPrefs {
   try {
     const raw = readFileSync(prefsPath(), "utf8");
-    const parsed = JSON.parse(raw) as { dtype?: string };
-    if (parsed.dtype && isGemmaDtypeId(parsed.dtype)) {
-      return { dtype: parsed.dtype };
-    }
+    const parsed = JSON.parse(raw) as {
+      dtype?: string;
+      bootstrapDismissed?: boolean;
+    };
+    const dtype =
+      parsed.dtype && isGemmaDtypeId(parsed.dtype) ? parsed.dtype : DEFAULT_GEMMA_DTYPE;
+    return {
+      dtype,
+      bootstrapDismissed: parsed.bootstrapDismissed === true,
+    };
   } catch {
-    // missing / invalid → default
+    return { dtype: DEFAULT_GEMMA_DTYPE };
   }
-  return { dtype: DEFAULT_GEMMA_DTYPE };
 }
 
-/** Persists EmbeddingGemma dtype preference under ~/.config/tangerine-desktop. */
+/** True when `gemma.json` already exists on disk (not first launch). */
+export function gemmaPrefsFileExists(): boolean {
+  try {
+    readFileSync(prefsPath(), "utf8");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Persists EmbeddingGemma prefs under ~/.config/tangerine-desktop. */
 export function writeGemmaPrefs(prefs: DesktopGemmaPrefs): void {
   const path = prefsPath();
   mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, `${JSON.stringify(prefs, null, 2)}\n`, "utf8");
+  const next: DesktopGemmaPrefs = {
+    dtype: prefs.dtype,
+    ...(prefs.bootstrapDismissed ? { bootstrapDismissed: true } : {}),
+  };
+  writeFileSync(path, `${JSON.stringify(next, null, 2)}\n`, "utf8");
 }
 
 export function gemmaPrefsFilePath(): string {
