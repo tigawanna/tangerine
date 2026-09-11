@@ -1,8 +1,12 @@
 import type { UserSearch } from "@/routes/_dashboard/$user/layout";
-import type { ComponentType, SVGProps } from "react";
+import type { LucideIcon } from "lucide-react";
 
-/** Icon component accepted by sidebar links (Lucide, react-icons, etc.). */
-export type SidebarIcon = ComponentType<SVGProps<SVGSVGElement> & { className?: string }>;
+/**
+ * Sidebar icons are Lucide components.
+ * Avoid `ComponentType<SVGProps<…>>` — under Deno it resolves a different
+ * `@types/react` than Lucide (CSSProperties / `--radix-*` clash).
+ */
+export type SidebarIcon = LucideIcon;
 
 export type SidebarItem = {
   title: string;

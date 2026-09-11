@@ -1,7 +1,9 @@
 {
   "nodeModulesDir": "manual",
   "unstable": ["sloppy-imports"],
+  "exclude": ["src/", "dist/", "dist-desktop/", ".output/", "node_modules/"],
   "lint": {
+    "include": ["deno/"],
     "rules": {
       "exclude": ["no-sloppy-imports"]
     }
