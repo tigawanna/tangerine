@@ -30,11 +30,12 @@ Your solution must address these pain points.
 
 **Three user types exist:**
 
-| Role | Description |
-| --- | --- |
-| **Admin** | Corporate oversight across all locations |
-| **Manager** | Runs one or more specific locations |
-| **Staff** | Works shifts at one or more locations |
+| Role        | Description                              |
+| ----------- | ---------------------------------------- |
+| **Admin**   | Corporate oversight across all locations |
+| **Manager** | Runs one or more specific locations      |
+| **Staff**   | Works shifts at one or more locations    |
+
 - Staff members can be certified to work at multiple locations
 - Staff have **skills** (e.g., "bartender", "line cook", "server", "host")
 - Staff have **availability windows** they set themselves (recurring weekly + one-off exceptions)
@@ -179,14 +180,14 @@ The evaluator will test your system with these scenarios (among others):
 
 ## Evaluation Criteria
 
-| Area | Weight |
-| --- | --- |
-| Constraint enforcement correctness | 25% |
-| Edge case handling | 20% |
-| Real-time functionality | 15% |
-| User experience & clarity of feedback | 15% |
-| Data integrity under concurrent operations | 15% |
-| Code organization & maintainability | 10% |
+| Area                                       | Weight |
+| ------------------------------------------ | ------ |
+| Constraint enforcement correctness         | 25%    |
+| Edge case handling                         | 20%    |
+| Real-time functionality                    | 15%    |
+| User experience & clarity of feedback      | 15%    |
+| Data integrity under concurrent operations | 15%    |
+| Code organization & maintainability        | 10%    |
 
 ---
 

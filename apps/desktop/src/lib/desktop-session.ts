@@ -1,8 +1,5 @@
 import { authClient, type BetterAuthSession } from "@/lib/auth-client";
-import {
-  hasDesktopBindings,
-  type DesktopAuthUser,
-} from "@/lib/desktop-bindings";
+import { hasDesktopBindings, type DesktopAuthUser } from "@/lib/desktop-bindings";
 import { useEffect, useState } from "react";
 
 type SessionUser = BetterAuthSession["user"] | DesktopAuthUser;

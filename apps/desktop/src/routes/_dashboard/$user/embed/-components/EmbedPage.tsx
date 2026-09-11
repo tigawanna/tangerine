@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   EMBED_TEXT_MAX_CHARS,
   EMBED_TEXT_MAX_WORDS,
+  cancelGemmaLoadFn,
   embedText,
   getGemmaLoadStatus,
   type EmbedTextResult,
@@ -103,6 +104,11 @@ export function EmbedPage() {
 
   function handleCancel() {
     abortRef.current?.abort();
+    if (loadStatus?.phase === "loading") {
+      void cancelGemmaLoadFn().catch(() => {
+        // best-effort unload
+      });
+    }
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -159,8 +165,8 @@ export function EmbedPage() {
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Embed</h1>
         <p className="text-sm text-muted-foreground">
-          Local EmbeddingGemma for {user}. First run downloads the quantized model
-          (~300MB) once; later embeds should be much faster. Nothing is saved yet.
+          Local EmbeddingGemma for {user}. First run downloads the quantized model (~300MB) once;
+          later embeds should be much faster. Nothing is saved yet.
         </p>
       </header>
 
@@ -233,10 +239,7 @@ export function EmbedPage() {
 
           <div className="flex items-center gap-3 sm:ml-auto">
             {pending || durationMs != null ? (
-              <span
-                className="text-xs tabular-nums text-muted-foreground"
-                data-test="embed-timing"
-              >
+              <span className="text-xs tabular-nums text-muted-foreground" data-test="embed-timing">
                 {pending
                   ? `Elapsed ${formatDuration(elapsedMs)}`
                   : `Took ${formatDuration(durationMs ?? 0)}`}
@@ -267,7 +270,19 @@ export function EmbedPage() {
               <span className="min-w-0 truncate">
                 {loadStatus.file ? `Fetching ${loadStatus.file}` : "Downloading model weights…"}
               </span>
-              <span className="tabular-nums">{Math.round(loadStatus.progress)}%</span>
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="tabular-nums">{Math.round(loadStatus.progress)}%</span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-7"
+                  data-test="embed-download-cancel"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
             <Progress value={loadStatus.progress} />
           </div>
@@ -300,10 +315,7 @@ function EmbedResultPanel({
   }
 
   return (
-    <section
-      className="flex flex-col gap-3 border-t border-border pt-4"
-      data-test="embed-result"
-    >
+    <section className="flex flex-col gap-3 border-t border-border pt-4" data-test="embed-result">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
         <span>
           Model <span className="text-foreground">{result.modelId}</span>

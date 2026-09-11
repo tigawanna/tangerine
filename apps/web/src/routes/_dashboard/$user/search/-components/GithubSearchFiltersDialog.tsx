@@ -90,7 +90,10 @@ export function GithubSearchFiltersDialog({
           <ListFilterPlus className="size-3.5" aria-hidden />
           Filters
           {activeCount > 0 ? (
-            <Badge variant="secondary" className="bg-primary-content/15 text-primary-content h-4 px-1.5">
+            <Badge
+              variant="secondary"
+              className="bg-primary-content/15 text-primary-content h-4 px-1.5"
+            >
               {activeCount}
             </Badge>
           ) : null}
@@ -425,13 +428,7 @@ function CheckRow({
   );
 }
 
-function LanguagePicker({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) {
+function LanguagePicker({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const [needle, setNeedle] = useState("");
   const q = needle.trim().toLowerCase();
   const matches = q

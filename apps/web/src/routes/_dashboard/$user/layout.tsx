@@ -11,13 +11,7 @@ export const repositoryOrderOptions = [
 ] as const;
 export const starOrderOptions = ["STARRED_AT"] as const;
 export const directionOptions = ["ASC", "DESC"] as const;
-export const userTabOptions = [
-  "repos",
-  "starred",
-  "followers",
-  "following",
-  "members",
-] as const;
+export const userTabOptions = ["repos", "starred", "followers", "following", "members"] as const;
 
 /**
  * Coerce URL string booleans. Bare `z.boolean()` rejects `"false"` from the query

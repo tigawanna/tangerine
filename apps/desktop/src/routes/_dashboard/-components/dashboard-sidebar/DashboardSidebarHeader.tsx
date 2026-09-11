@@ -54,9 +54,7 @@ export function DashboardSidebarHeader({ githubLogin }: DashboardSidebarHeaderPr
               params={{ user: githubLogin }}
               search={defaultUserSearch}
               className={
-                expanded
-                  ? "hover:bg-primary/10"
-                  : "hover:bg-primary/10 flex w-full justify-center"
+                expanded ? "hover:bg-primary/10" : "hover:bg-primary/10 flex w-full justify-center"
               }
             >
               <span className="flex aspect-square size-5 items-center justify-center">

@@ -5,7 +5,13 @@ import {
   setViewerIsFollowing,
 } from "@/routes/_dashboard/$user/-components/user/follow-user-shared";
 import { useState } from "react";
-import { commitLocalUpdate, graphql, useFragment, useMutation, useRelayEnvironment } from "react-relay";
+import {
+  commitLocalUpdate,
+  graphql,
+  useFragment,
+  useMutation,
+  useRelayEnvironment,
+} from "react-relay";
 import { toast } from "sonner";
 import type { FollowUserButton_user$key } from "./__generated__/FollowUserButton_user.graphql";
 import type { FollowUserButtonfollowMutation } from "./__generated__/FollowUserButtonfollowMutation.graphql";
@@ -27,7 +33,8 @@ export function FollowUserButton({ user, size = "sm", className }: FollowUserBut
   const data = useFragment(FollowUserButtonFragment, user);
   const environment = useRelayEnvironment();
   const [scopeDialogOpen, setScopeDialogOpen] = useState(false);
-  const [followMutation, isFollowPending] = useMutation<FollowUserButtonfollowMutation>(FOLLOW_USER);
+  const [followMutation, isFollowPending] =
+    useMutation<FollowUserButtonfollowMutation>(FOLLOW_USER);
   const [unfollowMutation, isUnfollowPending] =
     useMutation<FollowUserButtonunfollowMutation>(UNFOLLOW_USER);
 
@@ -132,9 +139,8 @@ export function FollowUserButton({ user, size = "sm", className }: FollowUserBut
         title="Follow permission needed"
         description={
           <>
-            Your GitHub session does not include the{" "}
-            <code className="font-mono">user:follow</code> scope. Sign in again to grant it, then
-            retry.
+            Your GitHub session does not include the <code className="font-mono">user:follow</code>{" "}
+            scope. Sign in again to grant it, then retry.
           </>
         }
       />

@@ -1,12 +1,7 @@
 import { z } from "zod";
 
 /** Always requested on GitHub OAuth (browse repos, profile, orgs). */
-export const GITHUB_BASE_SCOPES = [
-  "read:user",
-  "user:email",
-  "repo",
-  "read:org",
-] as const;
+export const GITHUB_BASE_SCOPES = ["read:user", "user:email", "repo", "read:org"] as const;
 
 export type GithubBaseScope = (typeof GITHUB_BASE_SCOPES)[number];
 
@@ -38,9 +33,7 @@ export const DEFAULT_GITHUB_SCOPES = GITHUB_BASE_SCOPES;
  * Merges base scopes with a filtered list of known optional scope ids.
  * Client `signIn.social({ scopes })` overrides the server default entirely.
  */
-export function buildGithubOAuthScopes(
-  optional: readonly string[] = [],
-): string[] {
+export function buildGithubOAuthScopes(optional: readonly string[] = []): string[] {
   const allowed = new Set<string>(optionalScopeIds);
   const extras = [...new Set(optional.filter((scope) => allowed.has(scope)))];
   return [...GITHUB_BASE_SCOPES, ...extras];

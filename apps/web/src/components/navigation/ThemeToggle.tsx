@@ -42,7 +42,11 @@ export function ThemeToggle({ className, showDevSelect = true }: ThemeToggleProp
         aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
         className={cn("btn btn-square size-8 min-h-8 p-0", className)}
       >
-        {theme === "light" ? <Moon className="size-4" aria-hidden /> : <Sun className="size-4" aria-hidden />}
+        {theme === "light" ? (
+          <Moon className="size-4" aria-hidden />
+        ) : (
+          <Sun className="size-4" aria-hidden />
+        )}
       </button>
     </div>
   );

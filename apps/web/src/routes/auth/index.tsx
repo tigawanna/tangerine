@@ -47,9 +47,7 @@ export const Route = createFileRoute("/auth/")({
 function AuthPage() {
   const { returnTo, optScopes, client_id, state, code_challenge, loopback } = Route.useSearch();
   const electronQuery =
-    client_id || state || code_challenge
-      ? { client_id, state, code_challenge }
-      : undefined;
+    client_id || state || code_challenge ? { client_id, state, code_challenge } : undefined;
 
   return (
     <AuthSignInScreen

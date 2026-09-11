@@ -21,7 +21,8 @@ export const gemmaModelSettingsQueryOptions = queryOptions({
 });
 
 /**
- * Live EmbeddingGemma load / download progress. Poll while `phase === "loading"`.
+ * Live EmbeddingGemma load / download progress (one-shot).
+ * Live updates: SSE `/api/embeddings/load/events` via `useGemmaLoadSse`.
  */
 export const gemmaLoadStatusQueryOptions = queryOptions({
   queryKey: gemmaQueryKeys.load,
@@ -29,7 +30,8 @@ export const gemmaLoadStatusQueryOptions = queryOptions({
 });
 
 /**
- * ORT + Q4 first-run bootstrap. Poll while overall is running.
+ * ORT + Q4 first-run bootstrap status (one-shot).
+ * Live updates: SSE `/api/embeddings/bootstrap/events` via `useEmbeddingBootstrapSse`.
  */
 export const embeddingBootstrapQueryOptions = queryOptions({
   queryKey: gemmaQueryKeys.bootstrap,

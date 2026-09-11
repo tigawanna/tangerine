@@ -213,9 +213,7 @@ export const ENRICHMENT_RECENT_REPOS_QUERY = print(EnrichmentRecentReposQuery);
 
 /** Narrows pinnedItems' Gist|Repository union to the Repository branch after a __typename guard. */
 type PinnedRepoNode = Extract<
-  NonNullable<
-    NonNullable<PinnedReposQueryResult["viewer"]["pinnedItems"]["nodes"]>[number]
-  >,
+  NonNullable<NonNullable<PinnedReposQueryResult["viewer"]["pinnedItems"]["nodes"]>[number]>,
   { __typename: "Repository" }
 >;
 

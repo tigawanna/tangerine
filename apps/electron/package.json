@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "description": "Tangerine desktop (Electron + Better Auth)",
-  "main": "./out/main/index.js",
-  "author": "tigawanna",
   "homepage": "https://github.com/tigawanna/tangerine",
+  "author": "tigawanna",
+  "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
     "start": "electron-vite preview",

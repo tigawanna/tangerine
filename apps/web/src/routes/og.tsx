@@ -13,29 +13,38 @@ export const Route = createFileRoute("/og")({
         const description = url.searchParams.get("description") ?? AppConfig.description;
 
         const response = new ImageResponse(
-          (
-            <div
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              padding: "72px",
+              background: "#171612",
+              color: "#e8e2d4",
+              fontFamily: "Space Grotesk",
+            }}
+          >
+            <p
               style={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                padding: "72px",
-                background: "#171612",
-                color: "#e8e2d4",
-                fontFamily: "Space Grotesk",
+                fontSize: 24,
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                opacity: 0.6,
               }}
             >
-              <p style={{ fontSize: 24, letterSpacing: "0.28em", textTransform: "uppercase", opacity: 0.6 }}>
-                tigawanna
-              </p>
-              <h1 style={{ fontSize: 72, lineHeight: 1.05, marginTop: 24, maxWidth: 900 }}>{title}</h1>
-              <p style={{ fontSize: 30, lineHeight: 1.5, marginTop: 24, maxWidth: 900, opacity: 0.75 }}>
-                {description}
-              </p>
-            </div>
-          ),
+              tigawanna
+            </p>
+            <h1 style={{ fontSize: 72, lineHeight: 1.05, marginTop: 24, maxWidth: 900 }}>
+              {title}
+            </h1>
+            <p
+              style={{ fontSize: 30, lineHeight: 1.5, marginTop: 24, maxWidth: 900, opacity: 0.75 }}
+            >
+              {description}
+            </p>
+          </div>,
           {
             width: 1200,
             height: 630,

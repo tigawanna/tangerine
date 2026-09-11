@@ -10,10 +10,7 @@ const perks = [
 
 export function LandingClosingCta() {
   return (
-    <section
-      className="bg-landing-surface-alt text-landing-fg"
-      data-test="landing-closing"
-    >
+    <section className="bg-landing-surface-alt text-landing-fg" data-test="landing-closing">
       <div className="landing-scroll-reveal mx-auto grid max-w-6xl items-end gap-10 px-4 py-16 sm:px-6 md:grid-cols-[minmax(0,1fr)_auto] md:gap-16 md:py-24">
         <div className="max-w-xl">
           <p className="landing-display text-landing-amber text-sm font-semibold tracking-[0.2em] uppercase">

@@ -20,8 +20,7 @@ export function StarRepoButton({
   stargazerCount,
   viewerHasStarred,
 }: StarRepoButtonProps) {
-  const [starMutation, isStarPending] =
-    useMutation<StarRepoButtonAddStarMutation>(AddStarMutation);
+  const [starMutation, isStarPending] = useMutation<StarRepoButtonAddStarMutation>(AddStarMutation);
   const [unstarMutation, isUnstarPending] =
     useMutation<StarRepoButtonRemoveStarMutation>(RemoveStarMutation);
 

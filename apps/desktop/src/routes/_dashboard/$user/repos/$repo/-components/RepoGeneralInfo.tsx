@@ -1,14 +1,5 @@
 import { getRelativeTimeString } from "@/utils/date-helpers";
-import {
-  Activity,
-  Code2,
-  Copy,
-  ExternalLink,
-  Github,
-  Globe,
-  HardDrive,
-  Lock,
-} from "lucide-react";
+import { Activity, Code2, Copy, ExternalLink, Github, Globe, HardDrive, Lock } from "lucide-react";
 import { graphql, useFragment } from "react-relay";
 import { EditRepoSettings } from "./EditRepoSettings";
 import { StarRepoButton } from "./StarRepoButton";
@@ -53,9 +44,7 @@ export function RepoGeneralInfo({ repository: repositoryKey }: RepoGeneralInfoPr
       (node): node is NonNullable<typeof node> => node != null,
     ) ?? [];
 
-  const pushed = repository.pushedAt
-    ? getRelativeTimeString(new Date(repository.pushedAt))
-    : null;
+  const pushed = repository.pushedAt ? getRelativeTimeString(new Date(repository.pushedAt)) : null;
   const updated = repository.updatedAt
     ? getRelativeTimeString(new Date(repository.updatedAt))
     : null;

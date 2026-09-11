@@ -15,9 +15,9 @@ export type CreateReactAuthClientOptions<
  * React Better Auth client for TanStack Start / browser apps.
  * Generic over `plugins` so client methods from plugins stay typed.
  */
-export function createReactAuthClient<
-  TPlugins extends AuthClientOptions["plugins"] = undefined,
->(options: CreateReactAuthClientOptions<TPlugins>) {
+export function createReactAuthClient<TPlugins extends AuthClientOptions["plugins"] = undefined>(
+  options: CreateReactAuthClientOptions<TPlugins>,
+) {
   return createAuthClient({
     baseURL: options.baseURL,
     basePath: options.basePath ?? "/api/auth",

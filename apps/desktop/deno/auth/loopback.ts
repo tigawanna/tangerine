@@ -166,11 +166,7 @@ async function ensureLoopbackServer(): Promise<string> {
           );
         } catch (error) {
           const message = error instanceof Error ? error.message : "Authentication failed";
-          logDesktopAuth(
-            "desktop.auth.loopback",
-            { ok: false, message, port: boundPort },
-            "error",
-          );
+          logDesktopAuth("desktop.auth.loopback", { ok: false, message, port: boundPort }, "error");
           getAuthListeners().onAuthError?.(message);
           if (wantsJson) {
             return Response.json(

@@ -34,16 +34,11 @@ type GitHubSignInProps = {
  * Desktop (Deno): system-browser OAuth via apps/api `electron()` + loopback/paste.
  * Browser (`pnpm dev`): same-origin social redirect (local Better Auth).
  */
-export function GitHubSignIn({
-  callbackURL,
-  initialOptionalScopes = [],
-}: GitHubSignInProps) {
+export function GitHubSignIn({ callbackURL, initialOptionalScopes = [] }: GitHubSignInProps) {
   const navigate = useNavigate();
   const isDesktop = hasDesktopBindings();
   const [selected, setSelected] = useState<Set<GithubOptionalScopeId>>(() => {
-    const next = new Set<GithubOptionalScopeId>(
-      GITHUB_OPTIONAL_SCOPES.map((scope) => scope.id),
-    );
+    const next = new Set<GithubOptionalScopeId>(GITHUB_OPTIONAL_SCOPES.map((scope) => scope.id));
     for (const id of initialOptionalScopes) next.add(id);
     return next;
   });
@@ -184,13 +179,18 @@ export function GitHubSignIn({
                     className="mt-0.5"
                   />
                   <div className="min-w-0 flex-1">
-                    <Label htmlFor={id} className="text-landing-fg cursor-pointer text-sm font-medium">
+                    <Label
+                      htmlFor={id}
+                      className="text-landing-fg cursor-pointer text-sm font-medium"
+                    >
                       {scope.label}
                       <span className="text-landing-fg-muted ml-1.5 font-mono text-xs font-normal">
                         {scope.id}
                       </span>
                     </Label>
-                    <p className="text-landing-fg-muted mt-0.5 text-xs leading-5">{scope.description}</p>
+                    <p className="text-landing-fg-muted mt-0.5 text-xs leading-5">
+                      {scope.description}
+                    </p>
                   </div>
                 </li>
               );

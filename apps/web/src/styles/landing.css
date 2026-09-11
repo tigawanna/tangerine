@@ -147,8 +147,7 @@
 }
 
 @theme inline {
-  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1
-    var(--delay, 0ms);
+  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1 var(--delay, 0ms);
 
   @keyframes cell-ripple {
     0% {
@@ -370,12 +369,11 @@
   gap: 0.5rem;
   width: 100%;
   min-height: 12rem;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in oklch, var(--color-landing-fg) 3%, transparent) 0%,
-      color-mix(in oklch, var(--color-landing-fg) 6%, transparent) 100%
-    );
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-landing-fg) 3%, transparent) 0%,
+    color-mix(in oklch, var(--color-landing-fg) 6%, transparent) 100%
+  );
   color: var(--color-landing-fg-muted);
   border: 1px dashed color-mix(in oklch, var(--color-landing-fg) 12%, transparent);
 }

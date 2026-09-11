@@ -37,8 +37,7 @@ export const Route = createFileRoute("/_dashboard")({
     const fromSession = sessionUser.githubUsername?.trim();
     // Prefer session login so we skip `/get-access-token` on every nav.
     // Relay still resolves the token (cached) when it queries GitHub.
-    const githubLogin =
-      fromSession || (await fetchGithubLogin(await getClientGithubAccessToken()));
+    const githubLogin = fromSession || (await fetchGithubLogin(await getClientGithubAccessToken()));
 
     return {
       githubLogin,

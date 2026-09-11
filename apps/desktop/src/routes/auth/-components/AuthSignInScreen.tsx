@@ -14,10 +14,7 @@ type AuthSignInScreenProps = {
   initialOptionalScopes?: readonly GithubOptionalScopeId[];
 };
 
-export function AuthSignInScreen({
-  returnTo,
-  initialOptionalScopes = [],
-}: AuthSignInScreenProps) {
+export function AuthSignInScreen({ returnTo, initialOptionalScopes = [] }: AuthSignInScreenProps) {
   const Icon = AppConfig.icon;
 
   return (
@@ -89,10 +86,7 @@ export function AuthSignInScreen({
               Continue with GitHub to open your repos and stars. Extra permissions are optional.
             </p>
             <div className="mt-8 space-y-3">
-              <GitHubSignIn
-                callbackURL={returnTo}
-                initialOptionalScopes={initialOptionalScopes}
-              />
+              <GitHubSignIn callbackURL={returnTo} initialOptionalScopes={initialOptionalScopes} />
               <Link to="/" className="landing-cta-secondary w-full" data-test="auth-back-home">
                 <ArrowLeft className="size-4" aria-hidden />
                 Back to home

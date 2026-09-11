@@ -10,11 +10,11 @@ Docs: [Better Auth Electron](https://better-auth.com/docs/integrations/electron)
 
 ## Commands
 
-| Command | What it does |
-| --- | --- |
-| `pnpm --filter electron dev` | electron-vite dev (main + preload + renderer HMR) |
-| `pnpm --filter electron build` | typecheck + production build to `out/` |
-| `pnpm --filter electron build:linux` | package with electron-builder |
+| Command                              | What it does                                      |
+| ------------------------------------ | ------------------------------------------------- |
+| `pnpm --filter electron dev`         | electron-vite dev (main + preload + renderer HMR) |
+| `pnpm --filter electron build`       | typecheck + production build to `out/`            |
+| `pnpm --filter electron build:linux` | package with electron-builder                     |
 
 ## Auth checklist
 

@@ -57,10 +57,7 @@ export function SearchPage() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6" data-test="github-search-page">
       <div className="flex flex-col gap-3">
-        <form
-          className="flex flex-col gap-3 sm:flex-row sm:items-center"
-          onSubmit={handleSubmit}
-        >
+        <form className="flex flex-col gap-3 sm:flex-row sm:items-center" onSubmit={handleSubmit}>
           <InputGroup className="github-search-vt h-11 min-w-0 flex-1 rounded-xl">
             <InputGroupAddon align="inline-start">
               <Search className="size-4" aria-hidden />
@@ -144,11 +141,17 @@ export function SearchPage() {
       </div>
 
       {hasQuery && queryRef ? (
-        <Suspense fallback={<SearchResultsFallback searchType={type} />} key={`${type}:${committed}`}>
+        <Suspense
+          fallback={<SearchResultsFallback searchType={type} />}
+          key={`${type}:${committed}`}
+        >
           <SearchList queryRef={queryRef} />
         </Suspense>
       ) : (
-        <Empty className="border-base-300 min-h-72 border border-dashed" data-test="github-search-prompt">
+        <Empty
+          className="border-base-300 min-h-72 border border-dashed"
+          data-test="github-search-prompt"
+        >
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <Search />

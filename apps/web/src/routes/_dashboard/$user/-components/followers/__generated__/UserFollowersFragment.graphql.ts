@@ -7,22 +7,32 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ReaderFragment } from 'relay-runtime';
+import { ReaderFragment } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
 export type UserFollowersFragment$data = {
   readonly followers: {
-    readonly edges: ReadonlyArray<{
-      readonly cursor: string;
-      readonly node: {
-        readonly id: string;
-        readonly isFollowingViewer: boolean;
-        readonly isViewer: boolean;
-        readonly login: string;
-        readonly name: string | null | undefined;
-        readonly viewerIsFollowing: boolean;
-        readonly " $fragmentSpreads": FragmentRefs<"UserCard_user">;
-      } | null | undefined;
-    } | null | undefined> | null | undefined;
+    readonly edges:
+      | ReadonlyArray<
+          | {
+              readonly cursor: string;
+              readonly node:
+                | {
+                    readonly id: string;
+                    readonly isFollowingViewer: boolean;
+                    readonly isViewer: boolean;
+                    readonly login: string;
+                    readonly name: string | null | undefined;
+                    readonly viewerIsFollowing: boolean;
+                    readonly " $fragmentSpreads": FragmentRefs<"UserCard_user">;
+                  }
+                | null
+                | undefined;
+            }
+          | null
+          | undefined
+        >
+      | null
+      | undefined;
     readonly pageInfo: {
       readonly endCursor: string | null | undefined;
       readonly hasNextPage: boolean;
@@ -39,202 +49,198 @@ export type UserFollowersFragment$key = {
   readonly " $fragmentSpreads": FragmentRefs<"UserFollowersFragment">;
 };
 
-import FollowersPaginationQuery_graphql from './FollowersPaginationQuery.graphql';
+import FollowersPaginationQuery_graphql from "./FollowersPaginationQuery.graphql";
 
-const node: ReaderFragment = (function(){
-var v0 = [
-  "followers"
-],
-v1 = {
-  "alias": null,
-  "args": null,
-  "kind": "ScalarField",
-  "name": "id",
-  "storageKey": null
-};
-return {
-  "argumentDefinitions": [
-    {
-      "defaultValue": null,
-      "kind": "LocalArgument",
-      "name": "after"
-    },
-    {
-      "defaultValue": 12,
-      "kind": "LocalArgument",
-      "name": "first"
-    }
-  ],
-  "kind": "Fragment",
-  "metadata": {
-    "connection": [
+const node: ReaderFragment = (function () {
+  var v0 = ["followers"],
+    v1 = {
+      alias: null,
+      args: null,
+      kind: "ScalarField",
+      name: "id",
+      storageKey: null,
+    };
+  return {
+    argumentDefinitions: [
       {
-        "count": "first",
-        "cursor": "after",
-        "direction": "forward",
-        "path": (v0/*:: as any*/)
-      }
-    ],
-    "refetch": {
-      "connection": {
-        "forward": {
-          "count": "first",
-          "cursor": "after"
-        },
-        "backward": null,
-        "path": (v0/*:: as any*/)
+        defaultValue: null,
+        kind: "LocalArgument",
+        name: "after",
       },
-      "fragmentPathInResult": [
-        "node"
-      ],
-      "operation": FollowersPaginationQuery_graphql,
-      "identifierInfo": {
-        "identifierField": "id",
-        "identifierQueryVariableName": "id"
-      }
-    }
-  },
-  "name": "UserFollowersFragment",
-  "selections": [
-    {
-      "alias": "followers",
-      "args": null,
-      "concreteType": "FollowerConnection",
-      "kind": "LinkedField",
-      "name": "__UserFollowersFragment_followers_connection",
-      "plural": false,
-      "selections": [
+      {
+        defaultValue: 12,
+        kind: "LocalArgument",
+        name: "first",
+      },
+    ],
+    kind: "Fragment",
+    metadata: {
+      connection: [
         {
-          "alias": null,
-          "args": null,
-          "concreteType": "UserEdge",
-          "kind": "LinkedField",
-          "name": "edges",
-          "plural": true,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "cursor",
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "concreteType": "User",
-              "kind": "LinkedField",
-              "name": "node",
-              "plural": false,
-              "selections": [
-                (v1/*:: as any*/),
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "login",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "name",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "isViewer",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "isFollowingViewer",
-                  "storageKey": null
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "viewerIsFollowing",
-                  "storageKey": null
-                },
-                {
-                  "args": null,
-                  "kind": "FragmentSpread",
-                  "name": "UserCard_user"
-                },
-                {
-                  "alias": null,
-                  "args": null,
-                  "kind": "ScalarField",
-                  "name": "__typename",
-                  "storageKey": null
-                }
-              ],
-              "storageKey": null
-            }
-          ],
-          "storageKey": null
+          count: "first",
+          cursor: "after",
+          direction: "forward",
+          path: v0 /*:: as any*/,
         },
-        {
-          "alias": null,
-          "args": null,
-          "concreteType": "PageInfo",
-          "kind": "LinkedField",
-          "name": "pageInfo",
-          "plural": false,
-          "selections": [
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "endCursor",
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "hasNextPage",
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "hasPreviousPage",
-              "storageKey": null
-            },
-            {
-              "alias": null,
-              "args": null,
-              "kind": "ScalarField",
-              "name": "startCursor",
-              "storageKey": null
-            }
-          ],
-          "storageKey": null
-        },
-        {
-          "alias": null,
-          "args": null,
-          "kind": "ScalarField",
-          "name": "totalCount",
-          "storageKey": null
-        }
       ],
-      "storageKey": null
+      refetch: {
+        connection: {
+          forward: {
+            count: "first",
+            cursor: "after",
+          },
+          backward: null,
+          path: v0 /*:: as any*/,
+        },
+        fragmentPathInResult: ["node"],
+        operation: FollowersPaginationQuery_graphql,
+        identifierInfo: {
+          identifierField: "id",
+          identifierQueryVariableName: "id",
+        },
+      },
     },
-    (v1/*:: as any*/)
-  ],
-  "type": "User",
-  "abstractKey": null
-};
+    name: "UserFollowersFragment",
+    selections: [
+      {
+        alias: "followers",
+        args: null,
+        concreteType: "FollowerConnection",
+        kind: "LinkedField",
+        name: "__UserFollowersFragment_followers_connection",
+        plural: false,
+        selections: [
+          {
+            alias: null,
+            args: null,
+            concreteType: "UserEdge",
+            kind: "LinkedField",
+            name: "edges",
+            plural: true,
+            selections: [
+              {
+                alias: null,
+                args: null,
+                kind: "ScalarField",
+                name: "cursor",
+                storageKey: null,
+              },
+              {
+                alias: null,
+                args: null,
+                concreteType: "User",
+                kind: "LinkedField",
+                name: "node",
+                plural: false,
+                selections: [
+                  v1 /*:: as any*/,
+                  {
+                    alias: null,
+                    args: null,
+                    kind: "ScalarField",
+                    name: "login",
+                    storageKey: null,
+                  },
+                  {
+                    alias: null,
+                    args: null,
+                    kind: "ScalarField",
+                    name: "name",
+                    storageKey: null,
+                  },
+                  {
+                    alias: null,
+                    args: null,
+                    kind: "ScalarField",
+                    name: "isViewer",
+                    storageKey: null,
+                  },
+                  {
+                    alias: null,
+                    args: null,
+                    kind: "ScalarField",
+                    name: "isFollowingViewer",
+                    storageKey: null,
+                  },
+                  {
+                    alias: null,
+                    args: null,
+                    kind: "ScalarField",
+                    name: "viewerIsFollowing",
+                    storageKey: null,
+                  },
+                  {
+                    args: null,
+                    kind: "FragmentSpread",
+                    name: "UserCard_user",
+                  },
+                  {
+                    alias: null,
+                    args: null,
+                    kind: "ScalarField",
+                    name: "__typename",
+                    storageKey: null,
+                  },
+                ],
+                storageKey: null,
+              },
+            ],
+            storageKey: null,
+          },
+          {
+            alias: null,
+            args: null,
+            concreteType: "PageInfo",
+            kind: "LinkedField",
+            name: "pageInfo",
+            plural: false,
+            selections: [
+              {
+                alias: null,
+                args: null,
+                kind: "ScalarField",
+                name: "endCursor",
+                storageKey: null,
+              },
+              {
+                alias: null,
+                args: null,
+                kind: "ScalarField",
+                name: "hasNextPage",
+                storageKey: null,
+              },
+              {
+                alias: null,
+                args: null,
+                kind: "ScalarField",
+                name: "hasPreviousPage",
+                storageKey: null,
+              },
+              {
+                alias: null,
+                args: null,
+                kind: "ScalarField",
+                name: "startCursor",
+                storageKey: null,
+              },
+            ],
+            storageKey: null,
+          },
+          {
+            alias: null,
+            args: null,
+            kind: "ScalarField",
+            name: "totalCount",
+            storageKey: null,
+          },
+        ],
+        storageKey: null,
+      },
+      v1 /*:: as any*/,
+    ],
+    type: "User",
+    abstractKey: null,
+  };
 })();
 
 (node as any).hash = "191c83af2596024b21246a936dee661f";

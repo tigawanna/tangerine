@@ -1,6 +1,15 @@
 import { cn } from "@/lib/utils";
 import { AppBrandIcon } from "@/components/icon/AppBrandIcon";
-import { CircleUser, ListFilterPlus, Search, Sparkles, Star, Trash2, UserPlus, Zap } from "lucide-react";
+import {
+  CircleUser,
+  ListFilterPlus,
+  Search,
+  Sparkles,
+  Star,
+  Trash2,
+  UserPlus,
+  Zap,
+} from "lucide-react";
 import {
   landingMockBulkRepos,
   landingMockPeople,
@@ -19,10 +28,7 @@ const profileTabs = ["repos", "starred", "followers", "following"] as const;
 export function LandingMockProfilePreview({ className }: { className?: string }) {
   return (
     <div
-      className={cn(
-        "bg-base-100 text-base-content pointer-events-none select-none",
-        className,
-      )}
+      className={cn("bg-base-100 text-base-content pointer-events-none select-none", className)}
       data-test="landing-mock-profile-preview"
       aria-hidden
     >
@@ -124,8 +130,7 @@ export function LandingMockStarsPreview({ className }: { className?: string }) {
           </span>
         </div>
         <span className="text-base-content/40 inline-flex items-center gap-1 text-[10px]">
-          <Star className="size-3 fill-current" />
-          3 filters
+          <Star className="size-3 fill-current" />3 filters
         </span>
       </div>
       <ul className="space-y-2">
@@ -374,7 +379,9 @@ export function LandingMockGraphPreview({ className }: { className?: string }) {
 
 /** Bulk follow-back: one button for everyone who followed you overnight. */
 export function LandingMockBulkFollowBackPreview({ className }: { className?: string }) {
-  const followBackCount = landingMockPeople.filter((person) => person.action === "Follow back").length;
+  const followBackCount = landingMockPeople.filter(
+    (person) => person.action === "Follow back",
+  ).length;
 
   return (
     <div

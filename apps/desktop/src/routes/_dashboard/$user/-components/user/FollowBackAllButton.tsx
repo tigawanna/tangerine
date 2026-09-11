@@ -62,9 +62,7 @@ export function FollowBackAllButton({ targets }: FollowBackAllButtonProps) {
               toast.error(
                 `Failed to follow back ${failures.length} user${failures.length === 1 ? "" : "s"}`,
                 {
-                  description: failures
-                    .map((item) => `@${item.login}: ${item.message}`)
-                    .join("; "),
+                  description: failures.map((item) => `@${item.login}: ${item.message}`).join("; "),
                 },
               );
               return;
@@ -141,9 +139,8 @@ export function FollowBackAllButton({ targets }: FollowBackAllButtonProps) {
         title="Follow permission needed"
         description={
           <>
-            Your GitHub session does not include the{" "}
-            <code className="font-mono">user:follow</code> scope. Sign in again to grant it, then
-            retry.
+            Your GitHub session does not include the <code className="font-mono">user:follow</code>{" "}
+            scope. Sign in again to grant it, then retry.
           </>
         }
       />

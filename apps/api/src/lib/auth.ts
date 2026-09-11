@@ -1,10 +1,6 @@
 import { apiKey } from "@better-auth/api-key";
 import { electron } from "@better-auth/electron";
-import {
-  DEFAULT_GITHUB_SCOPES,
-  ELECTRON_TRUSTED_ORIGIN,
-  ROLE,
-} from "@repo/auth";
+import { DEFAULT_GITHUB_SCOPES, ELECTRON_TRUSTED_ORIGIN, ROLE } from "@repo/auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import type { GithubProfile } from "better-auth/social-providers";

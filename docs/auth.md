@@ -34,12 +34,12 @@ Desktop sign-in **starts in the native app**. The webview only kicks off auth; t
          └─────────────────────┘ ⑥ navigate /viewer + getSession
 ```
 
-| Surface | Where session lives | How it talks to API |
-| --- | --- | --- |
-| **Web** (`apps/web`) | Browser cookies against `VITE_API_URL` | `authClient` + `credentials: "include"` |
-| **Deno Desktop** | Deno disk jar `~/.config/tangerine-desktop/session.json` | Preload `fetch` + `Authorization: Bearer` + `Origin: com.tigawanna.tangerine:/` |
-| **Electron** | Main-process `@better-auth/electron` storage | Official Electron client (sets Origin for you) |
-| **Desktop UI webview** | None for auth — UI only | `bindings.*` when present |
+| Surface                | Where session lives                                      | How it talks to API                                                             |
+| ---------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **Web** (`apps/web`)   | Browser cookies against `VITE_API_URL`                   | `authClient` + `credentials: "include"`                                         |
+| **Deno Desktop**       | Deno disk jar `~/.config/tangerine-desktop/session.json` | Preload `fetch` + `Authorization: Bearer` + `Origin: com.tigawanna.tangerine:/` |
+| **Electron**           | Main-process `@better-auth/electron` storage             | Official Electron client (sets Origin for you)                                  |
+| **Desktop UI webview** | None for auth — UI only                                  | `bindings.*` when present                                                       |
 
 Do **not** bake `GITHUB_CLIENT_SECRET` into web or desktop. GitHub callback is always:
 
@@ -49,11 +49,11 @@ Do **not** bake `GITHUB_CLIENT_SECRET` into web or desktop. GitHub callback is a
 
 ## Local ports (dev)
 
-| App | Port | Role |
-| --- | --- | --- |
-| `apps/api` | `:5000` | Better Auth + Hono |
-| `apps/web` | `:3064` | Browser + **desktop browser-half** sign-in (`VITE_SIGN_IN_URL`) |
-| `apps/desktop` | `:3070` | Native window UI (`VITE_APP_URL`) |
+| App            | Port    | Role                                                            |
+| -------------- | ------- | --------------------------------------------------------------- |
+| `apps/api`     | `:5000` | Better Auth + Hono                                              |
+| `apps/web`     | `:3064` | Browser + **desktop browser-half** sign-in (`VITE_SIGN_IN_URL`) |
+| `apps/desktop` | `:3070` | Native window UI (`VITE_APP_URL`)                               |
 
 Desktop token exchange must hit **`:5000`**, never `:3070`.
 
@@ -216,15 +216,15 @@ ls -la ~/.config/tangerine-desktop/
 # expect session.json after a good login; pkce.json during/after in-flight PKCE
 ```
 
-| Symptom | Likely cause |
-| --- | --- |
-| Social 500 on first run | Auth tables missing — `db:push` |
-| Lands on `:5000/viewer` | Relative `callbackURL` |
-| Web success, desktop still on login | Event drop / wrong `beforeLoad` / session cleared |
-| `session.json` missing after 200 token | Cleared by failed `get-session` or wrong cookie encoding |
-| Dashboard then `MISSING_OR_NULL_ORIGIN` | Deno fetch missing `Origin: com.tigawanna.tangerine:/` |
-| Loopback rejected / paste works | Stale loopback port / orphan process / preload not restarted |
-| `get-access-token` 400 | Wrong `accountId` (need row id from `list-accounts`) |
+| Symptom                                 | Likely cause                                                 |
+| --------------------------------------- | ------------------------------------------------------------ |
+| Social 500 on first run                 | Auth tables missing — `db:push`                              |
+| Lands on `:5000/viewer`                 | Relative `callbackURL`                                       |
+| Web success, desktop still on login     | Event drop / wrong `beforeLoad` / session cleared            |
+| `session.json` missing after 200 token  | Cleared by failed `get-session` or wrong cookie encoding     |
+| Dashboard then `MISSING_OR_NULL_ORIGIN` | Deno fetch missing `Origin: com.tigawanna.tangerine:/`       |
+| Loopback rejected / paste works         | Stale loopback port / orphan process / preload not restarted |
+| `get-access-token` 400                  | Wrong `accountId` (need row id from `list-accounts`)         |
 
 Optional: `DENO_DESKTOP_DEVTOOLS=1` (CEF backend) for webview DevTools.
 
@@ -232,13 +232,13 @@ Optional: `DENO_DESKTOP_DEVTOOLS=1` (CEF backend) for webview DevTools.
 
 ## Key files
 
-| Area | Path |
-| --- | --- |
-| API Better Auth | `apps/api/src/lib/auth.ts` |
-| Web sign-in + loopback handoff | `apps/web/src/routes/auth/-components/GitHubSignIn.tsx` |
-| Web “close this tab” after desktop handoff | `apps/web/src/routes/auth/desktop-done/index.tsx` |
-| Deno PKCE / loopback / jar | `apps/desktop/deno/auth/` (`auth.ts` re-exports) |
-| Deno window + bindings | `apps/desktop/deno/window.ts` |
-| Desktop UI auth / dashboard guards | `apps/desktop/src/routes/auth/index.tsx`, `.../_dashboard/layout.tsx` |
-| Protocol constants | `packages/auth/src/electron.ts` (`ELECTRON_PROTOCOL_SCHEME`, `ELECTRON_TRUSTED_ORIGIN`) |
-| Electron main client | `apps/electron/src/main/lib/auth-client.ts` |
+| Area                                       | Path                                                                                    |
+| ------------------------------------------ | --------------------------------------------------------------------------------------- |
+| API Better Auth                            | `apps/api/src/lib/auth.ts`                                                              |
+| Web sign-in + loopback handoff             | `apps/web/src/routes/auth/-components/GitHubSignIn.tsx`                                 |
+| Web “close this tab” after desktop handoff | `apps/web/src/routes/auth/desktop-done/index.tsx`                                       |
+| Deno PKCE / loopback / jar                 | `apps/desktop/deno/auth/` (`auth.ts` re-exports)                                        |
+| Deno window + bindings                     | `apps/desktop/deno/window.ts`                                                           |
+| Desktop UI auth / dashboard guards         | `apps/desktop/src/routes/auth/index.tsx`, `.../_dashboard/layout.tsx`                   |
+| Protocol constants                         | `packages/auth/src/electron.ts` (`ELECTRON_PROTOCOL_SCHEME`, `ELECTRON_TRUSTED_ORIGIN`) |
+| Electron main client                       | `apps/electron/src/main/lib/auth-client.ts`                                             |

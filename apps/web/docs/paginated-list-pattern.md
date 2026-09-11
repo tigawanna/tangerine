@@ -131,9 +131,7 @@ export function ListUsers() {
   const page = search.page;
   const q = search.q.trim();
 
-  const { data } = useSuspenseQuery(
-    teamMembersQueryOptions({ page, search: q || undefined }),
-  );
+  const { data } = useSuspenseQuery(teamMembersQueryOptions({ page, search: q || undefined }));
 
   const { members, total, totalPages } = data;
 
@@ -245,12 +243,12 @@ const { meta } = useTSDBQueryMeta(COLLECTION_QUERY_KEY, { page, q });
 
 Canonical sources in this repo:
 
-| List                    | Route id                           | Component                                                                 |
-| ----------------------- | ---------------------------------- | ------------------------------------------------------------------------- |
-| Admin users             | `/_dashboard/admin/users/`         | `routes/_dashboard/admin/users/-components/ListUsers.tsx`                 |
-| Manager team            | `/_dashboard/manager/team/`        | `routes/_dashboard/manager/team/-components/ListTeamMembers.tsx`        |
-| Admin locations         | `/_dashboard/admin/locations/`     | `routes/_dashboard/admin/locations/-components/ListLocations.tsx`         |
-| Manager locations       | `/_dashboard/manager/locations/`   | `routes/_dashboard/manager/locations/-components/ListLocations.tsx`       |
+| List              | Route id                         | Component                                                           |
+| ----------------- | -------------------------------- | ------------------------------------------------------------------- |
+| Admin users       | `/_dashboard/admin/users/`       | `routes/_dashboard/admin/users/-components/ListUsers.tsx`           |
+| Manager team      | `/_dashboard/manager/team/`      | `routes/_dashboard/manager/team/-components/ListTeamMembers.tsx`    |
+| Admin locations   | `/_dashboard/admin/locations/`   | `routes/_dashboard/admin/locations/-components/ListLocations.tsx`   |
+| Manager locations | `/_dashboard/manager/locations/` | `routes/_dashboard/manager/locations/-components/ListLocations.tsx` |
 
 TanStack DB variant (external reference):
 

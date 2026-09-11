@@ -10,10 +10,7 @@ export {
 export { UserCardFragment } from "./queries/fragments/user-card";
 export { RepoCardFragment } from "./queries/fragments/repo-card";
 export { RepoGeneralInfoFragment } from "./queries/fragments/repo-general-info";
-export {
-  SearchRepoFragment,
-  SearchUserFragment,
-} from "./queries/fragments/search-results";
+export { SearchRepoFragment, SearchUserFragment } from "./queries/fragments/search-results";
 export {
   RecentReposQuery,
   PinnedReposQuery,

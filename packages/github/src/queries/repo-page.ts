@@ -249,12 +249,10 @@ function mapBranchEdges(
         node: {
           id: string;
           name: string;
-          target:
-            | {
-                __typename: string;
-                history?: CommitHistoryConnection | null;
-              }
-            | null;
+          target: {
+            __typename: string;
+            history?: CommitHistoryConnection | null;
+          } | null;
         } | null;
       } | null>
     | null

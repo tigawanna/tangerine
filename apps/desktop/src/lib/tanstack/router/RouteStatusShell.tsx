@@ -69,17 +69,12 @@ export function RouteStatusShell({
       >
         {eyebrow ? (
           <p className="text-landing-fg-muted inline-flex items-center gap-2.5 text-[11px] font-semibold tracking-[0.18em] uppercase">
-            <span
-              aria-hidden
-              className="bg-landing-amber size-1.5 animate-pulse rounded-full"
-            />
+            <span aria-hidden className="bg-landing-amber size-1.5 animate-pulse rounded-full" />
             <span className="text-landing-amber">{eyebrow}</span>
           </p>
         ) : null}
 
-        {visual ? (
-          <div className={eyebrow ? "mt-10" : undefined}>{visual}</div>
-        ) : null}
+        {visual ? <div className={eyebrow ? "mt-10" : undefined}>{visual}</div> : null}
 
         <h1
           className={cn(

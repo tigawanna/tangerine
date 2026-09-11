@@ -1,10 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { loadQuery } from "react-relay";
 import { z } from "zod";
-import {
-  RepoDetailPage,
-  repoDetailPageQuery,
-} from "./-components/RepoDetailPage";
+import { RepoDetailPage, repoDetailPageQuery } from "./-components/RepoDetailPage";
 import type { RepoDetailPageQuery } from "./-components/__generated__/RepoDetailPageQuery.graphql";
 
 const repoSearchSchema = z.object({

@@ -61,7 +61,13 @@ function isRangeToken(token: string): boolean {
   return RANGE_PREFIXES.some((prefix) => token.startsWith(prefix));
 }
 
-function parseRangeToken(token: string): { field: keyof Pick<GithubSearchFilterDraft, "stars" | "forks" | "size" | "created" | "pushed">; value: string; op: "exact" | "min" | "max" } | null {
+function parseRangeToken(
+  token: string,
+): {
+  field: keyof Pick<GithubSearchFilterDraft, "stars" | "forks" | "size" | "created" | "pushed">;
+  value: string;
+  op: "exact" | "min" | "max";
+} | null {
   for (const prefix of RANGE_PREFIXES) {
     if (!token.startsWith(prefix)) continue;
     const field = prefix.slice(0, -1) as "stars" | "forks" | "size" | "created" | "pushed";

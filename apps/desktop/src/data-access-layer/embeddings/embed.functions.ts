@@ -8,7 +8,7 @@ import {
   type EmbeddingBootstrapStatus,
 } from "./embedding-bootstrap";
 import { gemmaPrefsFilePath, readGemmaPrefs, writeGemmaPrefs } from "./gemma-prefs";
-import { ensureOrtModulePath } from "./ort-runtime";
+import { ensureOrtReady } from "./ort-runtime";
 
 /** Max chars accepted by `embedText` (payload / paste comfort). */
 export const EMBED_TEXT_MAX_CHARS = 20_000;
@@ -50,6 +50,9 @@ export type GemmaLoadStatusResult = {
   file?: string;
   error?: string;
   dtype: "q4" | "q8" | "fp16" | "fp32";
+  loadedBytes?: number;
+  totalBytes?: number;
+  progressSettled?: boolean;
 };
 
 export type GemmaModelSettingsResult = {
@@ -76,6 +79,8 @@ export type GemmaModelSettingsResult = {
 
 export type { EmbeddingBootstrapStatus };
 
+export { watchEmbeddingBootstrap, watchGemmaLoadStatus } from "./embedding-streams";
+
 /** Poll while an embed / model switch is in flight. */
 export const getGemmaLoadStatus = createServerFn({ method: "GET" }).handler(
   async (): Promise<GemmaLoadStatusResult> => {
@@ -86,22 +91,22 @@ export const getGemmaLoadStatus = createServerFn({ method: "GET" }).handler(
 
 /** First-run / settings: ORT runtime + Q4 bootstrap status. */
 export const getEmbeddingBootstrap = createServerFn({ method: "GET" }).handler(
-  async (): Promise<EmbeddingBootstrapStatus> => getEmbeddingBootstrapStatus(),
+  (): Promise<EmbeddingBootstrapStatus> => getEmbeddingBootstrapStatus(),
 );
 
 /** Kick off ORT (if needed) + Q4 model download. Idempotent. */
 export const startEmbeddingBootstrapFn = createServerFn({ method: "POST" }).handler(
-  async (): Promise<EmbeddingBootstrapStatus> => startEmbeddingBootstrap(),
+  (): Promise<EmbeddingBootstrapStatus> => startEmbeddingBootstrap(),
 );
 
 /** Cancel bootstrap downloads and suppress auto-start until resume. */
 export const cancelEmbeddingBootstrapFn = createServerFn({ method: "POST" }).handler(
-  async (): Promise<EmbeddingBootstrapStatus> => cancelEmbeddingBootstrap(),
+  (): Promise<EmbeddingBootstrapStatus> => cancelEmbeddingBootstrap(),
 );
 
 /** Clear dismissed flag and start bootstrap again. */
 export const resumeEmbeddingBootstrapFn = createServerFn({ method: "POST" }).handler(
-  async (): Promise<EmbeddingBootstrapStatus> => resumeEmbeddingBootstrap(),
+  (): Promise<EmbeddingBootstrapStatus> => resumeEmbeddingBootstrap(),
 );
 
 /**
@@ -111,10 +116,10 @@ export const resumeEmbeddingBootstrapFn = createServerFn({ method: "POST" }).han
 export const getGemmaModelSettings = createServerFn({ method: "GET" }).handler(
   async (): Promise<GemmaModelSettingsResult> => {
     const prefs = readGemmaPrefs();
-    ensureOrtModulePath();
-    const { getGemmaModelSettingsSnapshot, setActiveGemmaDtype } = await import(
-      "@repo/gemma-embedding/server"
-    );
+    // Do not force ORT onto NODE_PATH here — settings only needs cache + prefs.
+    // Bootstrap status probes import safely via canImportOrt.
+    const { getGemmaModelSettingsSnapshot, setActiveGemmaDtype } =
+      await import("@repo/gemma-embedding/server");
     setActiveGemmaDtype(prefs.dtype);
     const snapshot = getGemmaModelSettingsSnapshot();
     const bootstrap = await getEmbeddingBootstrapStatus();
@@ -127,32 +132,67 @@ export const getGemmaModelSettings = createServerFn({ method: "GET" }).handler(
 );
 
 /**
- * Persist dtype preference and start download/load of that variant.
- * Returns immediately — poll `getGemmaLoadStatus` for progress.
+ * Persist dtype preference and load that variant into memory.
+ * Weights must already be on disk (use `downloadGemmaModel` first).
+ * Returns immediately — subscribe to `/api/embeddings/load/events` for progress.
  */
 export const selectGemmaModel = createServerFn({ method: "POST" })
-  .inputValidator(selectModelInput)
+  .validator(selectModelInput)
   .handler(async ({ data }): Promise<GemmaLoadStatusResult> => {
-    ensureOrtModulePath();
+    await ensureOrtReady();
     writeGemmaPrefs({ ...readGemmaPrefs(), dtype: data.dtype });
-    const { beginServerGemmaDtypeSwitch } = await import("@repo/gemma-embedding/server");
+    const { beginServerGemmaDtypeSwitch, inspectGemmaCache, preferIpv4ForHubFetches } =
+      await import("@repo/gemma-embedding/server");
+    preferIpv4ForHubFetches();
+    const inventory = inspectGemmaCache();
+    const ready = inventory.variants.some((variant) => variant.id === data.dtype && variant.ready);
+    if (!ready) {
+      throw new Error(
+        `${data.dtype.toUpperCase()} is not on disk yet — download it first, then load and switch.`,
+      );
+    }
     return beginServerGemmaDtypeSwitch(data.dtype);
   });
+
+/**
+ * Download ONNX weights for a dtype without activating it (prefs stay unchanged).
+ */
+export const downloadGemmaModel = createServerFn({ method: "POST" })
+  .validator(selectModelInput)
+  .handler(async ({ data }): Promise<GemmaLoadStatusResult> => {
+    await ensureOrtReady();
+    const { beginServerGemmaDtypeDownload, preferIpv4ForHubFetches } =
+      await import("@repo/gemma-embedding/server");
+    preferIpv4ForHubFetches();
+    return beginServerGemmaDtypeDownload(data.dtype);
+  });
+
+/**
+ * Best-effort cancel of an in-flight model download/load (unload shared instance).
+ * HF transformers has no AbortSignal; partial files may remain on disk for resume.
+ */
+export const cancelGemmaLoadFn = createServerFn({ method: "POST" }).handler(
+  async (): Promise<GemmaLoadStatusResult> => {
+    const { unloadServerGemmaEmbedding, getGemmaLoadSnapshot } =
+      await import("@repo/gemma-embedding/server");
+    await unloadServerGemmaEmbedding();
+    return getGemmaLoadSnapshot();
+  },
+);
 
 /**
  * Opens a local path in the OS file manager (folder, or parent if the file is missing).
  * Restricted to the EmbeddingGemma cache / prefs directory tree.
  */
 export const openGemmaPath = createServerFn({ method: "POST" })
-  .inputValidator(openPathInput)
+  .validator(openPathInput)
   .handler(async ({ data }): Promise<{ opened: string }> => {
     const { existsSync, mkdirSync, realpathSync, statSync } = await import("node:fs");
     const { dirname, resolve, sep } = await import("node:path");
     const { homedir, platform } = await import("node:os");
     const { spawn } = await import("node:child_process");
-    const { getGemmaModelCacheDir, getTransformersCacheRoot } = await import(
-      "@repo/gemma-embedding/server"
-    );
+    const { getGemmaModelCacheDir, getTransformersCacheRoot } =
+      await import("@repo/gemma-embedding/server");
     const { ortInstallRoot } = await import("./ort-runtime");
 
     const allowedRoots = [
@@ -234,13 +274,12 @@ export const openGemmaPath = createServerFn({ method: "POST" })
  * Uses persisted dtype preference. Does not write embeddings to the DB.
  */
 export const embedText = createServerFn({ method: "POST" })
-  .inputValidator(embedTextInput)
+  .validator(embedTextInput)
   .handler(async ({ data }): Promise<EmbedTextResult> => {
     const prefs = readGemmaPrefs();
-    ensureOrtModulePath();
-    const { getEmbeddingModelId, getServerGemmaEmbedding } = await import(
-      "@repo/gemma-embedding/server"
-    );
+    await ensureOrtReady();
+    const { getEmbeddingModelId, getServerGemmaEmbedding } =
+      await import("@repo/gemma-embedding/server");
 
     const totalStart = performance.now();
     const loadStart = performance.now();

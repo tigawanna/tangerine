@@ -1,9 +1,4 @@
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/components/ui/empty";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { RepoCard } from "@/routes/_dashboard/-components/repo/RepoCard";
 import type { GithubSearchType } from "@/routes/_dashboard/-components/search/github-search";
 import { UserCard } from "@/routes/_dashboard/$user/-components/followers/UserFollowersList";
@@ -12,7 +7,10 @@ import { Link } from "@tanstack/react-router";
 import { graphql, useFragment, usePreloadedQuery, type PreloadedQuery } from "react-relay";
 import type { SearchListOrgCard_organization$key } from "./__generated__/SearchListOrgCard_organization.graphql";
 import type { SearchReposQuery } from "./__generated__/SearchReposQuery.graphql";
-import type { SearchUsersQuery, SearchUsersQuery$data } from "./__generated__/SearchUsersQuery.graphql";
+import type {
+  SearchUsersQuery,
+  SearchUsersQuery$data,
+} from "./__generated__/SearchUsersQuery.graphql";
 
 export type GithubSearchQueryRef =
   | { kind: "REPOSITORY"; queryRef: PreloadedQuery<SearchReposQuery> }
@@ -128,7 +126,10 @@ function OrgSearchCard({ organization }: { organization: SearchListOrgCard_organ
 
 function SearchEmpty({ kind }: { kind: "repositories" | "users" }) {
   return (
-    <Empty className="border-base-300 min-h-72 border border-dashed" data-test="github-search-empty">
+    <Empty
+      className="border-base-300 min-h-72 border border-dashed"
+      data-test="github-search-empty"
+    >
       <EmptyHeader>
         <EmptyTitle>No matches</EmptyTitle>
         <EmptyDescription>GitHub didn’t return {kind} for this query.</EmptyDescription>

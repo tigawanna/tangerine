@@ -8,13 +8,13 @@ GitHub OAuth only — no email/password. App-specific wiring (plugins, DB adapte
 
 ## Exports
 
-| Import | Use for |
-| --- | --- |
-| `@repo/auth` | `authEnvSchema`, `createAuth`, `createAuthFromEnv`, roles, `getGithubAccessToken`, `ELECTRON_PROTOCOL_SCHEME` |
-| `@repo/auth/client` | Vanilla `createAuthClient` (CLI, non-React) |
-| `@repo/auth/react` | React `createAuthClient` (optional `plugins`) |
-| `@repo/auth/tanstack-start` | `tanstackStartCookies` (same better-auth instance as the factory) |
-| `@repo/auth/cli-credentials` | On-disk CLI tokens |
+| Import                       | Use for                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `@repo/auth`                 | `authEnvSchema`, `createAuth`, `createAuthFromEnv`, roles, `getGithubAccessToken`, `ELECTRON_PROTOCOL_SCHEME` |
+| `@repo/auth/client`          | Vanilla `createAuthClient` (CLI, non-React)                                                                   |
+| `@repo/auth/react`           | React `createAuthClient` (optional `plugins`)                                                                 |
+| `@repo/auth/tanstack-start`  | `tanstackStartCookies` (same better-auth instance as the factory)                                             |
+| `@repo/auth/cli-credentials` | On-disk CLI tokens                                                                                            |
 
 ## App patterns
 

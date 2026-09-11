@@ -97,10 +97,10 @@ export function ProjectCard({ repo, className }: ProjectCardProps) {
               .filter((topic): topic is NonNullable<typeof topic> => topic != null)
               .slice(0, 4)
               .map((topic) => (
-              <li key={topic.topic.name} className="landing-card-tag">
-                {topic.topic.name}
-              </li>
-            ))}
+                <li key={topic.topic.name} className="landing-card-tag">
+                  {topic.topic.name}
+                </li>
+              ))}
           </ul>
         ) : null}
 

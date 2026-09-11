@@ -7,28 +7,31 @@ Shared monorepo rules: root [`AGENTS.md`](../../AGENTS.md).
 List / search / pagination: repo root [`docs/backstage-list-pattern.md`](../../docs/backstage-list-pattern.md).
 
 <!-- intent-skills:start -->
+
 ## Skill Loading
 
 Before editing files for a substantial task:
+
 - Run `pnpm dlx @tanstack/intent@latest list` from the workspace root to see available local skills.
 - If a listed skill matches the task, run `pnpm dlx @tanstack/intent@latest load <package>#<skill>` before changing files.
 - Use the loaded `SKILL.md` guidance while making the change.
 - Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
 - Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
+
 <!-- intent-skills:end -->
 
 # Deno Desktop
 
 Requires **Deno ≥ 2.9**. Config: [`deno.json`](./deno.json). Preload: [`deno/window.ts`](./deno/window.ts) + [`deno/auth/`](./deno/auth/) (barrel [`deno/auth.ts`](./deno/auth.ts)). Packaging / icons / `dist-desktop` glance: [`README.md`](./README.md).
 
-| Command | What it does |
-| --- | --- |
-| `pnpm dev` (repo root) | Turbo: `api` + this app’s native `deno desktop --hmr` |
-| `pnpm dev` (this package) | Native window + Vite HMR on **:3070** |
-| `pnpm dev:vite` | Browser-only Vite on **:3070** (no native shell) |
-| `pnpm desktop:build` | `vp build` then package into `dist-desktop/` |
-| `pnpm desktop:run` | Run against existing `.output/` |
-| `pnpm db:setup` | Push Drizzle schema + create vector ANN index |
+| Command                   | What it does                                          |
+| ------------------------- | ----------------------------------------------------- |
+| `pnpm dev` (repo root)    | Turbo: `api` + this app’s native `deno desktop --hmr` |
+| `pnpm dev` (this package) | Native window + Vite HMR on **:3070**                 |
+| `pnpm dev:vite`           | Browser-only Vite on **:3070** (no native shell)      |
+| `pnpm desktop:build`      | `vp build` then package into `dist-desktop/`          |
+| `pnpm desktop:run`        | Run against existing `.output/`                       |
+| `pnpm db:setup`           | Push Drizzle schema + create vector ANN index         |
 
 Do **not** point Deno’s `task.dev` at `deno desktop` — HMR invokes `deno task dev` → `pnpm run dev:vite` and must not recurse.
 
@@ -36,11 +39,11 @@ Do **not** point Deno’s `task.dev` at `deno desktop` — HMR invokes `deno tas
 
 Embedded **libSQL** via `@libsql/client` + Drizzle (`dialect: "turso"`) — not better-sqlite3. Needed for `F32_BLOB` vector columns / `libsql_vector_idx`.
 
-| Piece | Path |
-| --- | --- |
-| Client | [`src/db/client.ts`](./src/db/client.ts) |
-| Schema | [`src/db/schema/`](./src/db/schema/) (`project_repo_artifacts`, `project_enrichment_outputs`, `project_embeddings`) |
-| Default file | `DATABASE_URL` or `~/.config/tangerine-desktop/tangerine.db` |
+| Piece        | Path                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Client       | [`src/db/client.ts`](./src/db/client.ts)                                                                            |
+| Schema       | [`src/db/schema/`](./src/db/schema/) (`project_repo_artifacts`, `project_enrichment_outputs`, `project_embeddings`) |
+| Default file | `DATABASE_URL` or `~/.config/tangerine-desktop/tangerine.db`                                                        |
 
 `pnpm db:push` then `pnpm db:ensure-vector` (or `pnpm db:setup`). Auth session cookies stay in JSON under `~/.config/tangerine-desktop/`; API auth tables remain on `apps/api`.
 
@@ -70,11 +73,11 @@ Mirrors [Better Auth Electron](https://better-auth.com/docs/integrations/electro
 
 All local drains share monorepo [`.evlog/logs/`](../../.evlog/logs/):
 
-| `service` | Source |
-| --- | --- |
-| `tangerine-desktop` | TanStack Start / Nitro inside the desktop app |
-| `tangerine-desktop-runtime` | Deno preload OAuth (`deno/auth/`) |
-| `tangerine-api` / `tangerine-web` | sibling apps (same folder) |
+| `service`                         | Source                                        |
+| --------------------------------- | --------------------------------------------- |
+| `tangerine-desktop`               | TanStack Start / Nitro inside the desktop app |
+| `tangerine-desktop-runtime`       | Deno preload OAuth (`deno/auth/`)             |
+| `tangerine-api` / `tangerine-web` | sibling apps (same folder)                    |
 
 Filter by `service` / `action` (`desktop.auth.*`) when tracing OAuth. **Read:** latest monorepo `.evlog/logs/YYYY-MM-DD.jsonl` (NDJSON, one event per line); e.g. `rg 'tangerine-desktop|desktop.auth' .evlog/logs/`.
 

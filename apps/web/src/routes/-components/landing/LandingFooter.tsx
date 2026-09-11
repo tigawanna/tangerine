@@ -20,7 +20,10 @@ export function LandingFooter() {
         <div className="border-landing-border flex flex-col gap-6 border-t pt-8 md:flex-row md:items-start md:justify-between">
           <p className="text-landing-fg-muted max-w-sm text-sm leading-6">{AppConfig.brief}</p>
 
-          <nav aria-label="Footer" className="text-landing-fg-muted flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <nav
+            aria-label="Footer"
+            className="text-landing-fg-muted flex flex-wrap gap-x-6 gap-y-2 text-sm"
+          >
             <Link to="/viewer" className="hover:text-landing-fg">
               Dashboard
             </Link>

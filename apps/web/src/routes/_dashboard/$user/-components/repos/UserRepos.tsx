@@ -6,14 +6,17 @@ import { graphql, usePaginationFragment } from "react-relay";
 import type { UserRepos_repositories$key } from "./__generated__/UserRepos_repositories.graphql";
 import type { SelectableRepo } from "./use-repo-selector";
 
-export type RepoListEdge = {
-  node?: {
-    id: string;
-    name: string;
-    nameWithOwner: string;
-    viewerPermission?: string | null;
-  } | null;
-} | null | undefined;
+export type RepoListEdge =
+  | {
+      node?: {
+        id: string;
+        name: string;
+        nameWithOwner: string;
+        viewerPermission?: string | null;
+      } | null;
+    }
+  | null
+  | undefined;
 
 interface UserReposProps {
   userReposKey: UserRepos_repositories$key;

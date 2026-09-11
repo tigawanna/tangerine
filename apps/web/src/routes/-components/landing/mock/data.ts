@@ -46,8 +46,7 @@ export const landingMockUser = {
   location: "Austin, TX",
   joinedLabel: "Joined 4 years ago",
   websiteLabel: "johndoe.dev",
-  avatarUrl:
-    "https://api.dicebear.com/9.x/notionists/svg?seed=JohnDoe&backgroundColor=f7b538",
+  avatarUrl: "https://api.dicebear.com/9.x/notionists/svg?seed=JohnDoe&backgroundColor=f7b538",
   languages: [
     { id: "ts", name: "TypeScript", color: "#3178c6" },
     { id: "rs", name: "Rust", color: "#dea584" },
@@ -192,7 +191,8 @@ export const landingMockPeople = [
     name: "Jonah Brooks",
     login: "jbrooks",
     bio: "Shipping local-first side projects.",
-    avatarUrl: "https://api.dicebear.com/9.x/notionists/svg?seed=JonahBrooks&backgroundColor=d1f4d1",
+    avatarUrl:
+      "https://api.dicebear.com/9.x/notionists/svg?seed=JonahBrooks&backgroundColor=d1f4d1",
     action: "Unfollow",
   },
 ] as const satisfies readonly LandingMockPerson[];

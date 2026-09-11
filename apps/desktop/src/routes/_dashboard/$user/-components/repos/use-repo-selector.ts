@@ -6,14 +6,17 @@ export type SelectableRepo = {
   nameWithOwner: string;
 };
 
-type AdminRepoEdge = {
-  node?: {
-    id: string;
-    name: string;
-    nameWithOwner: string;
-    viewerPermission?: string | null;
-  } | null;
-} | null | undefined;
+type AdminRepoEdge =
+  | {
+      node?: {
+        id: string;
+        name: string;
+        nameWithOwner: string;
+        viewerPermission?: string | null;
+      } | null;
+    }
+  | null
+  | undefined;
 
 /**
  * Multi-select state for bulk repository deletion.

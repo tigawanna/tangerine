@@ -81,11 +81,7 @@
       "indexes": {
         "project_embeddings_owner_name_chunk_uidx": {
           "name": "project_embeddings_owner_name_chunk_uidx",
-          "columns": [
-            "owner",
-            "name",
-            "chunk_key"
-          ],
+          "columns": ["owner", "name", "chunk_key"],
           "isUnique": true
         }
       },
@@ -143,10 +139,7 @@
       "indexes": {
         "project_enrichment_outputs_owner_name_uidx": {
           "name": "project_enrichment_outputs_owner_name_uidx",
-          "columns": [
-            "owner",
-            "name"
-          ],
+          "columns": ["owner", "name"],
           "isUnique": true
         }
       },
@@ -212,10 +205,7 @@
       "indexes": {
         "project_repo_artifacts_owner_name_uidx": {
           "name": "project_repo_artifacts_owner_name_uidx",
-          "columns": [
-            "owner",
-            "name"
-          ],
+          "columns": ["owner", "name"],
           "isUnique": true
         }
       },

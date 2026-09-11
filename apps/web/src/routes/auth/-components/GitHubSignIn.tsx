@@ -67,9 +67,7 @@ export function GitHubSignIn({
 }: GitHubSignInProps) {
   const [selected, setSelected] = useState<Set<GithubOptionalScopeId>>(() => {
     // Default all optional scopes on; caller can still pass extras to force-on.
-    const next = new Set<GithubOptionalScopeId>(
-      GITHUB_OPTIONAL_SCOPES.map((scope) => scope.id),
-    );
+    const next = new Set<GithubOptionalScopeId>(GITHUB_OPTIONAL_SCOPES.map((scope) => scope.id));
     for (const id of initialOptionalScopes) next.add(id);
     return next;
   });
@@ -215,8 +213,8 @@ export function GitHubSignIn({
         callbackURL: loopback
           ? // Stay on /auth after OAuth so the handoff effect can run.
             typeof window !== "undefined"
-              ? `${window.location.origin}/auth${window.location.search}`
-              : toAppCallbackURL(callbackURL)
+            ? `${window.location.origin}/auth${window.location.search}`
+            : toAppCallbackURL(callbackURL)
           : toAppCallbackURL(callbackURL),
         scopes: buildGithubOAuthScopes([...selected]),
         fetchOptions: electronQuery ? { query: electronQuery } : undefined,
@@ -267,13 +265,18 @@ export function GitHubSignIn({
                   className="mt-0.5"
                 />
                 <div className="min-w-0 flex-1">
-                  <Label htmlFor={id} className="text-landing-fg cursor-pointer text-sm font-medium">
+                  <Label
+                    htmlFor={id}
+                    className="text-landing-fg cursor-pointer text-sm font-medium"
+                  >
                     {scope.label}
                     <span className="text-landing-fg-muted ml-1.5 font-mono text-xs font-normal">
                       {scope.id}
                     </span>
                   </Label>
-                  <p className="text-landing-fg-muted mt-0.5 text-xs leading-5">{scope.description}</p>
+                  <p className="text-landing-fg-muted mt-0.5 text-xs leading-5">
+                    {scope.description}
+                  </p>
                 </div>
               </li>
             );
@@ -304,7 +307,9 @@ export function GitHubSignIn({
             If the app did not return automatically, copy this token and paste it into Tangerine
             Desktop.
           </p>
-          <code className="text-landing-fg block break-all font-mono text-xs select-all">{shownCode}</code>
+          <code className="text-landing-fg block break-all font-mono text-xs select-all">
+            {shownCode}
+          </code>
         </div>
       ) : null}
     </div>

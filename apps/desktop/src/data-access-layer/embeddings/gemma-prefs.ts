@@ -30,8 +30,7 @@ export function readGemmaPrefs(): DesktopGemmaPrefs {
       dtype?: string;
       bootstrapDismissed?: boolean;
     };
-    const dtype =
-      parsed.dtype && isGemmaDtypeId(parsed.dtype) ? parsed.dtype : DEFAULT_GEMMA_DTYPE;
+    const dtype = parsed.dtype && isGemmaDtypeId(parsed.dtype) ? parsed.dtype : DEFAULT_GEMMA_DTYPE;
     return {
       dtype,
       bootstrapDismissed: parsed.bootstrapDismissed === true,

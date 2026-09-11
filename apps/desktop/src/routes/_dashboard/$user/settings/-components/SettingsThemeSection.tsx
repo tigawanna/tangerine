@@ -1,8 +1,5 @@
 import { cn } from "@/lib/utils";
-import {
-  useThemeContext,
-  type Theme,
-} from "@/lib/tanstack/router/theme-provider";
+import { useThemeContext, type Theme } from "@/lib/tanstack/router/theme-provider";
 import { withThemeViewTransition } from "@/lib/tanstack/router/theme-view-transition";
 import { Monitor, Moon, Sun } from "lucide-react";
 
@@ -101,11 +98,7 @@ export function SettingsThemeSection() {
         </p>
       </header>
 
-      <div
-        className="grid gap-3 sm:grid-cols-3"
-        role="radiogroup"
-        aria-label="Color theme"
-      >
+      <div className="grid gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Color theme">
         {THEME_OPTIONS.map((option) => {
           const selected = theme === option.id;
           const Icon = option.icon;
@@ -124,9 +117,7 @@ export function SettingsThemeSection() {
                 "flex flex-col gap-3 rounded-xl border p-4 text-left transition-colors",
                 "hover:border-primary/40 hover:bg-muted/40",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                selected
-                  ? "border-primary bg-primary/5 shadow-sm"
-                  : "border-border bg-background",
+                selected ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-background",
               )}
             >
               <ThemePreview option={option.id} />

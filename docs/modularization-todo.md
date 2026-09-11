@@ -69,11 +69,11 @@ Enrich **never** calls GitHub — only reads `project_repo_artifacts.payload`.
 
 ## Pipeline — `@repo/ai`
 
-| Step                                              | Status | Notes                                                 |
-| ------------------------------------------------- | ------ | ----------------------------------------------------- |
-| AI-1 — Package scaffold                           | [x]    | `openrouter.ts`, `schema.ts`, `types.ts`              |
-| AI-2 — `enrich-prompt.ts` + `enrich-repo.ts`      | [x]    | DeepSeek V4 Flash via OpenRouter                      |
-| AI-3 — `embed-chunks.ts`                          | [x]    | Build text chunks from artifacts + enrichment payload |
+| Step                                             | Status | Notes                                                 |
+| ------------------------------------------------ | ------ | ----------------------------------------------------- |
+| AI-1 — Package scaffold                          | [x]    | `openrouter.ts`, `schema.ts`, `types.ts`              |
+| AI-2 — `enrich-prompt.ts` + `enrich-repo.ts`     | [x]    | DeepSeek V4 Flash via OpenRouter                      |
+| AI-3 — `embed-chunks.ts`                         | [x]    | Build text chunks from artifacts + enrichment payload |
 | AI-4 — Move logic out of `apps/web/enrich-ai.ts` | [x]    | Site keeps thin env + legacy extraction bridge        |
 
 ---

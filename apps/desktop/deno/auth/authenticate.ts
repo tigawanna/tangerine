@@ -62,8 +62,7 @@ export async function authenticate(input: { token: string }): Promise<DesktopAut
 
   const setCookies =
     typeof res.headers.getSetCookie === "function" ? res.headers.getSetCookie() : [];
-  const setCookie =
-    setCookies.length > 0 ? setCookies.join(", ") : res.headers.get("set-cookie");
+  const setCookie = setCookies.length > 0 ? setCookies.join(", ") : res.headers.get("set-cookie");
   // Bearer plugin exposes the signed session cookie value on success responses.
   const setAuthToken = res.headers.get("set-auth-token");
 
@@ -116,9 +115,7 @@ export async function authenticate(input: { token: string }): Promise<DesktopAut
     hasSetAuthToken: Boolean(setAuthToken),
     setCookieCount: setCookies.length,
   });
-  console.log(
-    `[tangerine-desktop] signed in as ${data.user.githubUsername ?? data.user.id}`,
-  );
+  console.log(`[tangerine-desktop] signed in as ${data.user.githubUsername ?? data.user.id}`);
   getAuthListeners().onAuthenticated?.(data.user);
   return session;
 }

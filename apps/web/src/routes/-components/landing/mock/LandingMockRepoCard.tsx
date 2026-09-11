@@ -37,7 +37,9 @@ export function LandingMockRepoCard({
       <div className={cn("flex flex-1 flex-col gap-2", compact ? "p-3" : "gap-3 p-4 pt-3")}>
         <div className="min-w-0 space-y-1">
           <div className="flex items-start gap-2">
-            <p className="min-w-0 flex-1 truncate text-sm font-semibold tracking-tight">{repo.name}</p>
+            <p className="min-w-0 flex-1 truncate text-sm font-semibold tracking-tight">
+              {repo.name}
+            </p>
             {repo.isPrivate ? (
               <Lock className="text-base-content/40 mt-0.5 size-3.5 shrink-0" aria-hidden />
             ) : null}

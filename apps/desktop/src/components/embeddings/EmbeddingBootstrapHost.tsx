@@ -2,46 +2,61 @@ import { Progress } from "@/components/ui/progress";
 import {
   cancelEmbeddingBootstrapFn,
   startEmbeddingBootstrapFn,
+  type EmbeddingBootstrapStatus,
 } from "@/data-access-layer/embeddings/embed.functions";
 import {
   embeddingBootstrapQueryOptions,
   gemmaQueryKeys,
 } from "@/data-access-layer/embeddings/gemma-query-options";
+import { useEmbeddingBootstrapSse } from "@/hooks/use-embedding-sse";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const TOAST_ID = "embedding-bootstrap";
 
+function isBootstrapLive(status: EmbeddingBootstrapStatus | undefined): boolean {
+  if (!status) return false;
+  return (
+    status.overall.phase === "running" ||
+    status.runtime.phase === "downloading" ||
+    status.model.phase === "downloading"
+  );
+}
+
 /**
  * Android Studio–style first-load prefetch: ORT runtime + Q4 model.
- * Sticky toast with progress + Cancel; quiet when everything is already ready.
+ * Progress via SSE (`/api/embeddings/bootstrap/events`); Cancel via POST.
  */
 export function EmbeddingBootstrapHost() {
   const queryClient = useQueryClient();
   const started = useRef(false);
   const wasRunning = useRef(false);
+  const [watchSse, setWatchSse] = useState(false);
 
-  const bootstrapQuery = useQuery({
-    ...embeddingBootstrapQueryOptions,
-    refetchInterval: (query) => {
-      const phase = query.state.data?.overall.phase;
-      if (phase === "running") return 400;
-      return false;
-    },
-  });
-
+  const bootstrapQuery = useQuery(embeddingBootstrapQueryOptions);
   const status = bootstrapQuery.data;
+  const live = isBootstrapLive(status);
+
+  useEmbeddingBootstrapSse(live || watchSse);
+
+  useEffect(() => {
+    if (!live && status && status.overall.phase !== "idle") {
+      setWatchSse(false);
+    }
+  }, [live, status]);
 
   useEffect(() => {
     if (!status?.shouldAutoStart || started.current) return;
     started.current = true;
+    setWatchSse(true);
     void startEmbeddingBootstrapFn()
       .then((next) => {
         queryClient.setQueryData(gemmaQueryKeys.bootstrap, next);
       })
       .catch(() => {
         started.current = false;
+        setWatchSse(false);
       });
   }, [status?.shouldAutoStart, queryClient]);
 
@@ -91,6 +106,13 @@ export function EmbeddingBootstrapHost() {
       toast.success("Embedding components ready", {
         id: TOAST_ID,
         description: "ONNX Runtime and Q4 model are on disk.",
+        duration: 8_000,
+        action: {
+          label: "OK",
+          onClick: () => {
+            toast.dismiss(TOAST_ID);
+          },
+        },
       });
       void queryClient.invalidateQueries({ queryKey: gemmaQueryKeys.settings });
       return;
@@ -101,6 +123,13 @@ export function EmbeddingBootstrapHost() {
       toast.error("Embedding download failed", {
         id: TOAST_ID,
         description: overall.label,
+        duration: Infinity,
+        action: {
+          label: "OK",
+          onClick: () => {
+            toast.dismiss(TOAST_ID);
+          },
+        },
       });
     }
   }, [status, queryClient]);

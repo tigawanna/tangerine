@@ -13,11 +13,7 @@ import {
   getRecentRepoSnapshots,
 } from "./queries/repo-list";
 import { getRepoDetail, getRepoSnapshotsByFullNames } from "./queries/repo-info";
-import {
-  getRepoLanguages,
-  getRepoPage,
-  getRepoStargazers,
-} from "./queries/repo-page";
+import { getRepoLanguages, getRepoPage, getRepoStargazers } from "./queries/repo-page";
 import { getRepoFileContent, getRepoReadme, getRepoTree } from "./queries/repo-contents";
 import {
   applyRepoMetadata,

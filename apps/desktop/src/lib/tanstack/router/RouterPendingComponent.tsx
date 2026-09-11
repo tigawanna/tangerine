@@ -19,10 +19,7 @@ export function RouterPendingComponent() {
  */
 function BrandLoadingMark() {
   return (
-    <div
-      aria-hidden
-      className="relative flex size-30 items-center justify-center"
-    >
+    <div aria-hidden className="relative flex size-30 items-center justify-center">
       <span className="bg-landing-amber/12 absolute inset-0 rounded-full" />
       <span className="border-landing-amber/30 absolute inset-2 rounded-full border" />
       <span className="border-landing-amber/15 absolute inset-0 rounded-full border border-dashed" />

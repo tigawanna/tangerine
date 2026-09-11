@@ -12,14 +12,14 @@ Auth deep dive: [`docs/auth.md`](../../docs/auth.md) · agent notes: [`AGENTS.md
 
 ## Quick commands
 
-| Command | What |
-| --- | --- |
-| `pnpm dev` (repo root) | Turbo: API + this native shell |
-| `pnpm dev` (here) | `deno desktop --hmr` → UI on **:3070** |
-| `pnpm dev:vite` | Browser-only Vite (no native window) |
-| `pnpm desktop:build` | `vp build` then package → `dist-desktop/` |
-| `pnpm desktop:run` | Run packaged / existing `.output/` |
-| `pnpm db:setup` | Push Turso/libSQL schema + vector ANN index |
+| Command                | What                                        |
+| ---------------------- | ------------------------------------------- |
+| `pnpm dev` (repo root) | Turbo: API + this native shell              |
+| `pnpm dev` (here)      | `deno desktop --hmr` → UI on **:3070**      |
+| `pnpm dev:vite`        | Browser-only Vite (no native window)        |
+| `pnpm desktop:build`   | `vp build` then package → `dist-desktop/`   |
+| `pnpm desktop:run`     | Run packaged / existing `.output/`          |
+| `pnpm db:setup`        | Push Turso/libSQL schema + vector ANN index |
 
 Copy `.env.example` → `.env`. Set `VITE_API_URL` → API, `VITE_SIGN_IN_URL` → web `/auth`. For local vectors: `DATABASE_URL=file:local.db` then `pnpm db:setup`.
 
@@ -42,12 +42,12 @@ apps/desktop/
 └── dist-desktop/          # packaged desktop app (do not commit)
 ```
 
-| Asset | Role |
-| --- | --- |
-| `public/*` | Served by Vite in dev; icons also referenced from `deno.json` |
-| `.output/` | Framework build that `deno desktop` **embeds** in the VFS and self-extracts at runtime |
-| `~/.config/tangerine-desktop/` | Runtime session + PKCE (`session.json`, `pkce.json`) — not the app binary |
-| `<deno_dir>/` | Cached CEF/webview/denort downloads (Deno-managed) |
+| Asset                          | Role                                                                                   |
+| ------------------------------ | -------------------------------------------------------------------------------------- |
+| `public/*`                     | Served by Vite in dev; icons also referenced from `deno.json`                          |
+| `.output/`                     | Framework build that `deno desktop` **embeds** in the VFS and self-extracts at runtime |
+| `~/.config/tangerine-desktop/` | Runtime session + PKCE (`session.json`, `pkce.json`) — not the app binary              |
+| `<deno_dir>/`                  | Cached CEF/webview/denort downloads (Deno-managed)                                     |
 
 **cwd note:** the compiled binary’s process cwd is the user’s cwd, not the binary folder. Framework outputs are resolved via the embedded VFS — don’t assume `Deno.cwd()` points at the install dir.
 
@@ -57,11 +57,11 @@ apps/desktop/
 
 Configured in [`deno.json`](./deno.json) → `desktop.app.icons` (paths relative to `deno.json`):
 
-| Platform | Current path | Docs prefer |
-| --- | --- | --- |
-| Linux | `./public/icon.png` | PNG (or multi-size PNG array) |
-| macOS | `./public/icon.png` | `.icns`, or PNG array with `{ path, size }` |
-| Windows | `./public/favicon.ico` | `.ico` |
+| Platform | Current path           | Docs prefer                                 |
+| -------- | ---------------------- | ------------------------------------------- |
+| Linux    | `./public/icon.png`    | PNG (or multi-size PNG array)               |
+| macOS    | `./public/icon.png`    | `.icns`, or PNG array with `{ path, size }` |
+| Windows  | `./public/favicon.ico` | `.ico`                                      |
 
 - Missing icon for a platform → Deno’s default icon.
 - Paths must exist at build time or `deno desktop` fails validation.
@@ -86,11 +86,11 @@ Packaged names: macOS `Contents/Resources/icon.icns` · Windows `AppIcon.ico` ·
 
 `desktop.output` in `deno.json`:
 
-| OS | Path | Shape |
-| --- | --- | --- |
-| Linux | `./dist-desktop/tangerine` | App dir + launcher script |
-| macOS | `./dist-desktop/Tangerine.app` | `.app` bundle |
-| Windows | `./dist-desktop/Tangerine` | Dir + `.bat` launcher + DLLs |
+| OS      | Path                           | Shape                        |
+| ------- | ------------------------------ | ---------------------------- |
+| Linux   | `./dist-desktop/tangerine`     | App dir + launcher script    |
+| macOS   | `./dist-desktop/Tangerine.app` | `.app` bundle                |
+| Windows | `./dist-desktop/Tangerine`     | Dir + `.bat` launcher + DLLs |
 
 **Priority:** `--output` CLI > `desktop.output` > project name default.
 
@@ -98,11 +98,11 @@ Our `pnpm desktop:build` currently passes `-o ./dist-desktop/tangerine` (overrid
 
 Extension picks the **format** (Deno docs):
 
-| Want | Set output to |
-| --- | --- |
-| macOS DMG | `…/Tangerine.dmg` (needs macOS host / `hdiutil`) |
-| Windows MSI | `…/Tangerine.msi` |
-| Linux AppImage / deb / rpm | `….AppImage` / `.deb` / `.rpm` |
+| Want                       | Set output to                                    |
+| -------------------------- | ------------------------------------------------ |
+| macOS DMG                  | `…/Tangerine.dmg` (needs macOS host / `hdiutil`) |
+| Windows MSI                | `…/Tangerine.msi`                                |
+| Linux AppImage / deb / rpm | `….AppImage` / `.deb` / `.rpm`                   |
 
 Optional: `deno desktop --compress` (or `xz` / `zstd`) for a smaller self-extracting payload.
 
@@ -112,12 +112,12 @@ Cross-compile: `--target <triple>` or `--all-targets`. Backend/runtime archives 
 
 ## Backend (webview vs CEF)
 
-| | `webview` (default) | `cef` |
-| --- | --- | --- |
-| Engine | OS webview (WebKit / WebView2 / WebKitGTK) | Bundled Chromium |
-| Size | Smaller (~40–70 MB class) | Larger (~150 MB+ framework) |
-| Rendering | Varies by OS | Identical everywhere |
-| DevTools | Not via Deno mux yet | Supported |
+|           | `webview` (default)                        | `cef`                       |
+| --------- | ------------------------------------------ | --------------------------- |
+| Engine    | OS webview (WebKit / WebView2 / WebKitGTK) | Bundled Chromium            |
+| Size      | Smaller (~40–70 MB class)                  | Larger (~150 MB+ framework) |
+| Rendering | Varies by OS                               | Identical everywhere        |
+| DevTools  | Not via Deno mux yet                       | Supported                   |
 
 Set in `deno.json` → `desktop.backend`, or override with `--backend=cef|webview`.
 

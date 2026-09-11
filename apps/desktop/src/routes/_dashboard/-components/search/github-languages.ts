@@ -420,7 +420,7 @@ export const githubLanguages = [
   "Zephir",
   "Zig",
   "ZIL",
-  "Zimpl"
+  "Zimpl",
 ] as const;
 
-export type GithubLanguage = typeof githubLanguages[number];
+export type GithubLanguage = (typeof githubLanguages)[number];

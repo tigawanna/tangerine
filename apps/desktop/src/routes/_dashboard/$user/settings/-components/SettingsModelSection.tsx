@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
+  cancelEmbeddingBootstrapFn,
+  cancelGemmaLoadFn,
+  downloadGemmaModel,
   openGemmaPath,
   resumeEmbeddingBootstrapFn,
-  cancelEmbeddingBootstrapFn,
   selectGemmaModel,
   type GemmaModelSettingsResult,
 } from "@/data-access-layer/embeddings/embed.functions";
@@ -18,89 +18,111 @@ import {
 import { cn } from "@/lib/utils";
 import { unwrapUnknownError } from "@/utils/errors";
 import { formatBytes } from "@/utils/format-bytes";
-import { sortVariants, variantFolder, type VariantSort } from "@/utils/gemma-model-variants";
+import { sortVariantsBySize, variantFolder } from "@/utils/gemma-model-variants";
+import { useEmbeddingBootstrapSse, useGemmaLoadSse } from "@/hooks/use-embedding-sse";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Cpu, FolderOpen, RefreshCw } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
-/** Single-line truncated path; full path on hover. */
+/** Single-line truncated path (open in file explorer for the full path). */
 function PathLine({
   path,
-  detail,
   className,
   "data-test": dataTest,
 }: {
   path: string;
-  /** Optional multi-line tooltip body (defaults to `path`). */
-  detail?: string[];
   className?: string;
   "data-test"?: string;
 }) {
-  const tipLines = detail && detail.length > 0 ? detail : [path];
-
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <code
-          data-test={dataTest}
-          className={cn(
-            "block w-full min-w-0 cursor-default overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[11px] leading-none text-muted-foreground",
-            className,
-          )}
-        >
-          {path}
-        </code>
-      </TooltipTrigger>
-      <TooltipContent
-        side="top"
-        className="max-w-[min(90vw,36rem)] space-y-1 break-all text-left font-mono text-[11px]"
-      >
-        {tipLines.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
-      </TooltipContent>
-    </Tooltip>
+    <code
+      data-test={dataTest}
+      className={cn(
+        "block w-full min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[11px] leading-none text-muted-foreground",
+        className,
+      )}
+    >
+      {path}
+    </code>
   );
 }
 
-function ModelSectionHeader({
-  sort,
-  onSortChange,
-  sortDisabled,
+/** Tiny ring + percent for in-list download progress. */
+function CircularPercent({
+  value,
+  "data-test": dataTest,
 }: {
-  sort: VariantSort;
-  onSortChange: (value: VariantSort) => void;
-  sortDisabled?: boolean;
+  value: number;
+  "data-test"?: string;
 }) {
+  const pct = Math.max(0, Math.min(100, Math.round(value)));
+  const radius = 14;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (pct / 100) * circumference;
+
   return (
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold tracking-tight">Embedding model</h2>
-        <p className="text-sm text-muted-foreground">
-          Local EmbeddingGemma ONNX weights. Switching starts a download only when that variant is
-          not already on disk.
-        </p>
-      </div>
-      <ToggleGroup
-        type="single"
-        variant="outline"
-        size="sm"
-        value={sort}
-        disabled={sortDisabled}
-        onValueChange={(value) => {
-          if (value === "size" || value === "exists") onSortChange(value);
-        }}
-        data-test="settings-model-sort"
-        className="shrink-0"
-      >
-        <ToggleGroupItem value="exists" data-test="settings-model-sort-exists">
-          On disk
-        </ToggleGroupItem>
-        <ToggleGroupItem value="size" data-test="settings-model-sort-size">
-          Size
-        </ToggleGroupItem>
-      </ToggleGroup>
+    <div
+      className="relative size-9 shrink-0"
+      role="progressbar"
+      aria-valuenow={pct}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`Download ${pct}%`}
+      data-test={dataTest}
+    >
+      <svg className="size-9 -rotate-90" viewBox="0 0 36 36" aria-hidden>
+        <circle cx="18" cy="18" r={radius} fill="none" className="stroke-muted" strokeWidth="3" />
+        <circle
+          cx="18"
+          cy="18"
+          r={radius}
+          fill="none"
+          className="stroke-primary transition-[stroke-dashoffset] duration-300"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-[9px] font-semibold tabular-nums leading-none text-foreground">
+        {pct}%
+      </span>
+    </div>
+  );
+}
+
+function downloadSizeLabel(load: {
+  loadedBytes?: number;
+  totalBytes?: number;
+  progress: number;
+  progressSettled?: boolean;
+  approxFallback?: number;
+}): string | null {
+  const total = load.totalBytes ?? load.approxFallback;
+  if (total == null || total <= 0) return null;
+  if (load.progressSettled !== true) {
+    return `0 B / ${formatBytes(total)}`;
+  }
+  const loaded = load.loadedBytes ?? Math.round((Math.min(100, load.progress) / 100) * total);
+  return `${formatBytes(loaded)} / ${formatBytes(total)}`;
+}
+
+/** Hold at 0 until the server marks the first credible HF progress sample. */
+function displayProgress(load: { progress: number; progressSettled?: boolean }): number {
+  return load.progressSettled === true ? load.progress : 0;
+}
+
+function ModelSectionHeader() {
+  return (
+    <header className="flex flex-col gap-1">
+      <h2 className="text-lg font-semibold tracking-tight">Embedding model</h2>
+      <p className="text-sm text-muted-foreground">
+        Download stores EmbeddingGemma ONNX weights on disk. Load and switch activates a variant.
+      </p>
+      <p className="text-xs text-muted-foreground">
+        Listed smallest → largest (lowest → highest quality).
+      </p>
     </header>
   );
 }
@@ -177,34 +199,34 @@ function ModelSettingsError({ message, onRetry }: { message: string; onRetry: ()
 }
 
 /**
- * EmbeddingGemma model picker: shows cache paths, download progress, and dtype switch.
+ * EmbeddingGemma model picker: download weights, then load and switch separately.
  */
 export function SettingsModelSection() {
   const queryClient = useQueryClient();
-  const [sort, setSort] = useState<VariantSort>("exists");
 
-  const settingsQuery = useQuery({
-    ...gemmaModelSettingsQueryOptions,
-    refetchInterval: (query) => {
-      const bootstrap = query.state.data?.bootstrap;
-      if (
-        bootstrap?.overall.phase === "running" ||
-        bootstrap?.runtime.phase === "downloading" ||
-        bootstrap?.model.phase === "downloading"
-      ) {
-        return 400;
-      }
-      return false;
-    },
-  });
+  const settingsQuery = useQuery(gemmaModelSettingsQueryOptions);
 
   const selectMutation = useMutation({
     mutationFn: (dtype: GemmaModelSettingsResult["activeDtype"]) =>
       selectGemmaModel({ data: { dtype } }),
     onSuccess: (status, dtype) => {
       queryClient.setQueryData(gemmaQueryKeys.load, status);
-      queryClient.setQueryData(gemmaQueryKeys.settings, (prev: GemmaModelSettingsResult | undefined) =>
-        prev ? { ...prev, activeDtype: dtype, load: status } : prev,
+      queryClient.setQueryData(
+        gemmaQueryKeys.settings,
+        (prev: GemmaModelSettingsResult | undefined) =>
+          prev ? { ...prev, activeDtype: dtype, load: status } : prev,
+      );
+    },
+  });
+
+  const downloadMutation = useMutation({
+    mutationFn: (dtype: GemmaModelSettingsResult["activeDtype"]) =>
+      downloadGemmaModel({ data: { dtype } }),
+    onSuccess: (status) => {
+      queryClient.setQueryData(gemmaQueryKeys.load, status);
+      queryClient.setQueryData(
+        gemmaQueryKeys.settings,
+        (prev: GemmaModelSettingsResult | undefined) => (prev ? { ...prev, load: status } : prev),
       );
     },
   });
@@ -214,11 +236,15 @@ export function SettingsModelSection() {
       action === "cancel" ? cancelEmbeddingBootstrapFn() : resumeEmbeddingBootstrapFn(),
     onSuccess: (bootstrap) => {
       queryClient.setQueryData(gemmaQueryKeys.bootstrap, bootstrap);
-      queryClient.setQueryData(gemmaQueryKeys.settings, (prev: GemmaModelSettingsResult | undefined) =>
-        prev ? { ...prev, bootstrap } : prev,
+      queryClient.setQueryData(
+        gemmaQueryKeys.settings,
+        (prev: GemmaModelSettingsResult | undefined) => (prev ? { ...prev, bootstrap } : prev),
       );
       if (bootstrap.overall.phase === "cancelled") {
         toast.message("Embedding download cancelled");
+      }
+      if (bootstrap.overall.phase === "ready" || bootstrap.overall.phase === "error") {
+        void queryClient.invalidateQueries({ queryKey: gemmaQueryKeys.settings });
       }
     },
   });
@@ -228,9 +254,18 @@ export function SettingsModelSection() {
     enabled: settingsQuery.isSuccess,
     initialData: settingsQuery.data?.load,
     initialDataUpdatedAt: settingsQuery.dataUpdatedAt,
-    refetchInterval: (query) => {
-      if (selectMutation.isPending || query.state.data?.phase === "loading") return 250;
-      return false;
+  });
+
+  const cancelLoadMutation = useMutation({
+    mutationFn: () => cancelGemmaLoadFn(),
+    onSuccess: (status) => {
+      queryClient.setQueryData(gemmaQueryKeys.load, status);
+      queryClient.setQueryData(
+        gemmaQueryKeys.settings,
+        (prev: GemmaModelSettingsResult | undefined) => (prev ? { ...prev, load: status } : prev),
+      );
+      void queryClient.invalidateQueries({ queryKey: gemmaQueryKeys.settings });
+      toast.message("Model download cancelled");
     },
   });
 
@@ -239,33 +274,49 @@ export function SettingsModelSection() {
   });
 
   const load = loadQuery.data ?? settingsQuery.data?.load ?? null;
+  const bootstrap = settingsQuery.data?.bootstrap;
+  const bootstrapLive =
+    bootstrap?.overall.phase === "running" ||
+    bootstrap?.runtime.phase === "downloading" ||
+    bootstrap?.model.phase === "downloading";
+  const loadLive =
+    selectMutation.isPending || downloadMutation.isPending || load?.phase === "loading";
+  const busy = selectMutation.isPending || downloadMutation.isPending || load?.phase === "loading";
+  const cancellingDownload = bootstrapMutation.isPending || cancelLoadMutation.isPending;
+
+  function handleCancelDownload() {
+    if (bootstrapLive) {
+      bootstrapMutation.mutate("cancel");
+      return;
+    }
+    cancelLoadMutation.mutate();
+  }
+
+  useEmbeddingBootstrapSse(Boolean(bootstrapLive));
+  useGemmaLoadSse(Boolean(loadLive));
+
   const prevLoadPhase = useRef(load?.phase);
 
   useEffect(() => {
     const phase = load?.phase;
     const prev = prevLoadPhase.current;
     prevLoadPhase.current = phase;
-    if (prev === "loading" && (phase === "ready" || phase === "error")) {
+    if (prev === "loading" && (phase === "ready" || phase === "error" || phase === "idle")) {
       void queryClient.invalidateQueries({ queryKey: gemmaQueryKeys.settings });
     }
   }, [load?.phase, queryClient]);
 
   const settings = settingsQuery.data;
-  const switching = selectMutation.isPending || load?.phase === "loading";
   const openingPath = openMutation.isPending ? (openMutation.variables ?? null) : null;
   const loadError =
     settingsQuery.error != null ? unwrapUnknownError(settingsQuery.error).message : null;
-  const actionError = selectMutation.error ?? openMutation.error;
+  const actionError = selectMutation.error ?? downloadMutation.error ?? openMutation.error;
   const inlineError = actionError != null ? unwrapUnknownError(actionError).message : null;
 
   if (!settings) {
     return (
       <section className="flex flex-col gap-4" data-test="settings-model-section">
-        <ModelSectionHeader
-          sort={sort}
-          onSortChange={setSort}
-          sortDisabled
-        />
+        <ModelSectionHeader />
         {loadError ? (
           <ModelSettingsError
             message={loadError}
@@ -281,11 +332,13 @@ export function SettingsModelSection() {
   }
 
   const downloading = load?.phase === "loading";
-  const variants = sortVariants(settings.cache.variants, sort);
+  const variants = sortVariantsBySize(settings.cache.variants);
+  const loadSizeLabel = downloading && load ? downloadSizeLabel(load) : null;
+  const loadPct = load ? displayProgress(load) : 0;
 
   return (
     <section className="flex flex-col gap-4" data-test="settings-model-section">
-      <ModelSectionHeader sort={sort} onSortChange={setSort} />
+      <ModelSectionHeader />
 
       <dl className="grid gap-2 text-sm sm:grid-cols-[8rem_minmax(0,1fr)]">
         <dt className="text-muted-foreground">Cache</dt>
@@ -327,10 +380,26 @@ export function SettingsModelSection() {
           <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
             <span className="min-w-0 truncate">
               {load.file ? `Fetching ${load.file}` : `Downloading ${load.dtype.toUpperCase()}…`}
+              {loadSizeLabel ? (
+                <span className="ml-2 tabular-nums text-foreground/80">{loadSizeLabel}</span>
+              ) : null}
             </span>
-            <span className="tabular-nums">{Math.round(load.progress)}%</span>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className="tabular-nums">{Math.round(loadPct)}%</span>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-7"
+                disabled={cancellingDownload}
+                data-test="settings-model-cancel-download"
+                onClick={handleCancelDownload}
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
-          <Progress value={load.progress} />
+          <Progress value={loadPct} />
         </div>
       ) : null}
 
@@ -460,6 +529,12 @@ export function SettingsModelSection() {
           const selected = settings.activeDtype === variant.id;
           const isDownloadingThis = downloading && load?.dtype === variant.id;
           const folder = variantFolder(variant);
+          const loadedHere = selected && load?.phase === "ready";
+          const variantSizeLabel =
+            isDownloadingThis && load
+              ? downloadSizeLabel({ ...load, approxFallback: variant.approxBytes })
+              : null;
+          const variantPct = isDownloadingThis && load ? displayProgress(load) : 0;
 
           return (
             <li
@@ -477,13 +552,17 @@ export function SettingsModelSection() {
                     <span className="text-xs text-muted-foreground">
                       ~{formatBytes(variant.approxBytes)}
                     </span>
-                    {variant.ready ? (
+                    {isDownloadingThis && load ? (
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
+                        {variantSizeLabel ?? `Downloading ${Math.round(variantPct)}%`}
+                      </span>
+                    ) : variant.ready ? (
                       <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs text-primary">
                         On disk
                       </span>
                     ) : variant.onDiskBytes > 0 ? (
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                        Partial {formatBytes(variant.onDiskBytes)}
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
+                        {formatBytes(variant.onDiskBytes)} / ~{formatBytes(variant.approxBytes)}
                       </span>
                     ) : (
                       <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
@@ -491,12 +570,20 @@ export function SettingsModelSection() {
                       </span>
                     )}
                     {selected ? (
-                      <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">Selected</span>
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
+                        Selected
+                      </span>
                     ) : null}
                   </div>
                   <p className="text-sm text-muted-foreground">{variant.description}</p>
                 </div>
-                <div className="flex shrink-0 flex-wrap gap-2">
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                  {isDownloadingThis && load ? (
+                    <CircularPercent
+                      value={variantPct}
+                      data-test={`settings-model-progress-${variant.id}`}
+                    />
+                  ) : null}
                   <Button
                     type="button"
                     size="sm"
@@ -510,35 +597,54 @@ export function SettingsModelSection() {
                     <FolderOpen className="size-3.5" />
                     Open
                   </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant={selected ? "secondary" : "outline"}
-                    disabled={switching || (selected && load?.phase === "ready")}
-                    data-test={`settings-model-select-${variant.id}`}
-                    onClick={() => {
-                      selectMutation.mutate(variant.id);
-                    }}
-                  >
-                    {isDownloadingThis
-                      ? "Downloading…"
-                      : selected && load?.phase === "ready"
-                        ? "Selected"
-                        : selected
-                          ? variant.ready
-                            ? "Load"
-                            : "Resume"
-                          : variant.ready
-                            ? "Switch"
-                            : "Download & use"}
-                  </Button>
+                  {isDownloadingThis ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={cancellingDownload}
+                      data-test={`settings-model-cancel-${variant.id}`}
+                      onClick={handleCancelDownload}
+                    >
+                      Cancel
+                    </Button>
+                  ) : (
+                    <>
+                      {!variant.ready ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled={busy}
+                          data-test={`settings-model-download-${variant.id}`}
+                          onClick={() => {
+                            downloadMutation.mutate(variant.id);
+                          }}
+                        >
+                          {variant.onDiskBytes > 0 ? "Resume" : "Download"}
+                        </Button>
+                      ) : null}
+                      {variant.ready ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={selected ? "secondary" : "outline"}
+                          disabled={busy || loadedHere}
+                          data-test={`settings-model-select-${variant.id}`}
+                          onClick={() => {
+                            selectMutation.mutate(variant.id);
+                          }}
+                        >
+                          {loadedHere ? "Selected" : "Load and switch"}
+                        </Button>
+                      ) : null}
+                    </>
+                  )}
                 </div>
               </div>
 
               <div className="min-w-0 overflow-hidden">
-                {folder ? (
-                  <PathLine path={folder} detail={variant.paths} />
-                ) : null}
+                {folder ? <PathLine path={folder} /> : null}
                 {variant.missing.length > 0 ? (
                   <p className="mt-1 truncate text-xs text-muted-foreground">
                     Missing: {variant.missing.join(", ")}

@@ -1,10 +1,5 @@
 import { authClient, type BetterAuthSession } from "@/lib/auth-client";
-import {
-  getUserAppRole,
-  hasAppRole,
-  isAdminRole,
-  type AppRole,
-} from "@repo/auth";
+import { getUserAppRole, hasAppRole, isAdminRole, type AppRole } from "@repo/auth";
 import { queryOptions, useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { redirect, useRouter } from "@tanstack/react-router";
 

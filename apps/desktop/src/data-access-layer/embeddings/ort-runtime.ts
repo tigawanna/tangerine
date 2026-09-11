@@ -1,19 +1,12 @@
-import {
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  rmSync,
-  statSync,
-} from "node:fs";
+import { createWriteStream, existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
 import { delimiter, dirname, join } from "node:path";
 import { arch, homedir, platform } from "node:os";
 import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
 import { spawn } from "node:child_process";
 
-/** Pinned to desktop package.json dependency. */
-export const ORT_NPM_VERSION = "1.27.0";
+/** Must match `@huggingface/transformers` pin (see pnpm override). */
+export const ORT_NPM_VERSION = "1.24.3";
 
 /** Approx installed size for current OS binary set (UI copy). */
 export const ORT_APPROX_BYTES = 40_000_000;
@@ -98,8 +91,18 @@ function downloadedOrtReady(): boolean {
 }
 
 /**
+ * Prefer the package-resolved ORT. Only fall back to a downloaded install
+ * (via NODE_PATH) when the bundled package cannot be imported.
+ */
+export async function ensureOrtReady(): Promise<void> {
+  if (await canImportOrt()) return;
+  if (!downloadedOrtReady()) return;
+  ensureOrtModulePath();
+}
+
+/**
  * Prepends the downloaded ORT `node_modules` root to `NODE_PATH` when present.
- * Best-effort for Node/Nitro resolution of `onnxruntime-node`.
+ * Only use after bundled import failed — mixing versions breaks native bindings.
  */
 export function ensureOrtModulePath(): void {
   if (!downloadedOrtReady()) return;
@@ -220,9 +223,7 @@ export async function beginOrtRuntimeDownload(): Promise<OrtRuntimeSnapshot> {
     const archivePath = join(tmpDir, `onnxruntime-node-${ORT_NPM_VERSION}.tgz`);
 
     let loaded = 0;
-    const nodeStream = Readable.fromWeb(
-      response.body as import("node:stream/web").ReadableStream,
-    );
+    const nodeStream = Readable.fromWeb(response.body as import("node:stream/web").ReadableStream);
     nodeStream.on("data", (chunk: Buffer | string) => {
       loaded += typeof chunk === "string" ? Buffer.byteLength(chunk) : chunk.byteLength;
       const pct =

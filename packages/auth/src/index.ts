@@ -12,11 +12,4 @@ export {
 } from "./env";
 export { ELECTRON_PROTOCOL_SCHEME, ELECTRON_TRUSTED_ORIGIN } from "./electron";
 export { getGithubAccessToken } from "./github-token";
-export {
-  ROLE,
-  parseAppRole,
-  getUserAppRole,
-  hasAppRole,
-  isAdminRole,
-  type AppRole,
-} from "./roles";
+export { ROLE, parseAppRole, getUserAppRole, hasAppRole, isAdminRole, type AppRole } from "./roles";

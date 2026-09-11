@@ -1,13 +1,9 @@
-import {
-  gemmaPrefsFileExists,
-  readGemmaPrefs,
-  writeGemmaPrefs,
-} from "./gemma-prefs";
+import { gemmaPrefsFileExists, readGemmaPrefs, writeGemmaPrefs } from "./gemma-prefs";
 import {
   awaitOrtRuntimeDownload,
   beginOrtRuntimeDownload,
   cancelOrtRuntimeDownload,
-  ensureOrtModulePath,
+  ensureOrtReady,
   getOrtRuntimeSnapshot,
   refreshOrtRuntimeSnapshot,
   type OrtRuntimeSnapshot,
@@ -55,7 +51,8 @@ function modelPhaseFromLoad(
   cancelled: boolean,
 ): Pick<EmbeddingBootstrapStatus["model"], "phase" | "progress" | "file" | "error"> {
   if (ready) return { phase: "ready", progress: 100 };
-  if (cancelled) return { phase: "cancelled", progress: load.progress, error: "Download cancelled" };
+  if (cancelled)
+    return { phase: "cancelled", progress: load.progress, error: "Download cancelled" };
   if (load.phase === "loading") {
     return { phase: "downloading", progress: load.progress, file: load.file };
   }
@@ -95,11 +92,7 @@ function overallFrom(
   if (runtime.phase === "ready" && model.phase === "ready") {
     return { phase: "ready", label: "Embedding components ready", progress: 100 };
   }
-  if (
-    running ||
-    runtime.phase === "downloading" ||
-    model.phase === "downloading"
-  ) {
+  if (running || runtime.phase === "downloading" || model.phase === "downloading") {
     const runtimeWeight = 0.2;
     const modelWeight = 0.8;
     const runtimePct = runtime.phase === "ready" ? 100 : runtime.progress;
@@ -148,8 +141,7 @@ export async function getEmbeddingBootstrapStatus(): Promise<EmbeddingBootstrapS
   const dismissed = prefs.bootstrapDismissed === true;
   const firstRun = !gemmaPrefsFileExists();
   const needsRuntime = runtime.phase !== "ready";
-  const needsSeedModel =
-    !modelReady && (firstRun || prefs.dtype === BOOTSTRAP_MODEL_DTYPE);
+  const needsSeedModel = !modelReady && (firstRun || prefs.dtype === BOOTSTRAP_MODEL_DTYPE);
   const shouldAutoStart = !dismissed && (needsRuntime || needsSeedModel);
 
   return {
@@ -165,7 +157,7 @@ export async function getEmbeddingBootstrapStatus(): Promise<EmbeddingBootstrapS
  * Start first-run style download: ORT (if needed) then Q4 model weights.
  * Returns immediately; poll `getEmbeddingBootstrapStatus`.
  */
-export async function startEmbeddingBootstrap(): Promise<EmbeddingBootstrapStatus> {
+export function startEmbeddingBootstrap(): Promise<EmbeddingBootstrapStatus> {
   if (bootstrapRunning) return getEmbeddingBootstrapStatus();
 
   bootstrapCancelled = false;
@@ -183,7 +175,7 @@ export async function startEmbeddingBootstrap(): Promise<EmbeddingBootstrapStatu
 
   void (async () => {
     try {
-      ensureOrtModulePath();
+      await ensureOrtReady();
       await beginOrtRuntimeDownload();
       if (bootstrapCancelled) return;
       await awaitOrtRuntimeDownload();
@@ -192,9 +184,8 @@ export async function startEmbeddingBootstrap(): Promise<EmbeddingBootstrapStatu
       const runtime = getOrtRuntimeSnapshot();
       if (runtime.phase !== "ready") return;
 
-      const { inspectGemmaCache, beginServerGemmaDtypeSwitch, setActiveGemmaDtype } = await import(
-        "@repo/gemma-embedding/server"
-      );
+      const { inspectGemmaCache, beginServerGemmaDtypeSwitch, setActiveGemmaDtype } =
+        await import("@repo/gemma-embedding/server");
       const q4 = inspectGemmaCache().variants.find((v) => v.id === BOOTSTRAP_MODEL_DTYPE);
       if (q4?.ready) return;
 
@@ -236,7 +227,7 @@ export async function cancelEmbeddingBootstrap(): Promise<EmbeddingBootstrapStat
 }
 
 /** Clear dismissed flag and start again (settings “Download” / toast retry). */
-export async function resumeEmbeddingBootstrap(): Promise<EmbeddingBootstrapStatus> {
+export function resumeEmbeddingBootstrap(): Promise<EmbeddingBootstrapStatus> {
   const prefs = readGemmaPrefs();
   writeGemmaPrefs({ ...prefs, bootstrapDismissed: false });
   bootstrapCancelled = false;

@@ -52,8 +52,9 @@ function formatDiskUsage(kilobytes: number | null | undefined): string | null {
 
 function fromGithubNode(repo: GithubRepoNode): RepoCardView {
   const languages =
-    repo.languages?.nodes?.filter((lang): lang is NonNullable<typeof lang> => lang != null).slice(0, 3) ??
-    [];
+    repo.languages?.nodes
+      ?.filter((lang): lang is NonNullable<typeof lang> => lang != null)
+      .slice(0, 3) ?? [];
   const primary = repo.primaryLanguage;
   return {
     id: repo.nameWithOwner,
@@ -260,7 +261,10 @@ function RepoCardSurface({
               {view.name}
             </Link>
             {view.isPrivate ? (
-              <Lock className="text-base-content/40 mt-0.5 size-3.5 shrink-0" aria-label="Private" />
+              <Lock
+                className="text-base-content/40 mt-0.5 size-3.5 shrink-0"
+                aria-label="Private"
+              />
             ) : null}
             {view.isFork ? (
               <span className="bg-base-300 text-base-content/60 shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase">

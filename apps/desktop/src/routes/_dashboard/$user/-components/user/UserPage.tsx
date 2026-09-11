@@ -8,10 +8,7 @@ import {
 } from "../repos/RepoFilters";
 import { ReposTabPanel } from "../repos/ReposTabPanel";
 import { UserStarredRepos } from "../starred/UserStarredRepos";
-import {
-  FollowersFollowBackAll,
-  UserFollowersList,
-} from "../followers/UserFollowersList";
+import { FollowersFollowBackAll, UserFollowersList } from "../followers/UserFollowersList";
 import { UserFollowingList } from "../following/UserFollowingList";
 import { userQuery, userTabOptions, resolveUserSearch, defaultUserSearch } from "../../layout";
 import type { layoutUserPageLoaderQuery } from "../../__generated__/layoutUserPageLoaderQuery.graphql";
@@ -49,9 +46,9 @@ export function UserPage() {
   const owner = query.repositoryOwner;
   const isOrg = owner?.__typename === "Organization";
 
-  const tabs = (user
-    ? (["repos", "starred", "followers", "following"] as const)
-    : (["repos"] as const)) satisfies readonly ProfileTab[];
+  const tabs = (
+    user ? (["repos", "starred", "followers", "following"] as const) : (["repos"] as const)
+  ) satisfies readonly ProfileTab[];
 
   const activeTab: ProfileTab = (tabs as readonly string[]).includes(tab) ? tab : "repos";
 
@@ -226,9 +223,7 @@ function useOwnerQuery() {
 }
 
 function HeaderFallback() {
-  return (
-    <div className="border-base-300 bg-base-200/20 h-40 animate-pulse rounded-2xl border" />
-  );
+  return <div className="border-base-300 bg-base-200/20 h-40 animate-pulse rounded-2xl border" />;
 }
 
 function TabFallback({ label }: { label: string }) {

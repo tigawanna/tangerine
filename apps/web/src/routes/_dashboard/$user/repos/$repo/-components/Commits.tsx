@@ -54,10 +54,13 @@ type CommitNode = {
   readonly committedDate: string;
   readonly message: string;
   readonly url: string;
-  readonly author: {
-    readonly name: string | null | undefined;
-    readonly email: string | null | undefined;
-  } | null | undefined;
+  readonly author:
+    | {
+        readonly name: string | null | undefined;
+        readonly email: string | null | undefined;
+      }
+    | null
+    | undefined;
 };
 
 function CommitRow({ commit }: { commit: CommitNode }) {

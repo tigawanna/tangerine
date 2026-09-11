@@ -21,6 +21,8 @@ import { Route as DashboardUserReposIndexRouteImport } from './routes/_dashboard
 import { Route as DashboardUserSearchIndexRouteImport } from './routes/_dashboard/$user/search/index'
 import { Route as DashboardUserSettingsIndexRouteImport } from './routes/_dashboard/$user/settings/index'
 import { Route as DashboardUserStarsIndexRouteImport } from './routes/_dashboard/$user/stars/index'
+import { Route as ApiEmbeddingsBootstrapEventsRouteImport } from './routes/api/embeddings/bootstrap/events'
+import { Route as ApiEmbeddingsLoadEventsRouteImport } from './routes/api/embeddings/load/events'
 import { Route as DashboardUserReposRepoIndexRouteImport } from './routes/_dashboard/$user/repos/$repo/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -84,6 +86,17 @@ const DashboardUserStarsIndexRoute = DashboardUserStarsIndexRouteImport.update({
   path: '/stars/',
   getParentRoute: () => DashboardUserLayoutRoute,
 } as any)
+const ApiEmbeddingsBootstrapEventsRoute =
+  ApiEmbeddingsBootstrapEventsRouteImport.update({
+    id: '/api/embeddings/bootstrap/events',
+    path: '/api/embeddings/bootstrap/events',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiEmbeddingsLoadEventsRoute = ApiEmbeddingsLoadEventsRouteImport.update({
+  id: '/api/embeddings/load/events',
+  path: '/api/embeddings/load/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardUserReposRepoIndexRoute =
   DashboardUserReposRepoIndexRouteImport.update({
     id: '/repos/$repo/',
@@ -98,6 +111,8 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$user/': typeof DashboardUserIndexRoute
   '/viewer/': typeof DashboardViewerIndexRoute
+  '/api/embeddings/bootstrap/events': typeof ApiEmbeddingsBootstrapEventsRoute
+  '/api/embeddings/load/events': typeof ApiEmbeddingsLoadEventsRoute
   '/$user/embed/': typeof DashboardUserEmbedIndexRoute
   '/$user/repos/': typeof DashboardUserReposIndexRoute
   '/$user/search/': typeof DashboardUserSearchIndexRoute
@@ -111,6 +126,8 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$user': typeof DashboardUserIndexRoute
   '/viewer': typeof DashboardViewerIndexRoute
+  '/api/embeddings/bootstrap/events': typeof ApiEmbeddingsBootstrapEventsRoute
+  '/api/embeddings/load/events': typeof ApiEmbeddingsLoadEventsRoute
   '/$user/embed': typeof DashboardUserEmbedIndexRoute
   '/$user/repos': typeof DashboardUserReposIndexRoute
   '/$user/search': typeof DashboardUserSearchIndexRoute
@@ -127,6 +144,8 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_dashboard/$user/': typeof DashboardUserIndexRoute
   '/_dashboard/viewer/': typeof DashboardViewerIndexRoute
+  '/api/embeddings/bootstrap/events': typeof ApiEmbeddingsBootstrapEventsRoute
+  '/api/embeddings/load/events': typeof ApiEmbeddingsLoadEventsRoute
   '/_dashboard/$user/embed/': typeof DashboardUserEmbedIndexRoute
   '/_dashboard/$user/repos/': typeof DashboardUserReposIndexRoute
   '/_dashboard/$user/search/': typeof DashboardUserSearchIndexRoute
@@ -143,6 +162,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/$user/'
     | '/viewer/'
+    | '/api/embeddings/bootstrap/events'
+    | '/api/embeddings/load/events'
     | '/$user/embed/'
     | '/$user/repos/'
     | '/$user/search/'
@@ -156,6 +177,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/$user'
     | '/viewer'
+    | '/api/embeddings/bootstrap/events'
+    | '/api/embeddings/load/events'
     | '/$user/embed'
     | '/$user/repos'
     | '/$user/search'
@@ -171,6 +194,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/_dashboard/$user/'
     | '/_dashboard/viewer/'
+    | '/api/embeddings/bootstrap/events'
+    | '/api/embeddings/load/events'
     | '/_dashboard/$user/embed/'
     | '/_dashboard/$user/repos/'
     | '/_dashboard/$user/search/'
@@ -184,6 +209,8 @@ export interface RootRouteChildren {
   DashboardLayoutRoute: typeof DashboardLayoutRouteWithChildren
   AuthIndexRoute: typeof AuthIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiEmbeddingsBootstrapEventsRoute: typeof ApiEmbeddingsBootstrapEventsRoute
+  ApiEmbeddingsLoadEventsRoute: typeof ApiEmbeddingsLoadEventsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +299,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUserStarsIndexRouteImport
       parentRoute: typeof DashboardUserLayoutRoute
     }
+    '/api/embeddings/bootstrap/events': {
+      id: '/api/embeddings/bootstrap/events'
+      path: '/api/embeddings/bootstrap/events'
+      fullPath: '/api/embeddings/bootstrap/events'
+      preLoaderRoute: typeof ApiEmbeddingsBootstrapEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/embeddings/load/events': {
+      id: '/api/embeddings/load/events'
+      path: '/api/embeddings/load/events'
+      fullPath: '/api/embeddings/load/events'
+      preLoaderRoute: typeof ApiEmbeddingsLoadEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_dashboard/$user/repos/$repo/': {
       id: '/_dashboard/$user/repos/$repo/'
       path: '/repos/$repo'
@@ -324,6 +365,8 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardLayoutRoute: DashboardLayoutRouteWithChildren,
   AuthIndexRoute: AuthIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiEmbeddingsBootstrapEventsRoute: ApiEmbeddingsBootstrapEventsRoute,
+  ApiEmbeddingsLoadEventsRoute: ApiEmbeddingsLoadEventsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

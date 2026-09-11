@@ -21,13 +21,7 @@ const userRoute = getRouteApi("/_dashboard/$user/");
 /**
  * Shared sticky chrome for tab filters (stays outside list Suspense).
  */
-export function TabFilterBar({
-  children,
-  testId,
-}: {
-  children: ReactNode;
-  testId: string;
-}) {
+export function TabFilterBar({ children, testId }: { children: ReactNode; testId: string }) {
   return (
     <div
       className="border-base-300 bg-base-200/30 sticky top-0 z-20 flex flex-wrap items-center justify-end gap-3 rounded-xl border px-3 py-2 backdrop-blur-sm"

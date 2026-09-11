@@ -45,8 +45,8 @@ function App(): React.JSX.Element {
     >
       <h1 style={{ margin: 0, fontSize: "1.5rem" }}>Tangerine Desktop</h1>
       <p style={{ margin: 0, opacity: 0.75 }}>
-        Blank Electron shell with Better Auth. Sign in opens the system browser;
-        the session is stored in the main process.
+        Blank Electron shell with Better Auth. Sign in opens the system browser; the session is
+        stored in the main process.
       </p>
 
       {error ? (
@@ -59,13 +59,7 @@ function App(): React.JSX.Element {
         <section style={{ display: "grid", gap: "0.75rem" }} data-test="desktop-auth-user">
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             {user.image ? (
-              <img
-                src={user.image}
-                alt=""
-                width={40}
-                height={40}
-                style={{ borderRadius: "50%" }}
-              />
+              <img src={user.image} alt="" width={40} height={40} style={{ borderRadius: "50%" }} />
             ) : null}
             <div>
               <div style={{ fontWeight: 600 }}>{user.name ?? "Signed in"}</div>

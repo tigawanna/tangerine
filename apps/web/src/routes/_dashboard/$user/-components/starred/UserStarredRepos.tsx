@@ -13,10 +13,10 @@ interface UserStarredReposProps {
  * Sort / owned-by-viewer filters live on `UserPage` (outside Suspense).
  */
 export function UserStarredRepos({ starredReposKey }: UserStarredReposProps) {
-  const frag = usePaginationFragment<
-    layoutUserPageLoaderQuery,
-    UserStarredRepos_repositories$key
-  >(UserStarredReposFragment, starredReposKey);
+  const frag = usePaginationFragment<layoutUserPageLoaderQuery, UserStarredRepos_repositories$key>(
+    UserStarredReposFragment,
+    starredReposKey,
+  );
   const edges = frag.data.starredRepositories.edges ?? [];
 
   if (edges.length === 0) {
@@ -52,10 +52,7 @@ const UserStarredReposFragment = graphql`
   @argumentDefinitions(
     firstStarredRepos: { type: "Int", defaultValue: 24 }
     afterStarredRepo: { type: "String" }
-    orderByStarredRepos: {
-      type: "StarOrder"
-      defaultValue: { field: STARRED_AT, direction: DESC }
-    }
+    orderByStarredRepos: { type: "StarOrder", defaultValue: { field: STARRED_AT, direction: DESC } }
     ownedByViewer: { type: "Boolean", defaultValue: false }
   )
   @refetchable(queryName: "StarredRepositoriesPaginationQuery") {

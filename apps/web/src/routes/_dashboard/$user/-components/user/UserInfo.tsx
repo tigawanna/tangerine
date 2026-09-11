@@ -338,7 +338,9 @@ type LanguageNode = {
  */
 function collectTopLanguages(
   nodes:
-    | ReadonlyArray<{ readonly primaryLanguage: LanguageNode | null | undefined } | null | undefined>
+    | ReadonlyArray<
+        { readonly primaryLanguage: LanguageNode | null | undefined } | null | undefined
+      >
     | null
     | undefined,
 ): LanguageNode[] {

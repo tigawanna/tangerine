@@ -16,35 +16,35 @@ export type GemmaDtypeOption = {
 };
 
 /**
- * CPU-friendly EmbeddingGemma ONNX variants (largest last).
- * `q4f16` omitted — WebGPU-oriented per kessler docs.
+ * CPU-friendly EmbeddingGemma ONNX variants, ordered smallest → largest
+ * (lowest → highest quality). `q4f16` omitted — WebGPU-oriented per kessler docs.
  */
 export const GEMMA_DTYPE_OPTIONS = [
   {
     id: "q4",
     label: "Q4",
-    description: "Smallest download — good for trying the feature quickly.",
+    description: "Lowest quality / smallest download — good for trying the feature quickly.",
     approxBytes: 197_000_000,
     files: ["model_q4.onnx", "model_q4.onnx_data"],
   },
   {
     id: "q8",
     label: "Q8",
-    description: "Recommended balance of size and quality (~300MB).",
+    description: "Balanced quality and size (~300MB).",
     approxBytes: 309_000_000,
     files: ["model_quantized.onnx", "model_quantized.onnx_data"],
   },
   {
     id: "fp16",
     label: "FP16",
-    description: "Higher fidelity — larger download (~600MB).",
+    description: "Higher quality — larger download (~600MB).",
     approxBytes: 618_000_000,
     files: ["model_fp16.onnx", "model_fp16.onnx_data"],
   },
   {
     id: "fp32",
     label: "FP32",
-    description: "Full precision — ~1.2GB first download; slowest to fetch.",
+    description: "Highest quality / full precision — ~1.2GB; slowest to fetch.",
     approxBytes: 1_235_000_000,
     files: ["model.onnx", "model.onnx_data"],
   },
