@@ -9,6 +9,5 @@
     "**/routeTree.gen.ts": true
   },
   "deno.enable": true,
-  "deno.enablePaths": ["./deno"],
-  "deno.disablePaths": ["./src"]
+  "deno.config": "./deno.json"
 }

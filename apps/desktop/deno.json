@@ -1,7 +1,16 @@
 {
   "nodeModulesDir": "manual",
   "unstable": ["sloppy-imports"],
-  "exclude": ["src/", "dist/", "dist-desktop/", ".output/", "node_modules/"],
+  "exclude": ["dist/", "dist-desktop/", ".output/", "node_modules/"],
+  "imports": {
+    "@/": "./src/",
+    "@api/": "../api/src/"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true
+  },
   "lint": {
     "include": ["deno/"],
     "rules": {

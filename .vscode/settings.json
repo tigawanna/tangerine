@@ -9,5 +9,8 @@
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "deno.enable": true,
+  "deno.enablePaths": ["apps/desktop"],
+  "deno.config": "apps/desktop/deno.json"
 }
