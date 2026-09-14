@@ -27,6 +27,10 @@ out/
 build
 dist
 
+# Deno Desktop local compile / CEF staging (apps/desktop/desktop/*.so etc.)
+apps/desktop/desktop/
+**/*.so
+
 
 # Debug
 npm-debug.log*

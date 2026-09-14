@@ -21,6 +21,11 @@ todos.json
 .deno_desktop_entry-*.ts
 deno.lock
 
+# Deno desktop local compile / CEF staging (never commit — can be hundreds of MB)
+/desktop/
+*.so
+.deno-desktop-app
+
 # Lighthouse audit artifacts (local only)
 lighthouse-reports/
 lighthouse-reports-desktop/
