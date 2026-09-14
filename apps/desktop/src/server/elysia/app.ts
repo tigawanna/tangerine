@@ -1,5 +1,5 @@
 import { sleep } from "@/lib/sse";
-import { getEmbeddingModelsInventory } from "@/server/elysia/embedding-inventory";
+import { embeddingsRoute } from "@/server/elysia/routes/models/embedding-inventory.ts";
 import { Elysia, sse } from "elysia";
 
 /**
@@ -29,7 +29,6 @@ export const elysiaApp = new Elysia({ prefix: "/api/elysia" })
       }
     }
   })
-  /** Catalog + on-disk inventory (runtime + model variants). Read-only. */
-  .get("/embedding/models", () => getEmbeddingModelsInventory());
+  .use(embeddingsRoute);
 
 export type ElysiaApp = typeof elysiaApp;
