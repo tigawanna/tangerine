@@ -1,44 +1,41 @@
-import { readGemmaPrefs } from "@/data-access-layer/embeddings/gemma-prefs";
-import { refreshOrtRuntimeSnapshot } from "@/data-access-layer/embeddings/ort-runtime";
+import { getEmbeddingBootstrapStatus } from "@/data-access-layer/embeddings/embedding-bootstrap";
+import { gemmaPrefsFilePath, readGemmaPrefs } from "@/data-access-layer/embeddings/gemma-prefs";
+import { bootstrapRoute } from "@/server/elysia/routes/models/bootstrap";
+import { embedRoute } from "@/server/elysia/routes/models/embed";
+import { modelsRoute } from "@/server/elysia/routes/models/models";
 import { Elysia } from "elysia";
 
-/** One-shot inventory for the Elysia embedding experiment (list only). */
-// export type EmbeddingModelsInventory = {
-//   at: string;
-//   activeDtype: "q4" | "q8" | "fp16" | "fp32";
-//   runtime: OrtRuntimeSnapshot;
-//   models: GemmaCacheInventory;
-// };
-
 /**
- * Lists ORT runtime readiness + EmbeddingGemma variants on disk.
- * Read-only — no download / load side effects.
+ * EmbeddingGemma + ORT via Elysia (replaces TanStack `/api/embeddings` + server-fns).
+ *
+ * Mounted under `/api/elysia/embedding/*`.
+ * Sub-routes: {@link bootstrapRoute}, {@link modelsRoute}, {@link embedRoute}.
  */
-// export async function getEmbeddingModelsInventory(): Promise<EmbeddingModelsInventory> {
-//   const prefs = readGemmaPrefs();
-//   const runtime = await refreshOrtRuntimeSnapshot();
-//   const { inspectGemmaCache, setActiveGemmaDtype } = await import("@repo/gemma-embedding/server");
-//   setActiveGemmaDtype(prefs.dtype);
-
-//   return {
-//     at: new Date().toISOString(),
-//     activeDtype: prefs.dtype,
-//     runtime,
-//     models: inspectGemmaCache(),
-//   };
-// }
-
 export const embeddingsRoute = new Elysia({ prefix: "/embedding" })
-.get("/models", async () => {
-  const prefs = readGemmaPrefs();
-  const runtime = await refreshOrtRuntimeSnapshot();
-  const { inspectGemmaCache, setActiveGemmaDtype } = await import("@repo/gemma-embedding/server");
-  setActiveGemmaDtype(prefs.dtype);
-
-  return {
-    at: new Date().toISOString(),
-    activeDtype: prefs.dtype,
-    runtime,
-    models: inspectGemmaCache(),
-  };
-});
+  .get(
+    "/settings",
+    async () => {
+      const prefs = readGemmaPrefs();
+      const { getGemmaModelSettingsSnapshot, setActiveGemmaDtype } =
+        await import("@repo/gemma-embedding/node");
+      setActiveGemmaDtype(prefs.dtype);
+      const snapshot = getGemmaModelSettingsSnapshot();
+      const bootstrap = await getEmbeddingBootstrapStatus();
+      return {
+        ...snapshot,
+        prefsPath: gemmaPrefsFilePath(),
+        bootstrap,
+      };
+    },
+    {
+      detail: {
+        summary: "Embedding settings snapshot",
+        description:
+          "Active dtype, cache inventory, prefs path, load snapshot, and first-run bootstrap status for the Settings model picker.",
+        tags: ["embedding"],
+      },
+    },
+  )
+  .use(bootstrapRoute)
+  .use(modelsRoute)
+  .use(embedRoute);

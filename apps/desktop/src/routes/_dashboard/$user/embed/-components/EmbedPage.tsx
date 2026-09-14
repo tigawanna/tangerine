@@ -1,3 +1,4 @@
+import { EMBED_TEXT_MAX_CHARS, EMBED_TEXT_MAX_WORDS } from "@/data-access-layer/embeddings/embed-limits";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
@@ -9,16 +10,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  EMBED_TEXT_MAX_CHARS,
-  EMBED_TEXT_MAX_WORDS,
-  cancelGemmaLoadFn,
-  embedText,
-  getGemmaLoadStatus,
-  type EmbedTextResult,
-  type GemmaLoadStatusResult,
-} from "@/data-access-layer/embeddings/embed.functions";
 import { cn } from "@/lib/utils";
+import type { EmbedTextResult, GemmaLoadStatusResult } from "@/server/elysia/embedding-types";
+import { getElysiaTreaty } from "@/server/elysia/treaty";
+import { treatyErrorMessage } from "@/server/elysia/treaty-error";
 import { getRouteApi } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -84,8 +79,9 @@ export function EmbedPage() {
 
     async function poll() {
       try {
-        const status = await getGemmaLoadStatus();
-        if (!cancelled) setLoadStatus(status);
+        const { data, error } = await getElysiaTreaty().embedding.models.load.get();
+        if (error || !data) return;
+        if (!cancelled) setLoadStatus(data);
       } catch {
         // Ignore poll failures; the embed request carries the real error.
       }
@@ -105,9 +101,11 @@ export function EmbedPage() {
   function handleCancel() {
     abortRef.current?.abort();
     if (loadStatus?.phase === "loading") {
-      void cancelGemmaLoadFn().catch(() => {
-        // best-effort unload
-      });
+      void getElysiaTreaty()
+        .embedding.models.cancel.post()
+        .catch(() => {
+          // best-effort unload
+        });
     }
   }
 
@@ -131,15 +129,17 @@ export function EmbedPage() {
     setPending(true);
     setError(null);
     try {
-      const next = await embedText({
-        data: { text: trimmed, mode },
-        signal: abort.signal,
-      });
+      const { data, error } = await getElysiaTreaty().embedding.embed.post(
+        { text: trimmed, mode },
+        { fetch: { signal: abort.signal } },
+      );
       if (abort.signal.aborted) return;
+      if (error) throw new Error(treatyErrorMessage(error));
+      if (!data) throw new Error("Embed returned no data");
       const ms = performance.now() - startMsRef.current;
       setElapsedMs(ms);
       setDurationMs(ms);
-      setResult(next);
+      setResult(data);
       setLoadStatus((prev) => ({
         phase: "ready",
         progress: 100,

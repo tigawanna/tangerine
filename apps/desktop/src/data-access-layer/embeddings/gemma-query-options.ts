@@ -1,8 +1,5 @@
-import {
-  getEmbeddingBootstrap,
-  getGemmaLoadStatus,
-  getGemmaModelSettings,
-} from "@/data-access-layer/embeddings/embed.functions";
+import { getElysiaTreaty } from "@/server/elysia/treaty";
+import { treatyErrorMessage } from "@/server/elysia/treaty-error";
 import { queryOptions } from "@tanstack/react-query";
 
 export const gemmaQueryKeys = {
@@ -12,28 +9,46 @@ export const gemmaQueryKeys = {
   bootstrap: ["gemma", "bootstrap"] as const,
 };
 
+async function fetchSettings() {
+  const { data, error } = await getElysiaTreaty().embedding.settings.get();
+  if (error) throw new Error(treatyErrorMessage(error));
+  return data;
+}
+
+async function fetchLoad() {
+  const { data, error } = await getElysiaTreaty().embedding.models.load.get();
+  if (error) throw new Error(treatyErrorMessage(error));
+  return data;
+}
+
+async function fetchBootstrap() {
+  const { data, error } = await getElysiaTreaty().embedding.bootstrap.get();
+  if (error) throw new Error(treatyErrorMessage(error));
+  return data;
+}
+
 /**
- * Active dtype, cache inventory, and prefs path for the settings model picker.
+ * Active dtype, cache inventory, prefs path, and bootstrap for the settings model picker.
  */
 export const gemmaModelSettingsQueryOptions = queryOptions({
   queryKey: gemmaQueryKeys.settings,
-  queryFn: () => getGemmaModelSettings(),
+  queryFn: fetchSettings,
 });
 
 /**
  * Live EmbeddingGemma load / download progress (one-shot).
- * Live updates: SSE `/api/embeddings/load/events` via `useGemmaLoadSse`.
+ * Live updates: SSE `/api/elysia/embedding/models/events` via `useGemmaLoadSse`.
  */
 export const gemmaLoadStatusQueryOptions = queryOptions({
   queryKey: gemmaQueryKeys.load,
-  queryFn: () => getGemmaLoadStatus(),
+  queryFn: fetchLoad,
 });
 
 /**
  * ORT + Q4 first-run bootstrap status (one-shot).
- * Live updates: SSE `/api/embeddings/bootstrap/events` via `useEmbeddingBootstrapSse`.
+ * Live updates: SSE `/api/elysia/embedding/bootstrap/events` via `useEmbeddingBootstrapSse`.
  */
 export const embeddingBootstrapQueryOptions = queryOptions({
   queryKey: gemmaQueryKeys.bootstrap,
-  queryFn: () => getEmbeddingBootstrap(),
+  queryFn: fetchBootstrap,
 });

@@ -3,10 +3,8 @@ import { embeddingsRoute } from "@/server/elysia/routes/models/embedding-invento
 import { Elysia, sse } from "elysia";
 
 /**
- * Experiment API: embedded Elysia inside TanStack Start (no sidecar).
- * Mounted at `/api/elysia/$` — see `routes/api/elysia/$.ts`.
- *
- * Port order: hello → tick SSE → models list → download progress → load.
+ * Embedded Elysia API for EmbeddingGemma + ORT (mounted at `/api/elysia/$`).
+ * Settings, bootstrap, embed playground, and the lab UI all talk to this app.
  */
 export const elysiaApp = new Elysia({ prefix: "/api/elysia" })
   .get("/hello", () => ({

@@ -2,24 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  cancelEmbeddingBootstrapFn,
-  cancelGemmaLoadFn,
-  downloadGemmaModel,
-  openGemmaPath,
-  resumeEmbeddingBootstrapFn,
-  selectGemmaModel,
-  type GemmaModelSettingsResult,
-} from "@/data-access-layer/embeddings/embed.functions";
-import {
   gemmaLoadStatusQueryOptions,
   gemmaModelSettingsQueryOptions,
   gemmaQueryKeys,
 } from "@/data-access-layer/embeddings/gemma-query-options";
+import { useEmbeddingBootstrapSse, useGemmaLoadSse } from "@/hooks/use-embedding-sse";
 import { cn } from "@/lib/utils";
+import type { GemmaDtypeId, GemmaModelSettingsResult } from "@/server/elysia/embedding-types";
+import { getElysiaTreaty } from "@/server/elysia/treaty";
+import { treatyErrorMessage } from "@/server/elysia/treaty-error";
 import { unwrapUnknownError } from "@/utils/errors";
 import { formatBytes } from "@/utils/format-bytes";
 import { sortVariantsBySize, variantFolder } from "@/utils/gemma-model-variants";
-import { useEmbeddingBootstrapSse, useGemmaLoadSse } from "@/hooks/use-embedding-sse";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Cpu, FolderOpen, RefreshCw } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -207,9 +201,13 @@ export function SettingsModelSection() {
   const settingsQuery = useQuery(gemmaModelSettingsQueryOptions);
 
   const selectMutation = useMutation({
-    mutationFn: (dtype: GemmaModelSettingsResult["activeDtype"]) =>
-      selectGemmaModel({ data: { dtype } }),
+    mutationFn: async (dtype: GemmaDtypeId) => {
+      const { data, error } = await getElysiaTreaty().embedding.models.select.post({ dtype });
+      if (error) throw new Error(treatyErrorMessage(error));
+      return data;
+    },
     onSuccess: (status, dtype) => {
+      if (!status) return;
       queryClient.setQueryData(gemmaQueryKeys.load, status);
       queryClient.setQueryData(
         gemmaQueryKeys.settings,
@@ -220,9 +218,13 @@ export function SettingsModelSection() {
   });
 
   const downloadMutation = useMutation({
-    mutationFn: (dtype: GemmaModelSettingsResult["activeDtype"]) =>
-      downloadGemmaModel({ data: { dtype } }),
+    mutationFn: async (dtype: GemmaDtypeId) => {
+      const { data, error } = await getElysiaTreaty().embedding.models.download.post({ dtype });
+      if (error) throw new Error(treatyErrorMessage(error));
+      return data;
+    },
     onSuccess: (status) => {
+      if (!status) return;
       queryClient.setQueryData(gemmaQueryKeys.load, status);
       queryClient.setQueryData(
         gemmaQueryKeys.settings,
@@ -232,9 +234,15 @@ export function SettingsModelSection() {
   });
 
   const bootstrapMutation = useMutation({
-    mutationFn: (action: "start" | "cancel") =>
-      action === "cancel" ? cancelEmbeddingBootstrapFn() : resumeEmbeddingBootstrapFn(),
+    mutationFn: async (action: "start" | "cancel") => {
+      const client = getElysiaTreaty().embedding.bootstrap;
+      const { data, error } =
+        action === "cancel" ? await client.cancel.post() : await client.resume.post();
+      if (error) throw new Error(treatyErrorMessage(error));
+      return data;
+    },
     onSuccess: (bootstrap) => {
+      if (!bootstrap) return;
       queryClient.setQueryData(gemmaQueryKeys.bootstrap, bootstrap);
       queryClient.setQueryData(
         gemmaQueryKeys.settings,
@@ -257,8 +265,13 @@ export function SettingsModelSection() {
   });
 
   const cancelLoadMutation = useMutation({
-    mutationFn: () => cancelGemmaLoadFn(),
+    mutationFn: async () => {
+      const { data, error } = await getElysiaTreaty().embedding.models.cancel.post();
+      if (error) throw new Error(treatyErrorMessage(error));
+      return data;
+    },
     onSuccess: (status) => {
+      if (!status) return;
       queryClient.setQueryData(gemmaQueryKeys.load, status);
       queryClient.setQueryData(
         gemmaQueryKeys.settings,
@@ -270,7 +283,11 @@ export function SettingsModelSection() {
   });
 
   const openMutation = useMutation({
-    mutationFn: (path: string) => openGemmaPath({ data: { path } }),
+    mutationFn: async (path: string) => {
+      const { data, error } = await getElysiaTreaty().embedding.models.open.post({ path });
+      if (error) throw new Error(treatyErrorMessage(error));
+      return data;
+    },
   });
 
   const load = loadQuery.data ?? settingsQuery.data?.load ?? null;
@@ -621,7 +638,7 @@ export function SettingsModelSection() {
                             downloadMutation.mutate(variant.id);
                           }}
                         >
-                          {variant.onDiskBytes > 0 ? "Resume" : "Download"}
+                          Download
                         </Button>
                       ) : null}
                       {variant.ready ? (

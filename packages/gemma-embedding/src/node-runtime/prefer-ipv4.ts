@@ -15,12 +15,14 @@ export function preferIpv4ForHubFetches(): void {
   applied = true;
   try {
     setDefaultResultOrder("ipv4first");
-  } catch {
+  } catch(e) {
     // older runtimes
-  }
+    console.error("== Error setting default result order == ", e);
+    }
   try {
     setDefaultAutoSelectFamily(false);
-  } catch {
+  } catch(e) {
     // Node < 18.13 / unsupported
+    console.error("== Error setting default auto select family == ", e);
   }
 }

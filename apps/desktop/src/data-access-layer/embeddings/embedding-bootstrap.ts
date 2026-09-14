@@ -119,7 +119,7 @@ export async function getEmbeddingBootstrapStatus(): Promise<EmbeddingBootstrapS
   const prefs = readGemmaPrefs();
   const runtime = await refreshOrtRuntimeSnapshot();
 
-  const { inspectGemmaCache, getGemmaLoadSnapshot } = await import("@repo/gemma-embedding/server");
+  const { inspectGemmaCache, getGemmaLoadSnapshot } = await import("@repo/gemma-embedding/node");
   const cache = inspectGemmaCache();
   const q4 = cache.variants.find((v) => v.id === BOOTSTRAP_MODEL_DTYPE);
   const load = getGemmaLoadSnapshot();
@@ -185,7 +185,7 @@ export function startEmbeddingBootstrap(): Promise<EmbeddingBootstrapStatus> {
       if (runtime.phase !== "ready") return;
 
       const { inspectGemmaCache, beginServerGemmaDtypeSwitch, setActiveGemmaDtype } =
-        await import("@repo/gemma-embedding/server");
+        await import("@repo/gemma-embedding/node");
       const q4 = inspectGemmaCache().variants.find((v) => v.id === BOOTSTRAP_MODEL_DTYPE);
       if (q4?.ready) return;
 
@@ -214,7 +214,7 @@ export async function cancelEmbeddingBootstrap(): Promise<EmbeddingBootstrapStat
   cancelOrtRuntimeDownload();
 
   try {
-    const { unloadServerGemmaEmbedding } = await import("@repo/gemma-embedding/server");
+    const { unloadServerGemmaEmbedding } = await import("@repo/gemma-embedding/node");
     await unloadServerGemmaEmbedding();
   } catch {
     // ignore unload errors

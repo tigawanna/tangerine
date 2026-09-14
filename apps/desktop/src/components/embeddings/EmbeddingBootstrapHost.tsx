@@ -1,14 +1,12 @@
 import { Progress } from "@/components/ui/progress";
 import {
-  cancelEmbeddingBootstrapFn,
-  startEmbeddingBootstrapFn,
-  type EmbeddingBootstrapStatus,
-} from "@/data-access-layer/embeddings/embed.functions";
-import {
   embeddingBootstrapQueryOptions,
   gemmaQueryKeys,
 } from "@/data-access-layer/embeddings/gemma-query-options";
 import { useEmbeddingBootstrapSse } from "@/hooks/use-embedding-sse";
+import type { EmbeddingBootstrapStatus } from "@/server/elysia/embedding-types";
+import { getElysiaTreaty } from "@/server/elysia/treaty";
+import { treatyErrorMessage } from "@/server/elysia/treaty-error";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -26,7 +24,7 @@ function isBootstrapLive(status: EmbeddingBootstrapStatus | undefined): boolean 
 
 /**
  * Android Studio–style first-load prefetch: ORT runtime + Q4 model.
- * Progress via SSE (`/api/embeddings/bootstrap/events`); Cancel via POST.
+ * Progress via SSE (`/api/elysia/embedding/bootstrap/events`); Cancel via POST.
  */
 export function EmbeddingBootstrapHost() {
   const queryClient = useQueryClient();
@@ -50,9 +48,11 @@ export function EmbeddingBootstrapHost() {
     if (!status?.shouldAutoStart || started.current) return;
     started.current = true;
     setWatchSse(true);
-    void startEmbeddingBootstrapFn()
-      .then((next) => {
-        queryClient.setQueryData(gemmaQueryKeys.bootstrap, next);
+    void getElysiaTreaty()
+      .embedding.bootstrap.start.post()
+      .then(({ data, error }) => {
+        if (error) throw new Error(treatyErrorMessage(error));
+        if (data) queryClient.setQueryData(gemmaQueryKeys.bootstrap, data);
       })
       .catch(() => {
         started.current = false;
@@ -85,14 +85,17 @@ export function EmbeddingBootstrapHost() {
         action: {
           label: "Cancel",
           onClick: () => {
-            void cancelEmbeddingBootstrapFn().then((next) => {
-              queryClient.setQueryData(gemmaQueryKeys.bootstrap, next);
-              void queryClient.invalidateQueries({ queryKey: gemmaQueryKeys.settings });
-              toast.dismiss(TOAST_ID);
-              toast.message("Embedding download cancelled", {
-                description: "You can resume anytime from Settings → Embedding model.",
+            void getElysiaTreaty()
+              .embedding.bootstrap.cancel.post()
+              .then(({ data, error }) => {
+                if (error) throw new Error(treatyErrorMessage(error));
+                if (data) queryClient.setQueryData(gemmaQueryKeys.bootstrap, data);
+                void queryClient.invalidateQueries({ queryKey: gemmaQueryKeys.settings });
+                toast.dismiss(TOAST_ID);
+                toast.message("Embedding download cancelled", {
+                  description: "You can resume anytime from Settings → Embedding model.",
+                });
               });
-            });
           },
         },
       });

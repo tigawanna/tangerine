@@ -2,7 +2,7 @@ import type {
   EmbeddingBootstrapStatus,
   GemmaLoadStatusResult,
   GemmaModelSettingsResult,
-} from "@/data-access-layer/embeddings/embed.functions";
+} from "@/server/elysia/embedding-types";
 import { gemmaQueryKeys } from "@/data-access-layer/embeddings/gemma-query-options";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -53,23 +53,26 @@ export function useEmbeddingBootstrapSse(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
-    return subscribeSseJson<EmbeddingBootstrapStatus>("/api/embeddings/bootstrap/events", {
-      onMessage: (status) => {
-        queryClient.setQueryData(gemmaQueryKeys.bootstrap, status);
-        queryClient.setQueryData(
-          gemmaQueryKeys.settings,
-          (prev: GemmaModelSettingsResult | undefined) =>
-            prev ? { ...prev, bootstrap: status } : prev,
-        );
-        if (
-          status.overall.phase === "ready" ||
-          status.overall.phase === "error" ||
-          status.overall.phase === "cancelled"
-        ) {
-          void queryClient.invalidateQueries({ queryKey: gemmaQueryKeys.settings });
-        }
+    return subscribeSseJson<EmbeddingBootstrapStatus>(
+      "/api/elysia/embedding/bootstrap/events",
+      {
+        onMessage: (status) => {
+          queryClient.setQueryData(gemmaQueryKeys.bootstrap, status);
+          queryClient.setQueryData(
+            gemmaQueryKeys.settings,
+            (prev: GemmaModelSettingsResult | undefined) =>
+              prev ? { ...prev, bootstrap: status } : prev,
+          );
+          if (
+            status.overall.phase === "ready" ||
+            status.overall.phase === "error" ||
+            status.overall.phase === "cancelled"
+          ) {
+            void queryClient.invalidateQueries({ queryKey: gemmaQueryKeys.settings });
+          }
+        },
       },
-    });
+    );
   }, [enabled, queryClient]);
 }
 
@@ -82,7 +85,7 @@ export function useGemmaLoadSse(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
-    return subscribeSseJson<GemmaLoadStatusResult>("/api/embeddings/load/events", {
+    return subscribeSseJson<GemmaLoadStatusResult>("/api/elysia/embedding/models/events", {
       onMessage: (status) => {
         queryClient.setQueryData(gemmaQueryKeys.load, status);
         queryClient.setQueryData(

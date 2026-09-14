@@ -1,5 +1,5 @@
-import { DEFAULT_GEMMA_DTYPE, isGemmaDtypeId } from "./catalog.js";
-import type { GemmaEmbeddingOptions } from "./types.js";
+import { DEFAULT_GEMMA_DTYPE, isGemmaDtypeId } from "../catalog.js";
+import type { GemmaEmbeddingOptions } from "../types.js";
 
 /**
  * Node/CLI defaults: CPU + q4 (smallest ONNX ~200MB).

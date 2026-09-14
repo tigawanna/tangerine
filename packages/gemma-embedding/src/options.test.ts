@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveServerGemmaOptions } from "./server-options.js";
+import { resolveServerGemmaOptions } from "./node-runtime/options.js";
 import { resolveWebGemmaOptions } from "./web-options.js";
 
 describe("resolveServerGemmaOptions", () => {

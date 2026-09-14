@@ -1,13 +1,14 @@
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, rmSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   GEMMA_DTYPE_OPTIONS,
   GEMMA_HF_MODEL_ID,
+  getGemmaDtypeOption,
   type GemmaDtypeId,
   type GemmaDtypeOption,
-} from "./catalog.js";
+} from "../catalog.js";
 
 export type GemmaCachedVariant = {
   id: GemmaDtypeId;
@@ -16,7 +17,10 @@ export type GemmaCachedVariant = {
   approxBytes: number;
   /** True when both ONNX graph + external data files exist (not `.tmp`). */
   ready: boolean;
-  /** Bytes currently on disk for this variant’s files (partial downloads included). */
+  /**
+   * Bytes of final weight files on disk.
+   * Incomplete downloads are wiped on error/cancel (HF does not byte-resume).
+   */
   onDiskBytes: number;
   /** Absolute paths for the expected weight files. */
   paths: string[];
@@ -144,4 +148,46 @@ export function inspectGemmaCache(): GemmaCacheInventory {
     hfModelId: GEMMA_HF_MODEL_ID,
     variants: GEMMA_DTYPE_OPTIONS.map((option) => inspectVariant(modelDir, option)),
   };
+}
+
+/**
+ * Deletes unfinished weight files for a dtype.
+ *
+ * Transformers.js writes `file.tmp.<pid>.<rand>` then renames; it does not
+ * byte-resume, so partial/incomplete variants are useless. No-op when ready.
+ */
+export function clearIncompleteGemmaVariant(dtype: GemmaDtypeId): void {
+  const option = getGemmaDtypeOption(dtype);
+  const modelDir = getGemmaModelCacheDir();
+  const variant = inspectVariant(modelDir, option);
+  if (variant.ready) return;
+
+  const onnxDir = join(modelDir, "onnx");
+  if (!existsSync(onnxDir)) return;
+
+  let names: string[] = [];
+  try {
+    names = readdirSync(onnxDir);
+  } catch {
+    return;
+  }
+
+  for (const basename of option.files) {
+    const finalPath = join(onnxDir, basename);
+    try {
+      rmSync(finalPath, { force: true });
+    } catch(e) {
+      console.error("== Error deleting incomplete gemma variant == ", e);
+    }
+
+    const prefix = `${basename}.tmp`;
+    for (const name of names) {
+      if (!name.startsWith(prefix)) continue;
+      try {
+        rmSync(join(onnxDir, name), { force: true });
+      } catch(e) {
+        console.error("== Error deleting incomplete gemma variant == ", e);
+      }
+    }
+  }
 }
