@@ -5,4 +5,4 @@
 import { ensureVectorIndex } from "../src/db/ensure-vector-index";
 
 await ensureVectorIndex();
-console.info("project_embeddings vector index ready");
+console.info("enriched_repos vector index ready");

@@ -52,7 +52,7 @@ Legend: `[x]` done · `[ ]` pending · `[~]` in progress
 | ----------------------------------------- | ------ | -------------------------------------------------------- |
 | DB-1 — `project_repo_artifacts` table     | [x]    | `generation`, `collectorVersion`, `payload`, `createdAt` |
 | DB-2 — `project_enrichment_outputs` table | [x]    | `sourceGeneration`, `payload`, `createdAt`               |
-| DB-3 — Extend `project_embeddings`        | [x]    | `sourceGeneration`, `sourceEnrichmentAt`                 |
+| DB-3 — Extend `enriched_repos`            | [x]    | `sourceGeneration`, `sourceEnrichmentAt`                 |
 | DB-4 — Drizzle migration + apply          | [x]    | `0009_superb_riptide.sql`                                |
 
 ### Skip rules (agreed)

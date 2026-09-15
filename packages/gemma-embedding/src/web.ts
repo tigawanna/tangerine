@@ -15,7 +15,7 @@ export function createWebGemmaEmbedding(options?: GemmaEmbeddingOptions) {
 }
 
 /**
- * Model id persisted on `project_embeddings.model_id`.
+ * Model id persisted on `enriched_repos.model_id`.
  */
 export function getEmbeddingModelId() {
   return EMBEDDING_MODEL_ID;

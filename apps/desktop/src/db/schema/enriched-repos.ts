@@ -3,15 +3,24 @@ import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core
 import { float32Array } from "./vector";
 
 /**
- * Chunk embeddings for local vector search (Turso `F32_BLOB` + `libsql_vector_idx`).
+ * How the user relates to this repo.
+ * Primary query path filters `type = 'starred'`; other/null values are fine —
+ * the table can hold any repo (starred or not).
+ */
+export type EnrichedRepoType = "starred";
+
+/**
+ * Chunk embeddings for enriched repos (Turso `F32_BLOB` + `libsql_vector_idx`).
  * Index is created via raw SQL in `ensureVectorIndex` — drizzle-kit cannot emit it.
  */
-export const projectEmbeddings = sqliteTable(
-  "project_embeddings",
+export const enrichedRepos = sqliteTable(
+  "enriched_repos",
   {
     id: text("id").primaryKey(),
     owner: text("owner").notNull(),
     name: text("name").notNull(),
+    /** `"starred"` when this is a repo the user has starred; omit for other repos. */
+    type: text("type").$type<EnrichedRepoType>(),
     chunkKey: text("chunk_key").notNull(),
     modelId: text("model_id").notNull(),
     sourceGeneration: integer("source_generation").notNull(),
@@ -23,7 +32,7 @@ export const projectEmbeddings = sqliteTable(
       .$defaultFn(() => new Date()),
   },
   (table) => [
-    uniqueIndex("project_embeddings_owner_name_chunk_uidx").on(
+    uniqueIndex("enriched_repos_owner_name_chunk_uidx").on(
       table.owner,
       table.name,
       table.chunkKey,

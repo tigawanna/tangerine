@@ -1,7 +1,8 @@
-CREATE TABLE `project_embeddings` (
+CREATE TABLE `enriched_repos` (
 	`id` text PRIMARY KEY NOT NULL,
 	`owner` text NOT NULL,
 	`name` text NOT NULL,
+	`type` text,
 	`chunk_key` text NOT NULL,
 	`model_id` text NOT NULL,
 	`source_generation` integer NOT NULL,
@@ -11,7 +12,7 @@ CREATE TABLE `project_embeddings` (
 	`created_at` integer NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `project_embeddings_owner_name_chunk_uidx` ON `project_embeddings` (`owner`,`name`,`chunk_key`);--> statement-breakpoint
+CREATE UNIQUE INDEX `enriched_repos_owner_name_chunk_uidx` ON `enriched_repos` (`owner`,`name`,`chunk_key`);--> statement-breakpoint
 CREATE TABLE `project_enrichment_outputs` (
 	`id` text PRIMARY KEY NOT NULL,
 	`owner` text NOT NULL,

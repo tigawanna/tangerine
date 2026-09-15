@@ -42,7 +42,7 @@ Embedded **libSQL** via `@libsql/client` + Drizzle (`dialect: "turso"`) — not 
 | Piece        | Path                                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------------------------- |
 | Client       | [`src/db/client.ts`](./src/db/client.ts)                                                                            |
-| Schema       | [`src/db/schema/`](./src/db/schema/) (`project_repo_artifacts`, `project_enrichment_outputs`, `project_embeddings`) |
+| Schema       | [`src/db/schema/`](./src/db/schema/) (`project_repo_artifacts`, `project_enrichment_outputs`, `enriched_repos`) |
 | Default file | `DATABASE_URL` or `~/.config/tangerine-desktop/tangerine.db`                                                        |
 
 `pnpm db:push` then `pnpm db:ensure-vector` (or `pnpm db:setup`). Auth session cookies stay in JSON under `~/.config/tangerine-desktop/`; API auth tables remain on `apps/api`.
