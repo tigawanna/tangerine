@@ -1,5 +1,6 @@
 import { sleep } from "@/lib/sse";
 import { embeddingsRoute } from "@/server/elysia/routes/models/embedding-inventory.ts";
+import { workerRoute } from "@/server/elysia/routes/worker";
 import { Elysia, sse } from "elysia";
 
 /**
@@ -27,6 +28,7 @@ export const elysiaApp = new Elysia({ prefix: "/api/elysia" })
       }
     }
   })
-  .use(embeddingsRoute);
+  .use(embeddingsRoute)
+  .use(workerRoute);
 
 export type ElysiaApp = typeof elysiaApp;

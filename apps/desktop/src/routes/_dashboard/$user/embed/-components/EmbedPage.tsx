@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { EmbedDemoBatchSection } from "@/routes/_dashboard/$user/embed/-components/EmbedDemoBatchSection";
 import type { EmbedTextResult, GemmaLoadStatusResult } from "@/server/elysia/routes/models/embedding-types.ts";
 import { getElysiaTreaty } from "@/server/elysia/treaty";
 import { treatyErrorMessage } from "@/server/elysia/treaty-error";
@@ -296,6 +297,8 @@ export function EmbedPage() {
       ) : null}
 
       {result ? <EmbedResultPanel result={result} durationMs={durationMs} /> : null}
+
+      <EmbedDemoBatchSection />
     </div>
   );
 }
