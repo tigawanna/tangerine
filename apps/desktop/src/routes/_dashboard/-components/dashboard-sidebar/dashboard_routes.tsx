@@ -43,8 +43,8 @@ export function dashboardPrimaryRoutes(user: string): SidebarItem[] {
       icon: Search,
     },
     {
-      title: "Embed",
-      href: "/$user/embed",
+      title: "Enriched",
+      href: "/$user/enriched",
       params,
       icon: Sparkles,
     },

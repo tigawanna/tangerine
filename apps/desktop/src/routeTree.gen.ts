@@ -18,6 +18,7 @@ import { Route as DashboardViewerIndexRouteImport } from './routes/_dashboard/vi
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiElysiaSplatRouteImport } from './routes/api/elysia/$'
 import { Route as DashboardUserEmbedIndexRouteImport } from './routes/_dashboard/$user/embed/index'
+import { Route as DashboardUserEnrichedIndexRouteImport } from './routes/_dashboard/$user/enriched/index'
 import { Route as DashboardUserReposIndexRouteImport } from './routes/_dashboard/$user/repos/index'
 import { Route as DashboardUserSearchIndexRouteImport } from './routes/_dashboard/$user/search/index'
 import { Route as DashboardUserSettingsIndexRouteImport } from './routes/_dashboard/$user/settings/index'
@@ -68,6 +69,12 @@ const DashboardUserEmbedIndexRoute = DashboardUserEmbedIndexRouteImport.update({
   path: '/embed/',
   getParentRoute: () => DashboardUserLayoutRoute,
 } as any)
+const DashboardUserEnrichedIndexRoute =
+  DashboardUserEnrichedIndexRouteImport.update({
+    id: '/enriched/',
+    path: '/enriched/',
+    getParentRoute: () => DashboardUserLayoutRoute,
+  } as any)
 const DashboardUserReposIndexRoute = DashboardUserReposIndexRouteImport.update({
   id: '/repos/',
   path: '/repos/',
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/$user/': typeof DashboardUserIndexRoute
   '/viewer/': typeof DashboardViewerIndexRoute
   '/$user/embed/': typeof DashboardUserEmbedIndexRoute
+  '/$user/enriched/': typeof DashboardUserEnrichedIndexRoute
   '/$user/repos/': typeof DashboardUserReposIndexRoute
   '/$user/search/': typeof DashboardUserSearchIndexRoute
   '/$user/settings/': typeof DashboardUserSettingsIndexRoute
@@ -120,6 +128,7 @@ export interface FileRoutesByTo {
   '/$user': typeof DashboardUserIndexRoute
   '/viewer': typeof DashboardViewerIndexRoute
   '/$user/embed': typeof DashboardUserEmbedIndexRoute
+  '/$user/enriched': typeof DashboardUserEnrichedIndexRoute
   '/$user/repos': typeof DashboardUserReposIndexRoute
   '/$user/search': typeof DashboardUserSearchIndexRoute
   '/$user/settings': typeof DashboardUserSettingsIndexRoute
@@ -137,6 +146,7 @@ export interface FileRoutesById {
   '/_dashboard/$user/': typeof DashboardUserIndexRoute
   '/_dashboard/viewer/': typeof DashboardViewerIndexRoute
   '/_dashboard/$user/embed/': typeof DashboardUserEmbedIndexRoute
+  '/_dashboard/$user/enriched/': typeof DashboardUserEnrichedIndexRoute
   '/_dashboard/$user/repos/': typeof DashboardUserReposIndexRoute
   '/_dashboard/$user/search/': typeof DashboardUserSearchIndexRoute
   '/_dashboard/$user/settings/': typeof DashboardUserSettingsIndexRoute
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/$user/'
     | '/viewer/'
     | '/$user/embed/'
+    | '/$user/enriched/'
     | '/$user/repos/'
     | '/$user/search/'
     | '/$user/settings/'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/$user'
     | '/viewer'
     | '/$user/embed'
+    | '/$user/enriched'
     | '/$user/repos'
     | '/$user/search'
     | '/$user/settings'
@@ -184,6 +196,7 @@ export interface FileRouteTypes {
     | '/_dashboard/$user/'
     | '/_dashboard/viewer/'
     | '/_dashboard/$user/embed/'
+    | '/_dashboard/$user/enriched/'
     | '/_dashboard/$user/repos/'
     | '/_dashboard/$user/search/'
     | '/_dashboard/$user/settings/'
@@ -264,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUserEmbedIndexRouteImport
       parentRoute: typeof DashboardUserLayoutRoute
     }
+    '/_dashboard/$user/enriched/': {
+      id: '/_dashboard/$user/enriched/'
+      path: '/enriched'
+      fullPath: '/$user/enriched/'
+      preLoaderRoute: typeof DashboardUserEnrichedIndexRouteImport
+      parentRoute: typeof DashboardUserLayoutRoute
+    }
     '/_dashboard/$user/repos/': {
       id: '/_dashboard/$user/repos/'
       path: '/repos'
@@ -305,6 +325,7 @@ declare module '@tanstack/react-router' {
 interface DashboardUserLayoutRouteChildren {
   DashboardUserIndexRoute: typeof DashboardUserIndexRoute
   DashboardUserEmbedIndexRoute: typeof DashboardUserEmbedIndexRoute
+  DashboardUserEnrichedIndexRoute: typeof DashboardUserEnrichedIndexRoute
   DashboardUserReposIndexRoute: typeof DashboardUserReposIndexRoute
   DashboardUserSearchIndexRoute: typeof DashboardUserSearchIndexRoute
   DashboardUserSettingsIndexRoute: typeof DashboardUserSettingsIndexRoute
@@ -315,6 +336,7 @@ interface DashboardUserLayoutRouteChildren {
 const DashboardUserLayoutRouteChildren: DashboardUserLayoutRouteChildren = {
   DashboardUserIndexRoute: DashboardUserIndexRoute,
   DashboardUserEmbedIndexRoute: DashboardUserEmbedIndexRoute,
+  DashboardUserEnrichedIndexRoute: DashboardUserEnrichedIndexRoute,
   DashboardUserReposIndexRoute: DashboardUserReposIndexRoute,
   DashboardUserSearchIndexRoute: DashboardUserSearchIndexRoute,
   DashboardUserSettingsIndexRoute: DashboardUserSettingsIndexRoute,

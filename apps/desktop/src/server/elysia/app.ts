@@ -2,6 +2,7 @@ import { sleep } from "@/lib/sse";
 import { embeddingsRoute } from "@/server/elysia/routes/models/embedding-inventory.ts";
 import { workerRoute } from "@/server/elysia/routes/worker";
 import { Elysia, sse } from "elysia";
+import { enrichRoute } from "@/server/elysia/routes/enrich/index.ts";
 
 /**
  * Embedded Elysia API for EmbeddingGemma + ORT (mounted at `/api/elysia/$`).
@@ -29,6 +30,7 @@ export const elysiaApp = new Elysia({ prefix: "/api/elysia" })
     }
   })
   .use(embeddingsRoute)
-  .use(workerRoute);
+  .use(workerRoute)
+  .use(enrichRoute);
 
 export type ElysiaApp = typeof elysiaApp;
