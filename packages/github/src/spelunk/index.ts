@@ -11,6 +11,7 @@ export {
 } from "./package-units";
 export { parseManifest } from "./parse-manifest";
 export { summarizePackageJson, parsePackageJson } from "./parsers/package-json";
+export { clipReadmeSummary, README_SUMMARY_LINES } from "./readme-summary";
 export {
   CURRENT_COLLECTOR_VERSION,
   type ManifestCandidate,

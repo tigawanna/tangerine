@@ -105,6 +105,7 @@ export {
 export {
   CURRENT_COLLECTOR_VERSION,
   classifyPackageDir,
+  clipReadmeSummary,
   collectArtifacts,
   detectMonorepoKind,
   discoverManifestCandidates,
@@ -116,6 +117,7 @@ export {
   packageUnitName,
   parseManifest,
   parsePackageJson,
+  README_SUMMARY_LINES,
   repoArtifactLanguages,
 } from "./spelunk/index";
 export type {
