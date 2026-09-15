@@ -1,24 +1,16 @@
-CREATE TABLE `enriched_repos` (
-	`id` text PRIMARY KEY NOT NULL,
-	`owner` text NOT NULL,
-	`name` text NOT NULL,
-	`type` text,
-	`chunk_key` text NOT NULL,
-	`model_id` text NOT NULL,
-	`source_generation` integer NOT NULL,
-	`source_enrichment_at` integer,
-	`text` text NOT NULL,
-	`embedding` F32_BLOB(768) NOT NULL,
-	`created_at` integer NOT NULL
-);
---> statement-breakpoint
-CREATE UNIQUE INDEX `enriched_repos_owner_name_chunk_uidx` ON `enriched_repos` (`owner`,`name`,`chunk_key`);--> statement-breakpoint
 CREATE TABLE `project_enrichment_outputs` (
 	`id` text PRIMARY KEY NOT NULL,
 	`owner` text NOT NULL,
 	`name` text NOT NULL,
+	`type` text,
+	`description` text,
+	`summary` text,
+	`url` text,
 	`source_generation` integer NOT NULL,
 	`payload` text NOT NULL,
+	`model_id` text,
+	`embedding` F32_BLOB(768),
+	`embedded_at` integer,
 	`created_at` integer NOT NULL
 );
 --> statement-breakpoint
@@ -27,6 +19,9 @@ CREATE TABLE `project_repo_artifacts` (
 	`id` text PRIMARY KEY NOT NULL,
 	`owner` text NOT NULL,
 	`name` text NOT NULL,
+	`description` text,
+	`summary` text,
+	`url` text,
 	`generation` integer DEFAULT 1 NOT NULL,
 	`collector_version` text NOT NULL,
 	`payload` text NOT NULL,

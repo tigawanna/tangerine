@@ -95,7 +95,7 @@ export async function getServerGemmaEmbedding(options?: GemmaEmbeddingOptions) {
 }
 
 /**
- * Model id persisted on `enriched_repos.model_id`.
+ * Model id persisted on `project_enrichment_outputs.model_id`.
  */
 export function getEmbeddingModelId() {
   return EMBEDDING_MODEL_ID;

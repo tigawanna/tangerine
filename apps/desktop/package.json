@@ -21,8 +21,7 @@
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "db:ensure-vector": "tsx --env-file=.env ./scripts/ensure-vector-index.ts",
-    "db:setup": "pnpm db:push && pnpm db:ensure-vector"
+    "db:setup": "pnpm db:migrate"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

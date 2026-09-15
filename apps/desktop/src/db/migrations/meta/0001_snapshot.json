@@ -1,8 +1,8 @@
 {
+  "id": "55de03dc-fe70-4776-9b8f-3e5996afccab",
+  "prevId": "a328151d-1114-4c60-bc06-9b71db116c22",
   "version": "6",
   "dialect": "sqlite",
-  "id": "a328151d-1114-4c60-bc06-9b71db116c22",
-  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "project_enrichment_outputs": {
       "name": "project_enrichment_outputs",
@@ -102,7 +102,10 @@
       "indexes": {
         "project_enrichment_outputs_owner_name_uidx": {
           "name": "project_enrichment_outputs_owner_name_uidx",
-          "columns": ["owner", "name"],
+          "columns": [
+            "owner",
+            "name"
+          ],
           "isUnique": true
         }
       },
@@ -189,7 +192,10 @@
       "indexes": {
         "project_repo_artifacts_owner_name_uidx": {
           "name": "project_repo_artifacts_owner_name_uidx",
-          "columns": ["owner", "name"],
+          "columns": [
+            "owner",
+            "name"
+          ],
           "isUnique": true
         }
       },
@@ -202,9 +208,9 @@
   "views": {},
   "enums": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
+    "tables": {}
   },
   "internal": {
     "indexes": {}
