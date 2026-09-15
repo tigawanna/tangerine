@@ -4,7 +4,7 @@ import {
   gemmaQueryKeys,
 } from "@/data-access-layer/embeddings/gemma-query-options";
 import { useEmbeddingBootstrapSse } from "@/hooks/use-embedding-sse";
-import type { EmbeddingBootstrapStatus } from "@/server/elysia/embedding-types";
+import type { EmbeddingBootstrapStatus } from "@/server/elysia/routes/models/embedding-types.ts";
 import { getElysiaTreaty } from "@/server/elysia/treaty";
 import { treatyErrorMessage } from "@/server/elysia/treaty-error";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

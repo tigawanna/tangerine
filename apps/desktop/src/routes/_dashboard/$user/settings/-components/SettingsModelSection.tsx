@@ -8,7 +8,7 @@ import {
 } from "@/data-access-layer/embeddings/gemma-query-options";
 import { useEmbeddingBootstrapSse, useGemmaLoadSse } from "@/hooks/use-embedding-sse";
 import { cn } from "@/lib/utils";
-import type { GemmaDtypeId, GemmaModelSettingsResult } from "@/server/elysia/embedding-types";
+import type { GemmaDtypeId, GemmaModelSettingsResult } from "@/server/elysia/routes/models/embedding-types.ts";
 import { getElysiaTreaty } from "@/server/elysia/treaty";
 import { treatyErrorMessage } from "@/server/elysia/treaty-error";
 import { unwrapUnknownError } from "@/utils/errors";

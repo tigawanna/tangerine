@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import type { EmbedTextResult, GemmaLoadStatusResult } from "@/server/elysia/embedding-types";
+import type { EmbedTextResult, GemmaLoadStatusResult } from "@/server/elysia/routes/models/embedding-types.ts";
 import { getElysiaTreaty } from "@/server/elysia/treaty";
 import { treatyErrorMessage } from "@/server/elysia/treaty-error";
 import { getRouteApi } from "@tanstack/react-router";
