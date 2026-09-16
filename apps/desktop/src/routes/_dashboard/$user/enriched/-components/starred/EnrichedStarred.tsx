@@ -1,13 +1,10 @@
-import { useLiveQuery } from "@tanstack/react-db";
-import { enrichedCollection } from "@/data-access-layer/enriched/list-enriched-collection.ts";
 import { PaginatedListScaffold } from "@/components/pagination/PaginatedListScaffold.tsx";
-import { Loader } from "lucide-react";
-import { EnrichedEmbedActivityCard } from "@/routes/_dashboard/$user/enriched/-components/EnrichedEmbedActivityCard.tsx";
+import { enrichedCollection } from "@/data-access-layer/enriched/list-enriched-collection.ts";
 import { enrichedRouteID } from "@/routes/_dashboard/$user/enriched/-components/constants.ts";
+import { useLiveQuery } from "@tanstack/react-db";
+import { Loader } from "lucide-react";
 
-
-
-export function EnrichedStarred(){
+export function EnrichedStarred() {
   const { data, isLoading } = useLiveQuery((q) => q.from({ enriched: enrichedCollection }));
 
   if (isLoading) {
@@ -33,8 +30,6 @@ export function EnrichedStarred(){
       description="Local corpus of starred repos with embeddings"
       searchPlaceholder="Search enriched">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6" data-test="enriched-page">
-        <EnrichedEmbedActivityCard />
-
         <ul className="divide-y divide-border rounded-lg border border-border">
           {(data?.length ?? 0) === 0 ? (
             <li className="p-4 text-sm text-muted-foreground">No embedded repos yet.</li>

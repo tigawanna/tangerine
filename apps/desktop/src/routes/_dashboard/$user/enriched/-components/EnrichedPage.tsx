@@ -4,7 +4,7 @@ import {
   enrichedRouteID,
   enrichedTabs,
 } from "@/routes/_dashboard/$user/enriched/-components/constants.ts";
-import { EnrichedStarred } from "@/routes/_dashboard/$user/enriched/-components/EnrichedStarred.tsx";
+import { EnrichedStarred } from "@/routes/_dashboard/$user/enriched/-components/starred/EnrichedStarred.tsx";
 import { EnrichedMine } from "@/routes/_dashboard/$user/enriched/-components/mine/EnrichedMine.tsx";
 import { getRouteApi } from "@tanstack/react-router";
 import { Activity, startTransition } from "react";
@@ -39,7 +39,6 @@ export function EnrichedPage() {
           </TabsTrigger>
         ))}
       </TabsList>
-
       <Activity mode={tab === "console" ? "visible" : "hidden"}>
         <EnrichedConsole />
       </Activity>
