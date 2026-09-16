@@ -1,9 +1,9 @@
 import { db } from "@/db/client.ts";
 import { projectEnrichmentOutputs } from "@/db/index.ts";
-import { enrichStreamRoute } from "@/server/elysia/routes/enrich/stream.ts";
 import { and, eq } from "drizzle-orm";
 import { Elysia } from "elysia";
 
+/** Enriched “mine” repos under `/api/elysia/enrich/mine/*`. */
 export const enrichedMineRoute = new Elysia({ prefix: "/mine" })
   .get(
     "/list",
@@ -13,14 +13,15 @@ export const enrichedMineRoute = new Elysia({ prefix: "/mine" })
         columns: {
           embedding: false,
         },
-        where: eq(projectEnrichmentOutputs.type,"mine"),
+        where: eq(projectEnrichmentOutputs.type, "mine"),
       });
     },
     {
       detail: {
-        summary: "Get enriched repos",
-        description: "Get all enriched repos (human-readable enrichment outputs)",
-        tags: ["embedding", "repos"],
+        summary: "List enriched mine repos",
+        description:
+          "Get all enriched repos owned by the viewer (human-readable enrichment outputs).",
+        tags: ["enrich", "mine"],
       },
     },
   )
@@ -64,9 +65,9 @@ export const enrichedMineRoute = new Elysia({ prefix: "/mine" })
     },
     {
       detail: {
-        summary: "Delete an enriched repo",
-        description: "Delete an enriched repo",
-        tags: ["embedding", "repos"],
+        summary: "Delete an enriched mine repo",
+        description: "Delete one enriched mine repo by owner/name.",
+        tags: ["enrich", "mine"],
       },
     },
   );

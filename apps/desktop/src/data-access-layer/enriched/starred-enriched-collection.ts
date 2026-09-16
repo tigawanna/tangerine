@@ -7,14 +7,14 @@ import { queryCollectionOptions } from "@tanstack/query-db-collection";
 
 type AwaitedData<T> = NonNullable<Awaited<T> extends { data: infer D } ? D : never>;
 
-/** One row from `GET /api/elysia/enrich/list` (enrichment output / repo SoT). */
+/** One row from `GET /api/elysia/enrich/starred/list` (enrichment output / repo SoT). */
 export type EnrichedRepoRow = AwaitedData<ReturnType<ElysiaTreaty["enrich"]["starred"]["list"]["get"]>>[number];
 
 export const enrichedReposQueryKey = ["enriched-repos"] as const;
 
 /**
  * TanStack DB collection of enriched repos (one row per owner/name).
- * Snapshot from `/enrich/list`; SSE upserts + 1m invalidate keep it fresh.
+ * Snapshot from `/enrich/starred/list`; SSE upserts + 1m invalidate keep it fresh.
  */
 export const enrichStarredReposCollection = createCollection(
   queryCollectionOptions({

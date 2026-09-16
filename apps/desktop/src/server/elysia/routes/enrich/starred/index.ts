@@ -1,9 +1,20 @@
+import { on } from "node:events";
 import { db } from "@/db/client.ts";
 import { projectEnrichmentOutputs } from "@/db/index.ts";
-import { enrichStreamRoute } from "@/server/elysia/routes/enrich/stream.ts";
+import {
+  embedActivityEmitter,
+  getEmbedActivityStatus,
+  type EmbedActivitySsePayload,
+} from "@/server/elysia/routes/enrich/helpers/embed-activity.ts";
+import { enqueueRepoEmbedListJob } from "@/server/elysia/routes/enrich/helpers/repo-list-worker.ts";
+import { DEFAULT_REPO_EMBED_LIMIT } from "@/server/elysia/routes/enrich/helpers/repo-worker.ts";
 import { and, eq } from "drizzle-orm";
-import { Elysia } from "elysia";
+import { Elysia, sse, t } from "elysia";
 
+/**
+ * Starred enrich under `/api/elysia/enrich/starred/*`:
+ * list / delete rows + crawl status, SSE, enqueue.
+ */
 export const enrichedStarredRoute = new Elysia({ prefix: "/starred" })
   .get(
     "/list",
@@ -13,14 +24,14 @@ export const enrichedStarredRoute = new Elysia({ prefix: "/starred" })
         columns: {
           embedding: false,
         },
-        where: eq(projectEnrichmentOutputs.type,"mine"),
+        where: eq(projectEnrichmentOutputs.type, "starred"),
       });
     },
     {
       detail: {
-        summary: "Get enriched repos",
-        description: "Get all enriched repos (human-readable enrichment outputs)",
-        tags: ["embedding", "repos"],
+        summary: "List enriched starred repos",
+        description: "Get all enriched starred repos (human-readable enrichment outputs).",
+        tags: ["enrich", "starred"],
       },
     },
   )
@@ -64,9 +75,84 @@ export const enrichedStarredRoute = new Elysia({ prefix: "/starred" })
     },
     {
       detail: {
-        summary: "Delete an enriched repo",
-        description: "Delete an enriched repo",
-        tags: ["embedding", "repos"],
+        summary: "Delete an enriched starred repo",
+        description: "Delete one enriched starred repo by owner/name.",
+        tags: ["enrich", "starred"],
+      },
+    },
+  )
+  .get("/activity", () => getEmbedActivityStatus(), {
+    detail: {
+      summary: "Starred enrich crawl status",
+      description: "Latest starred list/embed progress snapshot.",
+      tags: ["enrich", "starred", "stream"],
+    },
+  })
+  .get(
+    "/activity/events",
+    async function* ({ request }) {
+      const initial: EmbedActivitySsePayload = {
+        status: getEmbedActivityStatus(),
+        row: null,
+      };
+      yield sse({ data: initial });
+
+      for await (const [payload] of on(embedActivityEmitter, "activity", {
+        signal: request.signal,
+      })) {
+        yield sse({ data: payload });
+      }
+    },
+    {
+      detail: {
+        summary: "Starred enrich crawl SSE",
+        description:
+          "Streams starred list/embed activity. Frames may include a newly upserted enriched row (no vector).",
+        tags: ["enrich", "starred", "stream"],
+      },
+    },
+  )
+  .post(
+    "/enqueue",
+    async ({ body }) => {
+      const result = await enqueueRepoEmbedListJob({
+        pageSize: body?.pageSize ?? body?.limit,
+      });
+
+      return {
+        ok: true,
+        message: `Started starred-list crawl for ${result.login}`,
+        ...result,
+        status: getEmbedActivityStatus(),
+      };
+    },
+    {
+      body: t.Optional(
+        t.Object({
+          pageSize: t.Optional(
+            t.Number({
+              minimum: 1,
+              maximum: 100,
+              default: DEFAULT_REPO_EMBED_LIMIT,
+              description: "Starred repos per GitHub page (max 100).",
+            }),
+          ),
+          /** @deprecated Prefer `pageSize`. */
+          limit: t.Optional(
+            t.Number({
+              minimum: 1,
+              maximum: 100,
+              description: "Alias for pageSize (deprecated).",
+            }),
+          ),
+        }),
+      ),
+      detail: {
+        summary: "Start starred-repo enrich crawl",
+        description:
+          "Starts list + embed workers explicitly, enqueues the first starred page, " +
+          "and tracks progress on the enrich activity emitter.",
+        tags: ["enrich", "starred", "worker"],
       },
     },
   );

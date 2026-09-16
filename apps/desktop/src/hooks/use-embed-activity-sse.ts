@@ -32,7 +32,7 @@ export function useEmbedActivitySse() {
     let cancelled = false;
 
     void getElysiaTreaty()
-      .enrich.stream.activity.get()
+      .enrich.starred.activity.get()
       .then(({ data, error }) => {
         if (cancelled || error || !data) return;
         setStatus(data);
@@ -48,7 +48,7 @@ export function useEmbedActivitySse() {
 
   useEffect(() => {
     return subscribeSseJson<EmbedActivitySsePayload>(
-      "/api/elysia/enrich/stream/activity/events",
+      "/api/elysia/enrich/starred/activity/events",
       {
         onMessage: (payload) => {
           setStatus(payload.status);
