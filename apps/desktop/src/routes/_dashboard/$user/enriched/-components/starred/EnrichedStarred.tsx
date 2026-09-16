@@ -1,11 +1,13 @@
 import { PaginatedListScaffold } from "@/components/pagination/PaginatedListScaffold.tsx";
-import { enrichedCollection } from "@/data-access-layer/enriched/list-enriched-collection.ts";
+import { enrichStarredReposCollection } from "@/data-access-layer/enriched/list-enriched-collection.ts";
 import { enrichedRouteID } from "@/routes/_dashboard/$user/enriched/-components/constants.ts";
 import { useLiveQuery } from "@tanstack/react-db";
 import { Loader } from "lucide-react";
 
 export function EnrichedStarred() {
-  const { data, isLoading } = useLiveQuery((q) => q.from({ enriched: enrichedCollection }));
+  const { data, isLoading } = useLiveQuery((q) =>
+    q.from({ enriched: enrichStarredReposCollection }),
+  );
 
   if (isLoading) {
     return (

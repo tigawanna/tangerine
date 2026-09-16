@@ -17,7 +17,9 @@ export const getRouter = async () => {
     routeTree,
     defaultPendingComponent: () => <RouterPendingComponent />,
     defaultNotFoundComponent: () => <RouterNotFoundComponent />,
-    defaultErrorComponent: ({ error }) => <RouterErrorComponent error={error} />,
+    defaultErrorComponent: ({ error, reset }) => (
+      <RouterErrorComponent error={error} reset={reset} />
+    ),
     context: {
       ...tanstackQueryContext,
       /** Populated in `/_dashboard` `beforeLoad` (client-only). */

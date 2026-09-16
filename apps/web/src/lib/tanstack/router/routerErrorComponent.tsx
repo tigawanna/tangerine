@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { RouteStatusShell } from "./RouteStatusShell";
 
@@ -9,27 +9,59 @@ interface RouterErrorComponentProps {
 }
 
 /**
- * Builds a clipboard-ready dump of the error name, message, and stack.
+ * Walks `error.cause` and formats name / message / stack for display + clipboard.
  */
-function formatErrorForClipboard(error: Error): string {
-  const lines = [`${error.name}: ${error.message}`];
-  if (error.stack) {
-    lines.push("", error.stack);
+function formatErrorDump(error: unknown): string {
+  const blocks: string[] = [];
+  let current: unknown = error;
+  let depth = 0;
+
+  while (current != null && depth < 8) {
+    if (current instanceof Error) {
+      blocks.push(
+        [
+          depth === 0 ? `${current.name}: ${current.message}` : `Caused by: ${current.name}: ${current.message}`,
+          current.stack ?? "(no stack)",
+        ].join("\n"),
+      );
+      current = current.cause;
+      depth += 1;
+      continue;
+    }
+
+    try {
+      blocks.push(JSON.stringify(current, null, 2));
+    } catch {
+      // oxlint-disable-next-line typescript/no-base-to-string
+      blocks.push(String(current));
+    }
+    break;
   }
-  return lines.join("\n");
+
+  return blocks.join("\n\n");
 }
 
 export function RouterErrorComponent({ error, reset }: RouterErrorComponentProps) {
+  function reloadPage() {
+    window.location.reload();
+  }
+
   return (
     <RouteStatusShell
       data-test="router-error"
       title={<>Something failed</>}
-      description="This page hit a snag on our end. Give it another moment, or head back home while we sort things out."
+      description="This page hit a snag on our end. Give it another moment, reload, or head back home while we sort things out."
       actions={
         <>
-          <Link to="/" data-test="router-error-home" className="landing-cta-primary">
-            Back home
-          </Link>
+          <button
+            type="button"
+            data-test="router-error-reload"
+            onClick={reloadPage}
+            className="landing-cta-primary inline-flex items-center gap-2"
+          >
+            <RefreshCw className="size-4" aria-hidden="true" />
+            Reload
+          </button>
           {reset ? (
             <button
               type="button"
@@ -40,19 +72,23 @@ export function RouterErrorComponent({ error, reset }: RouterErrorComponentProps
               Try again
             </button>
           ) : null}
+          <Link to="/" data-test="router-error-home" className="landing-cta-secondary">
+            Back home
+          </Link>
         </>
       }
-      footer={import.meta.env.DEV ? <RouterErrorDevelopmentPanel error={error} /> : null}
+      footer={<RouterErrorDetailsPanel error={error} />}
     />
   );
 }
 
-function RouterErrorDevelopmentPanel({ error }: { error: Error }) {
+function RouterErrorDetailsPanel({ error }: { error: Error }) {
   const [copied, setCopied] = useState(false);
+  const dump = formatErrorDump(error);
 
   async function copyErrorDetails() {
     try {
-      await navigator.clipboard.writeText(formatErrorForClipboard(error));
+      await navigator.clipboard.writeText(dump);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -62,7 +98,7 @@ function RouterErrorDevelopmentPanel({ error }: { error: Error }) {
 
   return (
     <div
-      data-test="router-error-development"
+      data-test="router-error-details"
       className="border-landing-border bg-landing-panel/90 w-full min-w-0 overflow-hidden rounded-2xl border p-4 text-left backdrop-blur-sm"
     >
       <div className="flex items-center justify-between gap-3">
@@ -82,22 +118,12 @@ function RouterErrorDevelopmentPanel({ error }: { error: Error }) {
         </button>
       </div>
 
-      <div className="mt-2 min-w-0 overflow-x-auto">
-        <p className="text-landing-fg-muted w-max max-w-none font-mono text-sm leading-6 whitespace-pre">
-          {error.message}
-        </p>
-      </div>
-
-      {error.stack ? (
-        <details className="group mt-4" open>
-          <summary className="text-landing-fg-muted hover:text-landing-fg cursor-pointer text-sm transition-colors">
-            Stack trace
-          </summary>
-          <pre className="border-landing-border bg-landing-surface/80 text-landing-fg-muted mt-3 max-h-64 min-w-0 overflow-auto rounded-xl border p-3 font-mono text-xs leading-5 whitespace-pre">
-            {error.stack}
-          </pre>
-        </details>
-      ) : null}
+      <pre
+        data-test="router-error-dump"
+        className="border-landing-border bg-landing-surface/80 text-landing-fg-muted mt-3 max-h-[min(28rem,50vh)] min-w-0 overflow-auto rounded-xl border p-3 font-mono text-xs leading-5 whitespace-pre-wrap wrap-break-word"
+      >
+        {dump}
+      </pre>
     </div>
   );
 }

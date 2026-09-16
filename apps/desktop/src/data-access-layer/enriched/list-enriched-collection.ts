@@ -16,7 +16,7 @@ export const enrichedReposQueryKey = ["enriched-repos"] as const;
  * TanStack DB collection of enriched repos (one row per owner/name).
  * Snapshot from `/enrich/list`; SSE upserts + 1m invalidate keep it fresh.
  */
-export const enrichedCollection = createCollection(
+export const enrichStarredReposCollection = createCollection(
   queryCollectionOptions({
     id: "enriched-repos",
     queryKey: enrichedReposQueryKey,
@@ -41,7 +41,7 @@ export const enrichedCollection = createCollection(
 export function upsertEnrichedRepo(row: EnrichedRepoRow) {
   const write = () => {
     try {
-      enrichedCollection.utils.writeUpsert(row);
+      enrichStarredReposCollection.utils.writeUpsert(row);
     } catch {
       getQueryClient().setQueryData<EnrichedRepoRow[]>(enrichedReposQueryKey, (prev) => {
         const list = prev ?? [];
@@ -54,12 +54,12 @@ export function upsertEnrichedRepo(row: EnrichedRepoRow) {
     }
   };
 
-  if (enrichedCollection.isReady()) {
+  if (enrichStarredReposCollection.isReady()) {
     write();
     return;
   }
 
-  enrichedCollection.onFirstReady(write);
+  enrichStarredReposCollection.onFirstReady(write);
 }
 
 /** Full list refetch (also used on a 1-minute timer). */
