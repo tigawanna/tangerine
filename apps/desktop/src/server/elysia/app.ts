@@ -3,16 +3,13 @@ import { embeddingsRoute } from "@/server/elysia/routes/models/embedding-invento
 import { workerRoute } from "@/server/elysia/routes/worker";
 import { Elysia, sse } from "elysia";
 import { enrichRoute } from "@/server/elysia/routes/enrich/index.ts";
+import { helloRoute } from "@/server/elysia/routes/hello/index.ts";
 
 /**
  * Embedded Elysia API for EmbeddingGemma + ORT (mounted at `/api/elysia/$`).
  * Settings, bootstrap, embed playground, and the lab UI all talk to this app.
  */
 export const elysiaApp = new Elysia({ prefix: "/api/elysia" })
-  .get("/hello", () => ({
-    message: "Hello from Elysia",
-    at: new Date().toISOString(),
-  }))
   .get("/tick", async function* ({ request }) {
     let n = 0;
     while (!request.signal.aborted) {
@@ -31,6 +28,7 @@ export const elysiaApp = new Elysia({ prefix: "/api/elysia" })
   })
   .use(embeddingsRoute)
   .use(workerRoute)
-  .use(enrichRoute);
+  .use(enrichRoute)
+  .use(helloRoute);
 
 export type ElysiaApp = typeof elysiaApp;
