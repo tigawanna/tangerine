@@ -4,7 +4,7 @@ import {
   demoBatchQueue,
   store,
   type DemoBatchJob,
-} from "@/lib/worker/client";
+} from "@/lib/worker/store.ts";
 
 const DEFAULT_TOTAL = 1000;
 const DEFAULT_BATCH_SIZE = 10;
