@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 
 /**
- * Placeholder worker routes. Demo-batch was removed; real crawl lives under `/embed/repos/*`.
+ * Placeholder worker routes. Demo-batch was removed; real crawl lives under `/enrich/stream/*`.
  */
 export const workerRoute = new Elysia({ prefix: "/worker" });

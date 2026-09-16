@@ -7,7 +7,7 @@ import { subscribeSseJson } from "@/hooks/use-embedding-sse";
 import type {
   EmbedActivitySsePayload,
   EmbedActivityStatus,
-} from "@/server/elysia/routes/embed/helpers/embed-activity.ts";
+} from "@/server/elysia/routes/enrich/helpers/embed-activity.ts";
 import { getElysiaTreaty } from "@/server/elysia/treaty";
 import { useEffect, useState } from "react";
 
@@ -22,7 +22,7 @@ function isLive(status: EmbedActivityStatus | null): boolean {
 }
 
 /**
- * Live embed crawl status via SSE, optional row upserts into the enriched collection,
+ * Live enrich crawl status via SSE, optional row upserts into the enriched collection,
  * and a 1-minute full list refetch.
  */
 export function useEmbedActivitySse() {
@@ -32,7 +32,7 @@ export function useEmbedActivitySse() {
     let cancelled = false;
 
     void getElysiaTreaty()
-      .embed.repos.activity.get()
+      .enrich.stream.activity.get()
       .then(({ data, error }) => {
         if (cancelled || error || !data) return;
         setStatus(data);
@@ -48,7 +48,7 @@ export function useEmbedActivitySse() {
 
   useEffect(() => {
     return subscribeSseJson<EmbedActivitySsePayload>(
-      "/api/elysia/embed/repos/activity/events",
+      "/api/elysia/enrich/stream/activity/events",
       {
         onMessage: (payload) => {
           setStatus(payload.status);

@@ -1,9 +1,11 @@
 import { db } from "@/db/client.ts";
 import { projectEnrichmentOutputs } from "@/db/index.ts";
+import { enrichStreamRoute } from "@/server/elysia/routes/enrich/stream.ts";
 import { and, eq } from "drizzle-orm";
 import { Elysia } from "elysia";
 
 export const enrichRoute = new Elysia({ prefix: "/enrich" })
+  .use(enrichStreamRoute)
   .get(
     "/list",
     async () => {

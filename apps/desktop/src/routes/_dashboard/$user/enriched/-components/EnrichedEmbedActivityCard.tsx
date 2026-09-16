@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useEmbedActivitySse } from "@/hooks/use-embed-activity-sse";
-import type { EmbedActivityStatus } from "@/server/elysia/routes/embed/helpers/embed-activity.ts";
+import type { EmbedActivityStatus } from "@/server/elysia/routes/enrich/helpers/embed-activity.ts";
 import { getElysiaTreaty } from "@/server/elysia/treaty";
 import { treatyErrorMessage } from "@/server/elysia/treaty-error";
 import { Loader2, Play } from "lucide-react";
@@ -41,7 +41,7 @@ export function EnrichedEmbedActivityCard() {
   async function onStartCrawl() {
     setPending(true);
     try {
-      const { data, error } = await getElysiaTreaty().embed.repos.enqueue.post({});
+      const { data, error } = await getElysiaTreaty().enrich.stream.enqueue.post({});
       if (error) throw new Error(treatyErrorMessage(error));
       toast.success("Starred embed crawl started", {
         description: data ? `${data.login} · page size ${data.pageSize}` : undefined,

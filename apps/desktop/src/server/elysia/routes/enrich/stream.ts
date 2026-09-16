@@ -1,37 +1,20 @@
 import { on } from "node:events";
-import { db } from "@/db/client.ts";
 import {
   embedActivityEmitter,
   getEmbedActivityStatus,
   type EmbedActivitySsePayload,
-} from "@/server/elysia/routes/embed/helpers/embed-activity.ts";
-import { enqueueRepoEmbedListJob } from "@/server/elysia/routes/embed/helpers/repo-list-worker.ts";
-import { DEFAULT_REPO_EMBED_LIMIT } from "@/server/elysia/routes/embed/helpers/repo-worker.ts";
+} from "@/server/elysia/routes/enrich/helpers/embed-activity.ts";
+import { enqueueRepoEmbedListJob } from "@/server/elysia/routes/enrich/helpers/repo-list-worker.ts";
+import { DEFAULT_REPO_EMBED_LIMIT } from "@/server/elysia/routes/enrich/helpers/repo-worker.ts";
 import { Elysia, sse, t } from "elysia";
 
-export const embedReposRoute = new Elysia({ prefix: "/repos" })
-  .get(
-    "/",
-    async () => {
-      return db.query.projectEnrichmentOutputs.findMany({
-        columns: {
-          embedding: false,
-        },
-      });
-    },
-    {
-      detail: {
-        summary: "Get enriched repos",
-        description: "Get all enriched repos (human-readable enrichment outputs)",
-        tags: ["embedding", "repos"],
-      },
-    },
-  )
+/** Starred-list crawl + SSE under `/api/elysia/enrich/stream/*`. */
+export const enrichStreamRoute = new Elysia({ prefix: "/stream" })
   .get("/activity", () => getEmbedActivityStatus(), {
     detail: {
-      summary: "Embed crawl status",
+      summary: "Enrich crawl status",
       description: "Latest list/embed progress snapshot.",
-      tags: ["embedding", "repos"],
+      tags: ["enrich", "stream"],
     },
   })
   .get(
@@ -51,10 +34,10 @@ export const embedReposRoute = new Elysia({ prefix: "/repos" })
     },
     {
       detail: {
-        summary: "Embed crawl SSE",
+        summary: "Enrich crawl SSE",
         description:
           "Streams list/embed activity. Frames may include a newly upserted enriched row (no vector).",
-        tags: ["embedding", "repos"],
+        tags: ["enrich", "stream"],
       },
     },
   )
@@ -94,11 +77,11 @@ export const embedReposRoute = new Elysia({ prefix: "/repos" })
         }),
       ),
       detail: {
-        summary: "Start starred-repo embed list crawl",
+        summary: "Start starred-repo enrich crawl",
         description:
           "Starts list + embed workers explicitly, enqueues the first starred page, " +
-          "and tracks progress on the embed activity emitter.",
-        tags: ["embedding", "repos", "worker"],
+          "and tracks progress on the enrich activity emitter.",
+        tags: ["enrich", "stream", "worker"],
       },
     },
   );

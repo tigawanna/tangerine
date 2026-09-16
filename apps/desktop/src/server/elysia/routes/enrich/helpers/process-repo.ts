@@ -11,11 +11,11 @@ import {
   getEmbedActivityStatus,
   patchEmbedActivity,
   type EmbedActivityRepoRow,
-} from "@/server/elysia/routes/embed/helpers/embed-activity.ts";
+} from "@/server/elysia/routes/enrich/helpers/embed-activity.ts";
 import {
   REPO_EMBED_QUEUE,
   type RepoEmbedJob,
-} from "@/server/elysia/routes/embed/helpers/repo-worker.ts";
+} from "@/server/elysia/routes/enrich/helpers/repo-worker.ts";
 
 /**
  * Fetch README → clip → embed → upsert enrichment row.
