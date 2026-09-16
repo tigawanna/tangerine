@@ -1,7 +1,11 @@
 import { Elysia, sse, t } from "elysia";
-import { EventEmitter } from "node:events";
+import { EventEmitter, on } from "node:events";
 
-const helloEmitter = new EventEmitter();
+interface HelloEmitterEvents {
+  message: [message: string];
+}
+
+const helloEmitter = new EventEmitter<HelloEmitterEvents>();
 
 /** Demo hello routes under `/api/elysia/hello/*`. */
 export const helloRoute = new Elysia({ prefix: "/hello" })
@@ -15,36 +19,10 @@ export const helloRoute = new Elysia({ prefix: "/hello" })
   .get(
     "/sse",
     async function* ({ request }) {
-      const pending: string[] = [];
-      let wake: (() => void) | undefined;
-
-      const onMessage = (message: string) => {
-        pending.push(message);
-        wake?.();
-        wake = undefined;
-      };
-
-      helloEmitter.on("message", onMessage);
-
-      try {
-        while (!request.signal.aborted) {
-          if (pending.length === 0) {
-            await new Promise<void>((resolve) => {
-              if (request.signal.aborted) {
-                resolve();
-                return;
-              }
-              wake = resolve;
-              request.signal.addEventListener("abort", () => resolve(), { once: true });
-            });
-          }
-
-          while (pending.length > 0 && !request.signal.aborted) {
-            yield sse({ data: pending.shift()! });
-          }
-        }
-      } finally {
-        helloEmitter.off("message", onMessage);
+      // `on()` turns EventEmitter into an async iterable — each POST emit yields one loop iteration.
+      // `{ signal }` ends the loop (and removes listeners) when the client disconnects.
+      for await (const [message] of on(helloEmitter, "message", { signal: request.signal })) {
+        yield sse({ data: message });
       }
     },
     {
@@ -55,18 +33,22 @@ export const helloRoute = new Elysia({ prefix: "/hello" })
       },
     },
   )
-  .post("/", ({ body }) => {
-    helloEmitter.emit("message", body.message);
-    return {
-      message: `Emitted ${body.message}`,
-    };
-  }, {
-    body: t.Object({
-      message: t.String(),
-    }),
-    detail: {
-      summary: "Hello, world!",
-      description: "Hello, world!",
-      tags: ["hello"],
+  .post(
+    "/",
+    ({ body }) => {
+      helloEmitter.emit("message", body.message);
+      return {
+        message: `Emitted ${body.message}`,
+      };
     },
-  });
+    {
+      body: t.Object({
+        message: t.String(),
+      }),
+      detail: {
+        summary: "Hello, world!",
+        description: "Hello, world!",
+        tags: ["hello"],
+      },
+    },
+  );

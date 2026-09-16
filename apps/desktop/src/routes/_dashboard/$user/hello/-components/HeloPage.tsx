@@ -10,18 +10,18 @@ const routeID = "/_dashboard/$user/hello/" as const;
 export function HelloPage() {
   useHelloSse();
 
-  const { data, isLoading } = useLiveQuery((q) => q.from({ enriched: helloCollection }));
+  const { data, isLoading } = useLiveQuery((q) => q.from({ hello: helloCollection }));
 
   if (isLoading)
     return (
       <PaginatedListScaffold
         routeID={routeID}
-        title="Enriched"
-        description="Enriched"
-        searchPlaceholder="Search enrched">
+        title="Hello"
+        description="Hello SSE demo"
+        searchPlaceholder="Search messages">
         <div
           className="h-full minh-screen w-full flex justify-center items-center gap-6"
-          data-test="enriched-page">
+          data-test="hello-page">
           <Loader className="h-4 w-4 animate-spin" />
         </div>
       </PaginatedListScaffold>
@@ -30,10 +30,10 @@ export function HelloPage() {
   return (
     <PaginatedListScaffold
       routeID={routeID}
-      title="Enriched"
-      description="Enriched"
-      searchPlaceholder="Search enrched">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6" data-test="enriched-page">
+      title="Hello"
+      description="Hello SSE demo"
+      searchPlaceholder="Search messages">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6" data-test="hello-page">
         <ul>
           {data?.map((item) => (
             <li key={item.id}>

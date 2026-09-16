@@ -1,28 +1,42 @@
-import { helloCollection } from "@/data-access-layer/enriched/hello-collection.ts";
+import { appendHelloMessage, helloCollection } from "@/data-access-layer/enriched/hello-collection.ts";
 import { getElysiaTreaty } from "@/server/elysia/treaty.ts";
 import { useEffect } from "react";
 
 /** Stream POST /hello emits into the hello collection via SSE. */
 export function useHelloSse() {
   useEffect(() => {
-    const path = getElysiaTreaty().hello.sse["~path"];
-    const source = new EventSource(path);
+    let source: EventSource | null = null;
+    let cancelled = false;
 
-    source.onmessage = (event) => {
-      helloCollection.writeInsert({
-        id: crypto.randomUUID(),
-        message: event.data,
+    const connect = () => {
+      const path = getElysiaTreaty().hello.sse["~path"];
+      source = new EventSource(path);
+      source.onmessage = (event) => appendHelloMessage(event.data);
+      source.onerror = () => {
+        if (source && source.readyState !== EventSource.CONNECTING) {
+          source.close();
+        }
+      };
+    };
+
+    const disconnect = () => {
+      cancelled = true;
+      source?.close();
+    };
+
+    if (helloCollection.isReady()) {
+      connect();
+    } else {
+      const unsubscribe = helloCollection.onFirstReady(() => {
+        if (cancelled) return;
+        connect();
       });
-    };
+      return () => {
+        unsubscribe();
+        disconnect();
+      };
+    }
 
-    source.onerror = () => {
-      if (source.readyState !== EventSource.CONNECTING) {
-        source.close();
-      }
-    };
-
-    return () => {
-      source.close();
-    };
+    return disconnect;
   }, []);
 }
