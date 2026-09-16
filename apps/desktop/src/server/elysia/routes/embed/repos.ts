@@ -1,7 +1,13 @@
+import { on } from "node:events";
 import { db } from "@/db/client.ts";
+import {
+  embedActivityEmitter,
+  getEmbedActivityStatus,
+  type EmbedActivitySsePayload,
+} from "@/server/elysia/routes/embed/helpers/embed-activity.ts";
+import { enqueueRepoEmbedListJob } from "@/server/elysia/routes/embed/helpers/repo-list-worker.ts";
 import { DEFAULT_REPO_EMBED_LIMIT } from "@/server/elysia/routes/embed/helpers/repo-worker.ts";
-import { startStarredRepoEmbedList } from "@/server/elysia/routes/embed/helpers/repo-list-worker.ts";
-import { Elysia, t } from "elysia";
+import { Elysia, sse, t } from "elysia";
 
 export const embedReposRoute = new Elysia({ prefix: "/repos" })
   .get(
@@ -21,19 +27,49 @@ export const embedReposRoute = new Elysia({ prefix: "/repos" })
       },
     },
   )
+  .get("/activity", () => getEmbedActivityStatus(), {
+    detail: {
+      summary: "Embed crawl status",
+      description: "Latest list/embed progress snapshot.",
+      tags: ["embedding", "repos"],
+    },
+  })
+  .get(
+    "/activity/events",
+    async function* ({ request }) {
+      const initial: EmbedActivitySsePayload = {
+        status: getEmbedActivityStatus(),
+        row: null,
+      };
+      yield sse({ data: initial });
+
+      for await (const [payload] of on(embedActivityEmitter, "activity", {
+        signal: request.signal,
+      })) {
+        yield sse({ data: payload });
+      }
+    },
+    {
+      detail: {
+        summary: "Embed crawl SSE",
+        description:
+          "Streams list/embed activity. Frames may include a newly upserted enriched row (no vector).",
+        tags: ["embedding", "repos"],
+      },
+    },
+  )
   .post(
     "/enqueue",
     async ({ body }) => {
-      const result = await startStarredRepoEmbedList({
+      const result = await enqueueRepoEmbedListJob({
         pageSize: body?.pageSize ?? body?.limit,
       });
 
       return {
         ok: true,
-        message: result.started
-          ? `Started starred-list crawl for ${result.login} (page size ${result.pageSize})`
-          : `Starred-list crawl already running for ${result.login}`,
+        message: `Started starred-list crawl for ${result.login}`,
         ...result,
+        status: getEmbedActivityStatus(),
       };
     },
     {
@@ -44,7 +80,7 @@ export const embedReposRoute = new Elysia({ prefix: "/repos" })
               minimum: 1,
               maximum: 100,
               default: DEFAULT_REPO_EMBED_LIMIT,
-              description: "Starred repos per GitHub page (max 100). Pages chain until exhausted.",
+              description: "Starred repos per GitHub page (max 100).",
             }),
           ),
           /** @deprecated Prefer `pageSize`. */
@@ -60,9 +96,8 @@ export const embedReposRoute = new Elysia({ prefix: "/repos" })
       detail: {
         summary: "Start starred-repo embed list crawl",
         description:
-          "Starts a durable list worker that pages through the viewer's starred repos, " +
-          "enqueueing one embed job per repo. On GitHub rate limits it pauses ~60s and retries " +
-          "the same cursor. Does not run the embed worker.",
+          "Starts list + embed workers explicitly, enqueues the first starred page, " +
+          "and tracks progress on the embed activity emitter.",
         tags: ["embedding", "repos", "worker"],
       },
     },

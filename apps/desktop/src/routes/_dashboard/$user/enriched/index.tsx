@@ -1,6 +1,6 @@
 import { AppConfig } from "@/utils/system";
 import { createFileRoute } from "@tanstack/react-router";
-import { EnrichedPage } from "@/routes/_dashboard/$user/enriched/-components/EmbedPage.tsx";
+import { EnrichedPage } from "@/routes/_dashboard/$user/enriched/-components/EnrichedPage.tsx";
 
 
 

@@ -10,14 +10,16 @@ type AwaitedData<T> = NonNullable<Awaited<T> extends { data: infer D } ? D : nev
 /** One row from `GET /api/elysia/enrich/list` (enrichment output / repo SoT). */
 export type EnrichedRepoRow = AwaitedData<ReturnType<ElysiaTreaty["enrich"]["list"]["get"]>>[number];
 
+export const enrichedReposQueryKey = ["enriched-repos"] as const;
+
 /**
  * TanStack DB collection of enriched repos (one row per owner/name).
- * Snapshot from `/enrich/list`; later CDC/SSE can writeUpsert / writeDelete.
+ * Snapshot from `/enrich/list`; SSE upserts + 1m invalidate keep it fresh.
  */
 export const enrichedCollection = createCollection(
   queryCollectionOptions({
     id: "enriched-repos",
-    queryKey: ["enriched-repos"],
+    queryKey: enrichedReposQueryKey,
     queryClient: getQueryClient(),
     getKey: (item: EnrichedRepoRow) => item.id,
     queryFn: async () => {
@@ -34,3 +36,33 @@ export const enrichedCollection = createCollection(
     },
   }),
 );
+
+/** Upsert one enriched row from SSE (no embedding vector). */
+export function upsertEnrichedRepo(row: EnrichedRepoRow) {
+  const write = () => {
+    try {
+      enrichedCollection.utils.writeUpsert(row);
+    } catch {
+      getQueryClient().setQueryData<EnrichedRepoRow[]>(enrichedReposQueryKey, (prev) => {
+        const list = prev ?? [];
+        const index = list.findIndex((item) => item.id === row.id);
+        if (index === -1) return [...list, row];
+        const next = list.slice();
+        next[index] = row;
+        return next;
+      });
+    }
+  };
+
+  if (enrichedCollection.isReady()) {
+    write();
+    return;
+  }
+
+  enrichedCollection.onFirstReady(write);
+}
+
+/** Full list refetch (also used on a 1-minute timer). */
+export function invalidateEnrichedRepos() {
+  return getQueryClient().invalidateQueries({ queryKey: enrichedReposQueryKey });
+}

@@ -17,7 +17,6 @@ import { Route as DashboardUserIndexRouteImport } from './routes/_dashboard/$use
 import { Route as DashboardViewerIndexRouteImport } from './routes/_dashboard/viewer/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiElysiaSplatRouteImport } from './routes/api/elysia/$'
-import { Route as DashboardUserEmbedIndexRouteImport } from './routes/_dashboard/$user/embed/index'
 import { Route as DashboardUserEnrichedIndexRouteImport } from './routes/_dashboard/$user/enriched/index'
 import { Route as DashboardUserHelloIndexRouteImport } from './routes/_dashboard/$user/hello/index'
 import { Route as DashboardUserReposIndexRouteImport } from './routes/_dashboard/$user/repos/index'
@@ -64,11 +63,6 @@ const ApiElysiaSplatRoute = ApiElysiaSplatRouteImport.update({
   id: '/api/elysia/$',
   path: '/api/elysia/$',
   getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardUserEmbedIndexRoute = DashboardUserEmbedIndexRouteImport.update({
-  id: '/embed/',
-  path: '/embed/',
-  getParentRoute: () => DashboardUserLayoutRoute,
 } as any)
 const DashboardUserEnrichedIndexRoute =
   DashboardUserEnrichedIndexRouteImport.update({
@@ -118,7 +112,6 @@ export interface FileRoutesByFullPath {
   '/api/elysia/$': typeof ApiElysiaSplatRoute
   '/$user/': typeof DashboardUserIndexRoute
   '/viewer/': typeof DashboardViewerIndexRoute
-  '/$user/embed/': typeof DashboardUserEmbedIndexRoute
   '/$user/enriched/': typeof DashboardUserEnrichedIndexRoute
   '/$user/hello/': typeof DashboardUserHelloIndexRoute
   '/$user/repos/': typeof DashboardUserReposIndexRoute
@@ -134,7 +127,6 @@ export interface FileRoutesByTo {
   '/api/elysia/$': typeof ApiElysiaSplatRoute
   '/$user': typeof DashboardUserIndexRoute
   '/viewer': typeof DashboardViewerIndexRoute
-  '/$user/embed': typeof DashboardUserEmbedIndexRoute
   '/$user/enriched': typeof DashboardUserEnrichedIndexRoute
   '/$user/hello': typeof DashboardUserHelloIndexRoute
   '/$user/repos': typeof DashboardUserReposIndexRoute
@@ -153,7 +145,6 @@ export interface FileRoutesById {
   '/api/elysia/$': typeof ApiElysiaSplatRoute
   '/_dashboard/$user/': typeof DashboardUserIndexRoute
   '/_dashboard/viewer/': typeof DashboardViewerIndexRoute
-  '/_dashboard/$user/embed/': typeof DashboardUserEmbedIndexRoute
   '/_dashboard/$user/enriched/': typeof DashboardUserEnrichedIndexRoute
   '/_dashboard/$user/hello/': typeof DashboardUserHelloIndexRoute
   '/_dashboard/$user/repos/': typeof DashboardUserReposIndexRoute
@@ -172,7 +163,6 @@ export interface FileRouteTypes {
     | '/api/elysia/$'
     | '/$user/'
     | '/viewer/'
-    | '/$user/embed/'
     | '/$user/enriched/'
     | '/$user/hello/'
     | '/$user/repos/'
@@ -188,7 +178,6 @@ export interface FileRouteTypes {
     | '/api/elysia/$'
     | '/$user'
     | '/viewer'
-    | '/$user/embed'
     | '/$user/enriched'
     | '/$user/hello'
     | '/$user/repos'
@@ -206,7 +195,6 @@ export interface FileRouteTypes {
     | '/api/elysia/$'
     | '/_dashboard/$user/'
     | '/_dashboard/viewer/'
-    | '/_dashboard/$user/embed/'
     | '/_dashboard/$user/enriched/'
     | '/_dashboard/$user/hello/'
     | '/_dashboard/$user/repos/'
@@ -282,13 +270,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiElysiaSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_dashboard/$user/embed/': {
-      id: '/_dashboard/$user/embed/'
-      path: '/embed'
-      fullPath: '/$user/embed/'
-      preLoaderRoute: typeof DashboardUserEmbedIndexRouteImport
-      parentRoute: typeof DashboardUserLayoutRoute
-    }
     '/_dashboard/$user/enriched/': {
       id: '/_dashboard/$user/enriched/'
       path: '/enriched'
@@ -343,7 +324,6 @@ declare module '@tanstack/react-router' {
 
 interface DashboardUserLayoutRouteChildren {
   DashboardUserIndexRoute: typeof DashboardUserIndexRoute
-  DashboardUserEmbedIndexRoute: typeof DashboardUserEmbedIndexRoute
   DashboardUserEnrichedIndexRoute: typeof DashboardUserEnrichedIndexRoute
   DashboardUserHelloIndexRoute: typeof DashboardUserHelloIndexRoute
   DashboardUserReposIndexRoute: typeof DashboardUserReposIndexRoute
@@ -355,7 +335,6 @@ interface DashboardUserLayoutRouteChildren {
 
 const DashboardUserLayoutRouteChildren: DashboardUserLayoutRouteChildren = {
   DashboardUserIndexRoute: DashboardUserIndexRoute,
-  DashboardUserEmbedIndexRoute: DashboardUserEmbedIndexRoute,
   DashboardUserEnrichedIndexRoute: DashboardUserEnrichedIndexRoute,
   DashboardUserHelloIndexRoute: DashboardUserHelloIndexRoute,
   DashboardUserReposIndexRoute: DashboardUserReposIndexRoute,
