@@ -8,7 +8,7 @@ import { queryCollectionOptions } from "@tanstack/query-db-collection";
 type AwaitedData<T> = NonNullable<Awaited<T> extends { data: infer D } ? D : never>;
 
 /** One row from `GET /api/elysia/enrich/list` (enrichment output / repo SoT). */
-export type EnrichedRepoRow = AwaitedData<ReturnType<ElysiaTreaty["enrich"]["list"]["get"]>>[number];
+export type EnrichedRepoRow = AwaitedData<ReturnType<ElysiaTreaty["enrich"]["mine"]["list"]["get"]>>[number];
 
 export const enrichedReposQueryKey = ["enriched-repos"] as const;
 
@@ -23,14 +23,14 @@ export const enrichStarredReposCollection = createCollection(
     queryClient: getQueryClient(),
     getKey: (item: EnrichedRepoRow) => item.id,
     queryFn: async () => {
-      const { data, error } = await getElysiaTreaty().enrich.list.get();
+      const { data, error } = await getElysiaTreaty().enrich.mine.list.get();
       if (error) throw new Error(treatyErrorMessage(error));
       return data ?? [];
     },
     onDelete: async ({ transaction }) => {
       for (const mutation of transaction.mutations) {
         const { owner, name } = mutation.original;
-        const { error } = await getElysiaTreaty().enrich({ owner })({ name }).delete();
+        const { error } = await getElysiaTreaty().enrich.mine({ owner })({ name }).delete();
         if (error) throw new Error(treatyErrorMessage(error));
       }
     },

@@ -2,7 +2,7 @@ import {
   invalidateEnrichedRepos,
   upsertEnrichedRepo,
   type EnrichedRepoRow,
-} from "@/data-access-layer/enriched/list-enriched-collection.ts";
+} from "@/data-access-layer/enriched/starred-enriched-collection.ts";
 import { subscribeSseJson } from "@/hooks/use-embedding-sse";
 import type {
   EmbedActivitySsePayload,

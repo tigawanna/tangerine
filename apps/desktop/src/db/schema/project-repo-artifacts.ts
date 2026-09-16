@@ -14,7 +14,6 @@ export const projectRepoArtifacts = sqliteTable(
     id: text("id").primaryKey(),
     owner: text("owner").notNull(),
     name: text("name").notNull(),
-    /** GitHub repository description. */
     description: text("description"),
     /** First ~20 lines of the root README (see `clipReadmeSummary`). */
     summary: text("summary"),

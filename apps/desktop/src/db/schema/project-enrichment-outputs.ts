@@ -6,7 +6,7 @@ import { float32Array } from "./vector";
  * How the user relates to this repo.
  * Primary query path filters `type = 'starred'`; other/null values are fine.
  */
-export type EnrichedRepoType = "starred";
+export type EnrichedRepoType = "starred" | "mine" | "other";
 
 /**
  * One enriched repo (human-readable list SoT).
@@ -23,19 +23,13 @@ export const projectEnrichmentOutputs = sqliteTable(
     id: text("id").primaryKey(),
     owner: text("owner").notNull(),
     name: text("name").notNull(),
-    /** `"starred"` when this is a repo the user has starred; omit for other repos. */
     type: text("type").$type<EnrichedRepoType>(),
-    /** Copied from artifacts / GitHub repo description. */
     description: text("description"),
-    /** Copied README clip (first ~20 lines). */
     summary: text("summary"),
-    /** GitHub repo URL. */
     url: text("url"),
     sourceGeneration: integer("source_generation").notNull(),
     payload: text("payload", { mode: "json" }).notNull().$type<Record<string, unknown>>(),
-    /** Embedding model id; set when `embedding` is written. */
     modelId: text("model_id"),
-    /** Single repo vector (`F32_BLOB`); null until embed runs. */
     embedding: float32Array("embedding", { dimensions: EMBEDDING_DIMENSIONS }),
     embeddedAt: integer("embedded_at", { mode: "timestamp_ms" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })

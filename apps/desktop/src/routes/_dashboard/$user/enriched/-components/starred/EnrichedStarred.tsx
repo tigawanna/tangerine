@@ -1,5 +1,5 @@
 import { PaginatedListScaffold } from "@/components/pagination/PaginatedListScaffold.tsx";
-import { enrichStarredReposCollection } from "@/data-access-layer/enriched/list-enriched-collection.ts";
+import { enrichStarredReposCollection } from "@/data-access-layer/enriched/starred-enriched-collection.ts";
 import { enrichedRouteID } from "@/routes/_dashboard/$user/enriched/-components/constants.ts";
 import { useLiveQuery } from "@tanstack/react-db";
 import { Loader } from "lucide-react";
