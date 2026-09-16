@@ -9,7 +9,7 @@ import {
   getEmbedActivityStatus,
   patchEmbedActivity,
   resetEmbedActivity,
-} from "@/server/elysia/routes/enrich/helpers/embed-activity.ts";
+} from "@/server/elysia/routes/enrich/starred/helpers/embed-activity.ts";
 import { getStarredRepos } from "@/server/elysia/routes/enrich/helpers/fetchers.ts";
 import { ensureRepoEmbedWorker } from "@/server/elysia/routes/enrich/helpers/process-repo.ts";
 import {

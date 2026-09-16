@@ -7,15 +7,12 @@ import { db } from "@/db/client.ts";
 import { projectEnrichmentOutputs } from "@/db/index.ts";
 import { getGithubToken } from "@/lib/github-token.server.ts";
 import { workerStore } from "@/lib/worker/store.ts";
-import {
-  getEmbedActivityStatus,
-  patchEmbedActivity,
-  type EmbedActivityRepoRow,
-} from "@/server/elysia/routes/enrich/helpers/embed-activity.ts";
+
 import {
   REPO_EMBED_QUEUE,
   type RepoEmbedJob,
 } from "@/server/elysia/routes/enrich/helpers/repo-worker.ts";
+import { EmbedActivityRepoRow, getEmbedActivityStatus, patchEmbedActivity } from "@/server/elysia/routes/enrich/starred/helpers/embed-activity.ts";
 
 /**
  * Fetch README → clip → embed → upsert enrichment row.
