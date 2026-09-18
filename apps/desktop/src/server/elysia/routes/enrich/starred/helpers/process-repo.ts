@@ -11,8 +11,12 @@ import { workerStore } from "@/lib/worker/store.ts";
 import {
   REPO_EMBED_QUEUE,
   type RepoEmbedJob,
-} from "@/server/elysia/routes/enrich/helpers/repo-worker.ts";
-import { EmbedActivityRepoRow, getEmbedActivityStatus, patchEmbedActivity } from "@/server/elysia/routes/enrich/starred/helpers/embed-activity.ts";
+} from "@/server/elysia/routes/enrich/starred/helpers/repo-worker.ts";
+import {
+  getEmbedActivityStatus,
+  patchEmbedActivity,
+  type EmbedActivityRepoRow,
+} from "@/server/elysia/routes/enrich/starred/helpers/embed-activity.ts";
 
 /**
  * Fetch README → clip → embed → upsert enrichment row.

@@ -5,9 +5,9 @@ import {
   embedActivityEmitter,
   getEmbedActivityStatus,
   type EmbedActivitySsePayload,
-} from "@/server/elysia/routes/enrich/helpers/embed-activity.ts";
-import { enqueueRepoEmbedListJob } from "@/server/elysia/routes/enrich/helpers/repo-list-worker.ts";
-import { DEFAULT_REPO_EMBED_LIMIT } from "@/server/elysia/routes/enrich/helpers/repo-worker.ts";
+} from "@/server/elysia/routes/enrich/starred/helpers/embed-activity.ts";
+import { enqueueRepoEmbedListJob } from "@/server/elysia/routes/enrich/starred/helpers/repo-list-worker.ts";
+import { DEFAULT_REPO_EMBED_LIMIT } from "@/server/elysia/routes/enrich/starred/helpers/repo-worker.ts";
 import { and, eq } from "drizzle-orm";
 import { Elysia, sse, t } from "elysia";
 

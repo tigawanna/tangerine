@@ -1,5 +1,7 @@
+import { RequestError } from "octokit";
 import { describe, expect, it } from "vitest";
 import {
+  isGithubRateLimited,
   isIgnorableGraphqlAggregateError,
   isOrgPatPolicyError,
   parseGraphqlAggregateError,
@@ -33,6 +35,29 @@ describe("parseGraphqlAggregateError", () => {
   it("returns null for non-aggregate errors", () => {
     expect(parseGraphqlAggregateError(new Error("Network failure"))).toBeNull();
     expect(parseGraphqlAggregateError("not an error")).toBeNull();
+  });
+});
+
+describe("isGithubRateLimited", () => {
+  it("detects HTTP 429", () => {
+    expect(
+      isGithubRateLimited(
+        new RequestError("rate limited", 429, {
+          request: { method: "GET", url: "https://api.github.com", headers: {} },
+          response: { url: "https://api.github.com", status: 429, headers: {}, data: {} },
+        }),
+      ),
+    ).toBe(true);
+  });
+
+  it("detects GraphQL RATE_LIMITED body errors", () => {
+    expect(
+      isGithubRateLimited({ errors: [{ type: "RATE_LIMITED", message: "API rate limit exceeded" }] }),
+    ).toBe(true);
+  });
+
+  it("returns false for unrelated errors", () => {
+    expect(isGithubRateLimited(new Error("boom"))).toBe(false);
   });
 });
 

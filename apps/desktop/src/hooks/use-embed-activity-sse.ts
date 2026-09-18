@@ -7,7 +7,7 @@ import { subscribeSseJson } from "@/hooks/use-embedding-sse";
 import type {
   EmbedActivitySsePayload,
   EmbedActivityStatus,
-} from "@/server/elysia/routes/enrich/helpers/embed-activity.ts";
+} from "@/server/elysia/routes/enrich/starred/helpers/embed-activity.ts";
 import { getElysiaTreaty } from "@/server/elysia/treaty";
 import { useEffect, useState } from "react";
 

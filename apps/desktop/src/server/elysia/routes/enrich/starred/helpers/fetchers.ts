@@ -1,9 +1,9 @@
-import { createGitHubClient, RequestError } from "@repo/github";
+import { createGitHubClient, isGithubRateLimited } from "@repo/github";
 import { getGithubToken } from "@/lib/github-token.server.ts";
 import {
   DEFAULT_REPO_EMBED_LIMIT,
   type RepoEmbedJob,
-} from "@/server/elysia/routes/enrich/helpers/repo-worker.ts";
+} from "@/server/elysia/routes/enrich/starred/helpers/repo-worker.ts";
 
 export type GetStarredReposInput = {
   login: string;
@@ -73,66 +73,9 @@ export async function getStarredRepos(
       error: null,
     };
   } catch (caught) {
-    if (isRateLimited(caught)) {
+    if (isGithubRateLimited(caught)) {
       return { data: null, error: "429" };
     }
     throw caught;
   }
-}
-
-type GraphqlBodyError = {
-  type?: string;
-  message?: string;
-  extensions?: { code?: string };
-};
-
-/**
- * GraphQL often returns HTTP 200 with `errors` in the body. Octokit throws those
- * as an error with `.errors` (or an aggregate message). Rate limits look like
- * `{ type: "RATE_LIMITED", message: "API rate limit exceeded…" }`.
- */
-function graphqlBodyErrors(error: unknown): GraphqlBodyError[] {
-  if (error && typeof error === "object" && "errors" in error) {
-    const errors = (error as { errors?: unknown }).errors;
-    if (Array.isArray(errors)) {
-      return errors as GraphqlBodyError[];
-    }
-  }
-
-  if (
-    error instanceof Error &&
-    error.message.includes("Request failed due to following response errors")
-  ) {
-    return error.message
-      .split("\n")
-      .slice(1)
-      .map((line) => ({ message: line.replace(/^\s*-\s*/, "").trim() }))
-      .filter((entry) => entry.message.length > 0);
-  }
-
-  return [];
-}
-
-function looksLikeRateLimitMessage(message: string): boolean {
-  const lower = message.toLowerCase();
-  return (
-    lower.includes("rate limit") ||
-    lower.includes("secondary rate") ||
-    lower.includes("api rate limit")
-  );
-}
-
-function isRateLimited(error: unknown): boolean {
-  if (error instanceof RequestError) {
-    if (error.status === 429) return true;
-    if (error.status === 403 && looksLikeRateLimitMessage(error.message)) return true;
-  }
-
-  for (const entry of graphqlBodyErrors(error)) {
-    const code = (entry.type ?? entry.extensions?.code ?? "").toUpperCase();
-    if (code === "RATE_LIMITED" || code === "RATE_LIMIT") return true;
-    if (entry.message && looksLikeRateLimitMessage(entry.message)) return true;
-  }
-
-  return false;
 }

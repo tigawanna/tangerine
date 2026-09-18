@@ -1,5 +1,11 @@
 export { createGitHubClient, GitHubClient, RequestError } from "./client";
 export {
+  isGithubRateLimited,
+  isIgnorableGraphqlAggregateError,
+  isOrgPatPolicyError,
+  parseGraphqlAggregateError,
+} from "./utils/graphql-errors";
+export {
   ViewerQuery,
   UserProfileQuery,
   VIEWER_QUERY,
