@@ -1,7 +1,7 @@
 import { BackgroundRippleEffect } from "@/components/acceternity/background-ripple-effect";
 import { AppBrandIcon } from "@/components/icon/AppBrandIcon";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
-import { landingRippleToneClassName } from "@/lib/landing/rippleTone";
+import { landingRippleToneClassName } from "@/routes/-components/landing/rippleTone.ts";
 import { cn } from "@/lib/utils";
 import { GitHubSignIn } from "@/routes/auth/-components/GitHubSignIn";
 import { AppConfig } from "@/utils/system";

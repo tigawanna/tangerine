@@ -1,8 +1,8 @@
-import { on } from "node:events";
 import { db } from "@/db/client.ts";
 import { projectEnrichmentOutputs } from "@/db/index.ts";
+import { pubSub } from "@/lib/pub-sub/client";
+import { PUB_SUB_TOPICS } from "@/lib/pub-sub/topics";
 import {
-  embedActivityEmitter,
   getEmbedActivityStatus,
   type EmbedActivitySsePayload,
 } from "@/server/elysia/routes/enrich/starred/helpers/embed-activity.ts";
@@ -97,9 +97,10 @@ export const enrichedStarredRoute = new Elysia({ prefix: "/starred" })
       };
       yield sse({ data: initial });
 
-      for await (const [payload] of on(embedActivityEmitter, "activity", {
-        signal: request.signal,
-      })) {
+      for await (const payload of pubSub.listen<EmbedActivitySsePayload>(
+        PUB_SUB_TOPICS.REPO_EMBED_PROGRESS,
+        { signal: request.signal },
+      )) {
         yield sse({ data: payload });
       }
     },
@@ -151,7 +152,7 @@ export const enrichedStarredRoute = new Elysia({ prefix: "/starred" })
         summary: "Start starred-repo enrich crawl",
         description:
           "Starts list + embed workers explicitly, enqueues the first starred page, " +
-          "and tracks progress on the enrich activity emitter.",
+          "and tracks progress on the shared pub/sub bus.",
         tags: ["enrich", "starred", "worker"],
       },
     },

@@ -1,5 +1,5 @@
 import { BackgroundRippleEffect } from "@/components/acceternity/background-ripple-effect";
-import { landingRippleToneClassName } from "@/lib/landing/rippleTone";
+import { landingRippleToneClassName } from "@/routes/-components/landing/rippleTone.ts";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 

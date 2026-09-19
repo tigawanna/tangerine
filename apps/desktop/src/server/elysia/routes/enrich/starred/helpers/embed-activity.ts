@@ -1,4 +1,5 @@
-import { EventEmitter } from "node:events";
+import { pubSub } from "@/lib/pub-sub/client";
+import { PUB_SUB_TOPICS } from "@/lib/pub-sub/topics";
 
 export type EmbedActivityPhase =
   | "idle"
@@ -70,10 +71,6 @@ export type EmbedActivityPatch = {
   };
 };
 
-interface EmbedActivityEvents {
-  activity: [EmbedActivitySsePayload];
-}
-
 const idleStatus = (): EmbedActivityStatus => ({
   phase: "idle",
   login: null,
@@ -96,9 +93,6 @@ const idleStatus = (): EmbedActivityStatus => ({
 
 let status = idleStatus();
 
-/** In-process bus for list/embed progress (hello SSE pattern). */
-export const embedActivityEmitter = new EventEmitter<EmbedActivityEvents>();
-
 /** Latest snapshot for GET / status. */
 export function getEmbedActivityStatus(): EmbedActivityStatus {
   return status;
@@ -106,7 +100,7 @@ export function getEmbedActivityStatus(): EmbedActivityStatus {
 
 function emitActivity(row: EmbedActivityRepoRow | null = null): EmbedActivitySsePayload {
   const payload: EmbedActivitySsePayload = { status, row };
-  embedActivityEmitter.emit("activity", payload);
+  pubSub.publish(PUB_SUB_TOPICS.REPO_EMBED_PROGRESS, payload);
   return payload;
 }
 
