@@ -5,22 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1789837000000,
+      "when": 1789838981855,
       "tag": "0000_extensions",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1789837057386,
-      "tag": "0001_schema",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1789837100000,
-      "tag": "0002_project_enrichment_outputs_embedding_hnsw",
+      "when": 1789839060764,
+      "tag": "0001_needy_swordsman",
       "breakpoints": true
     }
   ]

@@ -20,7 +20,6 @@ CREATE TABLE "project_repo_artifacts" (
 	"name" text NOT NULL,
 	"description" text,
 	"summary" text,
-	"url" text,
 	"generation" integer DEFAULT 1 NOT NULL,
 	"collector_version" text NOT NULL,
 	"payload" jsonb NOT NULL,
