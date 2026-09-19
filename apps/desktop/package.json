@@ -19,7 +19,7 @@
     "db:gen": "drizzle-kit generate",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:migrate": "tsx --env-file=.env ./scripts/db-migrate.ts",
+    "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:setup": "pnpm db:migrate"
   },
@@ -30,7 +30,6 @@
     "@electric-sql/pglite": "^0.5.8",
     "@electric-sql/pglite-pgvector": "^0.0.9",
     "@elysiajs/eden": "^1.4.9",
-    "@libsql/client": "^0.15.15",
     "@repo/auth": "workspace:*",
     "@repo/gemma-embedding": "workspace:*",
     "@repo/github": "workspace:*",
