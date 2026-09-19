@@ -19,9 +19,9 @@ Auth deep dive: [`docs/auth.md`](../../docs/auth.md) · agent notes: [`AGENTS.md
 | `pnpm dev:vite`        | Browser-only Vite (no native window)        |
 | `pnpm desktop:build`   | `vp build` then package → `dist-desktop/`   |
 | `pnpm desktop:run`     | Run packaged / existing `.output/`          |
-| `pnpm db:setup`        | Push Turso/libSQL schema + vector ANN index |
+| `pnpm db:setup`        | Apply PGlite schema + pgvector HNSW index   |
 
-Copy `.env.example` → `.env`. Set `VITE_API_URL` → API, `VITE_SIGN_IN_URL` → web `/auth`. For local vectors: `DATABASE_URL=file:local.db` then `pnpm db:setup`.
+Copy `.env.example` → `.env`. Set `VITE_API_URL` → API, `VITE_SIGN_IN_URL` → web `/auth`. For local vectors: `DATABASE_URL=pgdata` then `pnpm db:setup`.
 
 ---
 

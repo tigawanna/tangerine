@@ -1,32 +1,42 @@
 import { mkdirSync } from "node:fs";
-import { dirname } from "node:path";
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
-import { resolveDatabaseUrl } from "./path";
+import { PGlite } from "@electric-sql/pglite";
+import { live } from "@electric-sql/pglite/live";
+import { vector } from "@electric-sql/pglite-pgvector";
+import { drizzle } from "drizzle-orm/pglite";
+import { resolveDatabaseDir } from "./path";
 import * as schema from "./schema";
 
 /**
- * Ensure the parent dir exists before opening a local `file:` database.
- * No-op for remote `libsql://` / `:memory:` URLs.
+ * PGlite NodeFS data dir (or `memory://`).
+ * @see https://orm.drizzle.team/docs/get-started/pglite-new
+ * @see https://pglite.dev/docs/filesystems
  */
-function ensureLocalDbParent(url: string): void {
-  if (!url.startsWith("file:")) return;
-  mkdirSync(dirname(url.slice("file:".length)), { recursive: true });
+const dataDir = resolveDatabaseDir();
+
+if (dataDir !== "memory://") {
+  mkdirSync(dataDir, { recursive: true });
 }
 
-const url = resolveDatabaseUrl({
-  override: process.env.DATABASE_URL,
+/**
+ * Same shape as the Drizzle guide (`new PGlite(url)` → `drizzle({ client })`),
+ * plus [live queries](https://pglite.dev/docs/live-queries) and
+ * [pgvector](https://github.com/pgvector/pgvector).
+ *
+ * `CREATE EXTENSION vector` lives in migrations (`0000_extensions.sql`).
+ * `live` is registered here only (JS plugin — no SQL extension in this build).
+ */
+export const client = await PGlite.create({
+  dataDir,
+  extensions: {
+    live,
+    vector,
+  },
 });
-ensureLocalDbParent(url);
 
-const client = createClient({
-  url,
-  authToken: process.env.DATABASE_AUTH_TOKEN,
-});
-
-/** Embedded Turso/libSQL DB (vector-capable). Not better-sqlite3. */
-export const db = drizzle(client, { schema });
+export const db = drizzle({ client, schema });
 
 export type DesktopDatabase = typeof db;
 
-export { client as libsqlClient };
+/** @deprecated Prefer {@link client}. */
+export const pglite = client;
+export const pgClient = client;

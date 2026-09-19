@@ -2,7 +2,6 @@ import { defineConfig } from "nitro";
 import evlog from "evlog/nitro/v3";
 
 const isVercel = Boolean(process.env.VERCEL);
-const isProd = process.env.NODE_ENV === "production";
 
 export default defineConfig({
   /**
@@ -10,20 +9,15 @@ export default defineConfig({
    * Build Output API layout stable for TanStack Start + Nitro.
    */
   preset: isVercel ? "vercel" : undefined,
-  /**
-   * libsql uses dynamic `require('@libsql/<platform>')` for local file DB.
-   * Force-trace native bindings so Vercel serverless functions can load them when needed.
-   */
-  traceDeps: ["@libsql/linux-x64-gnu", "@libsql/linux-x64-musl"],
   experimental: {
     asyncContext: true,
   },
-  /** Local FS drains are not available on Vercel Functions. */
-  plugins: isVercel || isProd ? [] : ["./server/plugins/evlog-fs-drain.ts"],
+  /** Desktop can always write local NDJSON — shared monorepo `.evlog/logs/`. */
+  plugins: ["./server/plugins/evlog-fs-drain.ts"],
   modules: [
     evlog({
       env: { service: "tangerine-desktop" },
-      enabled: !isProd,
+      enabled: true,
     }),
   ],
 });

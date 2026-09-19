@@ -1,19 +1,26 @@
 {
   "version": "7",
-  "dialect": "sqlite",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "6",
-      "when": 1789062589055,
-      "tag": "0000_vengeful_sasquatch",
+      "version": "7",
+      "when": 1789837000000,
+      "tag": "0000_extensions",
       "breakpoints": true
     },
     {
       "idx": 1,
-      "version": "6",
-      "when": 1789500242474,
-      "tag": "0001_project_enrichment_outputs_vector_idx",
+      "version": "7",
+      "when": 1789837057386,
+      "tag": "0001_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789837100000,
+      "tag": "0002_project_enrichment_outputs_embedding_hnsw",
       "breakpoints": true
     }
   ]

@@ -10,8 +10,7 @@ config({ path: resolve(rootDir, ".env.local"), override: true });
 
 const scriptEnvSchema = z
   .object({
-    DATABASE_URL: z.string().min(1),
-    DATABASE_AUTH_TOKEN: z.string().optional(),
+    DATABASE_URL: z.string().min(1).optional(),
     GH_PAT: z.string().min(1),
     OPENAI_API_KEY: z.string().min(1).optional(),
     OPENROUTER_API_KEY: z.string().min(1).optional(),

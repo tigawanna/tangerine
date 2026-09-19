@@ -1,9 +1,21 @@
 /**
- * Smoke-test Turso vector insert + `vector_top_k`.
+ * Smoke-test PGlite pgvector insert + cosine nearest-neighbor.
  * Run: `pnpm exec tsx --env-file=.env ./scripts/smoke-vector.ts`
+ *
+ * Applies migrations in-process (same PGlite instance) then inserts / queries.
  */
-import { eq, sql } from "drizzle-orm";
-import { db, projectEnrichmentOutputs } from "../src/db/index.ts";
+import { migrate } from "drizzle-orm/pglite/migrator";
+import { cosineDistance, eq, sql } from "drizzle-orm";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { client, db, projectEnrichmentOutputs } from "../src/db/index.ts";
+
+const migrationsFolder = resolve(
+  fileURLToPath(new URL(".", import.meta.url)),
+  "../src/db/migrations",
+);
+
+await migrate(db, { migrationsFolder });
 
 const vec = Array.from({ length: 768 }, (_, i) => (i % 10) / 10);
 
@@ -19,15 +31,19 @@ await db.insert(projectEnrichmentOutputs).values({
   embeddedAt: new Date(),
 });
 
-const rows = await db.all(sql`
-  SELECT id FROM vector_top_k(
-    'project_enrichment_outputs_vector_idx',
-    vector32(${JSON.stringify(vec)}),
-    1
-  )
-`);
+const distance = sql<number>`${cosineDistance(projectEnrichmentOutputs.embedding, vec)}`;
 
-console.info("vector_top_k ok:", rows);
+const rows = await db
+  .select({
+    id: projectEnrichmentOutputs.id,
+    distance,
+  })
+  .from(projectEnrichmentOutputs)
+  .orderBy(distance)
+  .limit(1);
+
+console.info("pgvector cosine nn ok:", rows);
 
 await db.delete(projectEnrichmentOutputs).where(eq(projectEnrichmentOutputs.id, "smoke-1"));
+await client.close();
 console.info("cleaned up");

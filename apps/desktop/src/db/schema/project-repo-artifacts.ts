@@ -1,5 +1,5 @@
 import type { SpelunkPayload } from "@repo/github";
-import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { integer, jsonb, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 /**
  * Cached GitHub spelunk output per repo (owner/name).
@@ -8,7 +8,7 @@ import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core
  * Display fields (`description`, `summary`, `url`) are denormalized from the
  * GitHub snapshot + README so list/search UI does not unpack `payload`.
  */
-export const projectRepoArtifacts = sqliteTable(
+export const projectRepoArtifacts = pgTable(
   "project_repo_artifacts",
   {
     id: text("id").primaryKey(),
@@ -17,12 +17,10 @@ export const projectRepoArtifacts = sqliteTable(
     description: text("description"),
     /** First ~20 lines of the root README (see `clipReadmeSummary`). */
     summary: text("summary"),
-    /** GitHub repo URL (`https://github.com/{owner}/{name}`). */
-    url: text("url"),
-    generation: integer("generation").notNull().default(1),
-    collectorVersion: text("collector_version").notNull(),
-    payload: text("payload", { mode: "json" }).notNull().$type<SpelunkPayload>(),
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
+    generation: integer("generation").notNull().default(1), // bumps when we re-collect this repo
+    collectorVersion: text("collector_version").notNull(), // spelunk collector build that wrote the row
+    payload: jsonb("payload").notNull().$type<SpelunkPayload>(), // full GitHub spelunk snapshot
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .notNull()
       .$defaultFn(() => new Date()),
   },

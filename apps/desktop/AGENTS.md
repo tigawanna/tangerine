@@ -31,22 +31,22 @@ Requires **Deno ≥ 2.9**. Config: [`deno.json`](./deno.json). Preload: [`deno/w
 | `pnpm dev:vite`           | Browser-only Vite on **:3070** (no native shell)      |
 | `pnpm desktop:build`      | `vp build` then package into `dist-desktop/`          |
 | `pnpm desktop:run`        | Run against existing `.output/`                       |
-| `pnpm db:setup`           | Apply Drizzle migrations (incl. vector ANN custom SQL) |
+| `pnpm db:setup`           | Apply Drizzle migrations (incl. pgvector HNSW custom SQL) |
 
 Do **not** point Deno’s `task.dev` at `deno desktop` — HMR invokes `deno task dev` → `pnpm run dev:vite` and must not recurse.
 
-## Local DB (Turso / libSQL)
+## Local DB (PGlite)
 
-Embedded **libSQL** via `@libsql/client` + Drizzle (`dialect: "turso"`) — not better-sqlite3. Needed for `F32_BLOB` vector columns / `libsql_vector_idx`.
+Embedded **Postgres** via [`@electric-sql/pglite`](https://pglite.dev/docs/) + Drizzle (`dialect: "postgresql"`). [NodeFS](https://pglite.dev/docs/filesystems) persistence, plus [`live`](https://pglite.dev/docs/live-queries) and [`pgvector`](https://github.com/pgvector/pgvector) extensions.
 
 | Piece        | Path                                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------------------------- |
-| Client       | [`src/db/client.ts`](./src/db/client.ts)                                                                            |
-| Schema       | [`src/db/schema/`](./src/db/schema/) (`project_repo_artifacts`, `project_enrichment_outputs` + vector) |
-| Migrations   | [`src/db/migrations/`](./src/db/migrations/) (vector ANN index is a custom SQL migration)                              |
-| Default file | `DATABASE_URL` or `~/.config/tangerine-desktop/tangerine.db`                                                        |
+| Client       | [`src/db/client.ts`](./src/db/client.ts) (`PGlite.create` + `live` + `vector`)                                      |
+| Schema       | [`src/db/schema/`](./src/db/schema/) (`project_repo_artifacts`, `project_enrichment_outputs` + `vector(n)`) |
+| Migrations   | [`src/db/migrations/`](./src/db/migrations/) (HNSW cosine index is a custom SQL migration)                           |
+| Default dir  | `DATABASE_URL` or `~/.config/tangerine-desktop/pgdata`                                                              |
 
-`pnpm db:migrate` (or `pnpm db:setup`). Auth session cookies stay in JSON under `~/.config/tangerine-desktop/`; API auth tables remain on `apps/api`.
+`pnpm db:migrate` (or `pnpm db:setup`). Auth session cookies stay in JSON under `~/.config/tangerine-desktop/`; API auth tables remain on `apps/api` (Turso).
 
 ## OAuth (system browser + API)
 
