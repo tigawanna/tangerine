@@ -28,7 +28,7 @@ Before editing files for a substantial task:
 
 **Desktop OAuth (browser half):** `/auth` preserves PKCE, uses `transferUser` + `loopback` for Deno Desktop (or `ensureElectronRedirect` for Electron scheme).
 
-**Deploy (Vercel):** Project Root Directory = `apps/web`. Set `VITE_APP_URL` + `VITE_API_URL` (API origin for the rewrite). On the API project set `BETTER_AUTH_URL` to the **web** URL. Auth secrets stay on the API service.
+**Deploy (Vercel):** Root = `apps/web`. Proxy + Turso + Hono packing details: [`docs/vercel-deploy.md`](../../docs/vercel-deploy.md). Set `VITE_APP_URL` (web) + `VITE_API_URL` (API upstream). API project `BETTER_AUTH_URL` must be the **web** URL. Auth secrets stay on the API.
 
 **Relay (dashboard only):** `/_dashboard` is `ssr: false`. `beforeLoad` sets `githubLogin` + a **stable** Relay `Environment` on context. `/viewer` is the post-login entry and redirects to `/$user` with that login. Nested under `/$user`: profile index, `repos`, `stars`. Layout `loadQuery`; children `usePreloadedQuery`. Run `pnpm relay` after GraphQL edits.
 

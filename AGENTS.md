@@ -9,7 +9,7 @@ pnpm + Turbo monorepo. **Stack- and app-specific rules live in nested `AGENTS.md
 - `apps/electron` — Electron + electron-vite shell (Better Auth Electron → `apps/api`). See [`apps/electron/AGENTS.md`](apps/electron/AGENTS.md).
 - `apps/api` — Hono API + Turso + Better Auth. See [`apps/api/AGENTS.md`](apps/api/AGENTS.md).
 
-Shared libraries live in `packages/*`. Auth is [`packages/auth`](packages/auth/AGENTS.md) (GitHub-only Better Auth pieces; apps own wiring). End-to-end flows, gotchas, and debugging: [`docs/auth.md`](docs/auth.md). End-to-end flows, gotchas, and debugging: [`docs/auth.md`](docs/auth.md).
+Shared libraries live in `packages/*`. Auth is [`packages/auth`](packages/auth/AGENTS.md) (GitHub-only Better Auth pieces; apps own wiring). Auth flows: [`docs/auth.md`](docs/auth.md). Vercel / Turso / `/api` proxy: [`docs/vercel-deploy.md`](docs/vercel-deploy.md).
 
 Add a new app under `apps/<name>/` with its own `AGENTS.md` when the stack or product conventions differ (e.g. Next.js, Expo, Deno).
 

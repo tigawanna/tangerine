@@ -4,6 +4,8 @@ GitHub-only Better Auth. **Secrets and session issuance live on `apps/api`.** Fr
 
 Shared constants / helpers: [`packages/auth`](../packages/auth/AGENTS.md). Per-app wiring notes: [`apps/api`](../apps/api/AGENTS.md), [`apps/web`](../apps/web/AGENTS.md), [`apps/desktop`](../apps/desktop/AGENTS.md), [`apps/electron`](../apps/electron/AGENTS.md).
 
+**Vercel / Turso / same-origin `/api` proxy (ops):** [`vercel-deploy.md`](./vercel-deploy.md).
+
 ---
 
 ## Architecture
@@ -27,7 +29,7 @@ Desktop sign-in **starts in the native app**. The webview only kicks off auth; t
          │            │    (:3064)      │◄───│ electron()+bearer│
          │            └────────┬────────┘    └──────────────────┘
          │                     │ ③ GitHub OAuth
-         │                     │    callback → API
+         │                     │    callback → web /api (proxy) → API
          │                     ▼
          │            ④ transferUser → fetch loopback ?token=
          │                     │
@@ -221,6 +223,8 @@ ls -la ~/.config/tangerine-desktop/
 | Symptom                                 | Likely cause                                                 |
 | --------------------------------------- | ------------------------------------------------------------ |
 | Social 500 on first run                 | Auth tables missing — `db:push`                              |
+| `state_security_mismatch` on Vercel     | Missing web `/api` proxy or `BETTER_AUTH_URL` ≠ web origin — see [`vercel-deploy.md`](./vercel-deploy.md) |
+| Lands on API `/?error=state_mismatch`   | Wrong `BETTER_AUTH_URL` / relative `callbackURL`             |
 | Lands on `:5000/viewer`                 | Relative `callbackURL`                                       |
 | Web success, desktop still on login     | Event drop / wrong `beforeLoad` / session cleared            |
 | `session.json` missing after 200 token  | Cleared by failed `get-session` or wrong cookie encoding     |
@@ -236,6 +240,8 @@ Optional: `DENO_DESKTOP_DEVTOOLS=1` (CEF backend) for webview DevTools.
 
 | Area                                       | Path                                                                                    |
 | ------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Vercel / Turso / `/api` proxy              | [`docs/vercel-deploy.md`](./vercel-deploy.md)                                           |
+| Short redirect cheat sheet (other projects)| [`docs/auth-redirects.md`](./auth-redirects.md)                                         |
 | API Better Auth                            | `apps/api/src/lib/auth.ts`                                                              |
 | Web sign-in + loopback handoff             | `apps/web/src/routes/auth/-components/GitHubSignIn.tsx`                                 |
 | Web “close this tab” after desktop handoff | `apps/web/src/routes/auth/desktop-done/index.tsx`                                       |

@@ -40,13 +40,9 @@ Do **not** hand-edit `src/db/schema/auth-schema.ts` — regenerate with `pnpm --
 
 ## Deploy (Vercel)
 
-Separate Vercel project from `apps/web`. Root Directory = `apps/api`. Framework preset **Other** (`framework: null`). Build is Vite+ `vp pack` (tsdown / Rolldown) → one Node ESM file plus Build Output API metadata under `.vercel/output`. That avoids Vercel’s Hono file-by-file transpile, which breaks `@api/*` and workspace `.ts` exports (`vercel/vercel#14910`). Local: `src/index.ts` default-exports the app; `serve()` runs only when `VERCEL` is unset.
+Full write-up (Hono `vp pack` BOA, `shouldAddHelpers: false`, Turso `vercelSafeLibsqlFetch`, web `/api` proxy, env checklist): [`docs/vercel-deploy.md`](../../docs/vercel-deploy.md).
 
-**Env (API project):** `DATABASE_URL` (Turso `libsql://…`, not `file:`), `DATABASE_AUTH_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (**web** public origin, not this API hostname), `BETTER_AUTH_TRUSTED_ORIGINS` (prod web + `com.tigawanna.tangerine:/`), `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`, `FRONTEND_URL`, `NODE_ENV=production`, optional `ADMIN_EMAIL`.
-
-**GitHub OAuth callback:** `{BETTER_AUTH_URL}/api/auth/callback/github` (web URL).
-
-**Web project:** `VITE_APP_URL` = web origin, `VITE_API_URL` = this API (proxy upstream). Auth secrets stay here only.
+Short version: separate Vercel project, Root = `apps/api`, `framework: null`, build `vp pack` → `.vercel/output`. `BETTER_AUTH_URL` = **web** public origin (not this API hostname). GitHub callback = `{BETTER_AUTH_URL}/api/auth/callback/github`.
 
 ## Logging (evlog)
 
