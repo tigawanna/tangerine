@@ -40,7 +40,7 @@ Do **not** hand-edit `src/db/schema/auth-schema.ts` — regenerate with `pnpm --
 
 ## Deploy (Vercel)
 
-Separate Vercel project from `apps/web`. Root Directory = `apps/api`. Framework = Hono (`vercel.json` — leave build/output to Vercel; only override `installCommand` for the monorepo). `src/index.ts` default-exports the app; `serve()` runs only when `VERCEL` is unset.
+Separate Vercel project from `apps/web`. Root Directory = `apps/api`. Framework preset **Other** (`framework: null`). Build is Vite+ `vp pack` (tsdown / Rolldown) → one Node ESM file plus Build Output API metadata under `.vercel/output`. That avoids Vercel’s Hono file-by-file transpile, which breaks `@api/*` and workspace `.ts` exports (`vercel/vercel#14910`). Local: `src/index.ts` default-exports the app; `serve()` runs only when `VERCEL` is unset.
 
 **Env (API project):** `DATABASE_URL` (Turso `libsql://…`, not `file:`), `DATABASE_AUTH_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (this deployment’s public origin), `BETTER_AUTH_TRUSTED_ORIGINS` (prod web + `com.tigawanna.tangerine:/`), `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`, `FRONTEND_URL`, `NODE_ENV=production`, optional `ADMIN_EMAIL`.
 

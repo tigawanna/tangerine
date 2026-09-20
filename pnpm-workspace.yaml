@@ -5,6 +5,15 @@ packages:
   - apps/api
   - packages/*
 
+catalog:
+  lucide-react: ^0.561.0
+  tailwind-merge: ^3.6.0
+  tailwindcss: ^4.3.3
+  typescript: ^6.0.3
+  vite: npm:@voidzero-dev/vite-plus-core@latest
+  vite-plus: ^0.3.3
+  vitest: npm:@voidzero-dev/vite-plus-test@latest
+
 onlyBuiltDependencies:
   - core-js
   - es5-ext
@@ -13,25 +22,19 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
   - workerd
-catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
-  vite-plus: latest
-  typescript: ^6.0.3
-  lucide-react: ^0.561.0
-  tailwind-merge: ^3.6.0
-  tailwindcss: ^4.3.3
+
 overrides:
-  vite: "catalog:"
-  vitest: "catalog:"
-  "@better-auth/utils": "0.4.2"
-  better-auth: "1.7.3"
-  "@better-auth/core": "1.7.3"
-  "@better-auth/api-key": "1.7.3"
+  '@better-auth/api-key': 1.7.3
+  '@better-auth/core': 1.7.3
+  '@better-auth/utils': 0.4.2
+  better-auth: 1.7.3
+  vite: 'catalog:'
+  vitest: 'catalog:'
+
 peerDependencyRules:
   allowAny:
     - vite
     - vitest
   allowedVersions:
-    vite: "*"
-    vitest: "*"
+    vite: '*'
+    vitest: '*'

@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.build.json",
+    "build:vercel": "vp pack",
     "start": "node dist/index.js",
     "deploy": "vercel --prod",
     "deploy:vercel": "vercel --prod",
@@ -42,6 +43,7 @@
     "@types/node": "^25.2.0",
     "drizzle-kit": "^0.31.9",
     "tsx": "^4.21.0",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
   }
 }
