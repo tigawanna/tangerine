@@ -11,6 +11,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
+    "deploy": "vercel --prod",
+    "deploy:vercel": "vercel --prod",
     "check-types": "tsc --noEmit",
     "auth:gen": "pnpx auth@latest generate --output ./src/db/schema/auth-schema.ts",
     "db:gen": "drizzle-kit generate",
