@@ -50,9 +50,10 @@ function writeBuildOutputApi(handler: string) {
  * Vercel’s Hono preset transpiles files one-by-one and leaves `@api/*` /
  * workspace `.ts` imports broken (vercel/vercel#14910).
  *
- * Pack aliases `@libsql/client` to the Web-standard client so the function
- * stays a JS-only bundle (Turso `libsql://` / `https:`). Local `file:` DBs
- * still use the Node client through `tsx` / `src/index.ts`.
+ * Remote Turso uses `@libsql/client/http` (same as shift-sync). Pack still
+ * aliases the bare `@libsql/client` entry to `/http` so any transitive import
+ * stays JS-only (no native bindings). Local `file:` uses `local-client.ts`
+ * through `tsx` / `src/index.ts` and is not in the Vercel graph.
  */
 export default defineConfig({
   resolve: {
@@ -72,7 +73,7 @@ export default defineConfig({
     clean: true,
     nodeProtocol: true,
     alias: {
-      "@libsql/client": "@libsql/client/web",
+      "@libsql/client": "@libsql/client/http",
     },
     deps: {
       alwaysBundle: () => true,

@@ -27,6 +27,8 @@ const EnvSchema = authEnvSchema
   })
   .transform((env) => ({
     ...env,
+    DATABASE_URL: env.DATABASE_URL.trim(),
+    DATABASE_AUTH_TOKEN: env.DATABASE_AUTH_TOKEN?.trim() || undefined,
     BETTER_AUTH_TRUSTED_ORIGINS_LIST: env.BETTER_AUTH_TRUSTED_ORIGINS.split(",")
       .map((origin) => origin.trim())
       .filter(Boolean),
