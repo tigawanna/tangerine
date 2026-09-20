@@ -2,5 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "tanstack-start",
   "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm run build"
+  "buildCommand": "pnpm run build",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://tangerine-api.vercel.app/api/:path*"
+    }
+  ]
 }

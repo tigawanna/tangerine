@@ -28,7 +28,7 @@ Web `tsconfig` / Vite alias: `"@api/*": ["../api/src/*"]`.
 
 ## Auth mount
 
-Handler at `/api/auth/*` (`BETTER_AUTH_URL` + GitHub callback `{BETTER_AUTH_URL}/api/auth/callback/github`).
+Handler at `/api/auth/*`. `BETTER_AUTH_URL` is the public **web** origin (`apps/web` proxies `/api` → this app) so OAuth cookies are first-party. GitHub callback: `{BETTER_AUTH_URL}/api/auth/callback/github`.
 
 Include `com.tigawanna.tangerine:/` in `BETTER_AUTH_TRUSTED_ORIGINS` (or rely on `ELECTRON_TRUSTED_ORIGIN` merged in `createApiAuth`).
 
@@ -42,11 +42,11 @@ Do **not** hand-edit `src/db/schema/auth-schema.ts` — regenerate with `pnpm --
 
 Separate Vercel project from `apps/web`. Root Directory = `apps/api`. Framework preset **Other** (`framework: null`). Build is Vite+ `vp pack` (tsdown / Rolldown) → one Node ESM file plus Build Output API metadata under `.vercel/output`. That avoids Vercel’s Hono file-by-file transpile, which breaks `@api/*` and workspace `.ts` exports (`vercel/vercel#14910`). Local: `src/index.ts` default-exports the app; `serve()` runs only when `VERCEL` is unset.
 
-**Env (API project):** `DATABASE_URL` (Turso `libsql://…`, not `file:`), `DATABASE_AUTH_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (this deployment’s public origin), `BETTER_AUTH_TRUSTED_ORIGINS` (prod web + `com.tigawanna.tangerine:/`), `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`, `FRONTEND_URL`, `NODE_ENV=production`, optional `ADMIN_EMAIL`.
+**Env (API project):** `DATABASE_URL` (Turso `libsql://…`, not `file:`), `DATABASE_AUTH_TOKEN`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (**web** public origin, not this API hostname), `BETTER_AUTH_TRUSTED_ORIGINS` (prod web + `com.tigawanna.tangerine:/`), `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET`, `FRONTEND_URL`, `NODE_ENV=production`, optional `ADMIN_EMAIL`.
 
-**GitHub OAuth callback:** `{BETTER_AUTH_URL}/api/auth/callback/github`.
+**GitHub OAuth callback:** `{BETTER_AUTH_URL}/api/auth/callback/github` (web URL).
 
-**Web project:** set `VITE_API_URL` to the API origin. Auth secrets stay here only.
+**Web project:** `VITE_APP_URL` = web origin, `VITE_API_URL` = this API (proxy upstream). Auth secrets stay here only.
 
 ## Logging (evlog)
 

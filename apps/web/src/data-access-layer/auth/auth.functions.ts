@@ -3,8 +3,7 @@ import { authClient, type BetterAuthSession } from "@/lib/auth-client";
 export type Session = BetterAuthSession;
 
 /**
- * Current session from apps/api (dishi-style: client → remote Better Auth).
- * No local `/api/auth` mount on web.
+ * Current session via same-origin `/api/auth` (proxied to apps/api).
  */
 export async function getSession(): Promise<Session | null> {
   try {

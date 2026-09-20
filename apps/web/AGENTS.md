@@ -20,15 +20,15 @@ Before editing files for a substantial task:
 
 **Routes:** Folder + `index.tsx`. Thin file: `beforeLoad`, loader, compose. Prefix `-` to opt a folder out of the router.
 
-**Auth:** GitHub OAuth via **`apps/api`** Better Auth (no local `/api/auth` on web — same split as dishi `site`). Client: `@/lib/auth-client` with `baseURL: VITE_API_URL`. Session: `authClient.getSession()` / `getSession()` in `beforeLoad`. Desktop/Electron browser half: `electronProxyClient` + PKCE query + `loopback` / `ensureElectronRedirect`. Deep dive: [`docs/auth.md`](../../docs/auth.md).
+**Auth:** GitHub OAuth via **`apps/api`** Better Auth. Web exposes same-origin `/api/*` (Nitro `routeRules` / `vercel.json` → `VITE_API_URL`) so cookies are first-party. Client: `@/lib/auth-client` with `baseURL: VITE_APP_URL`. Session: `authClient.getSession()` / `getSession()` in `beforeLoad`. Desktop/Electron browser half: `electronProxyClient` + PKCE query + `loopback` / `ensureElectronRedirect`. Deep dive: [`docs/auth.md`](../../docs/auth.md).
 
 **Logging (evlog):** Dev Nitro FS drain → monorepo [`.evlog/logs/`](../../.evlog/logs/) (`service: tangerine-web`). Client Vite plugin uses the same service name. **Read:** latest `.evlog/logs/YYYY-MM-DD.jsonl` (NDJSON); `rg '"service":"tangerine-web"' .evlog/logs/`.
 
-**API:** Hono + Turso at `VITE_API_URL` (`:5000` locally). CORS + `trustedOrigins` must include `http://localhost:3064`. OAuth secrets and GitHub callback live only on the API: `{BETTER_AUTH_URL}/api/auth/callback/github`.
+**API:** Browser calls `VITE_APP_URL/api…` (proxied to Hono). `VITE_API_URL` is proxy upstream only (`:5000` locally). OAuth secrets live on the API; GitHub callback is the **web** origin: `{BETTER_AUTH_URL}/api/auth/callback/github` with `BETTER_AUTH_URL` = `VITE_APP_URL`.
 
 **Desktop OAuth (browser half):** `/auth` preserves PKCE, uses `transferUser` + `loopback` for Deno Desktop (or `ensureElectronRedirect` for Electron scheme).
 
-**Deploy (Vercel):** Project Root Directory = `apps/web`. Set `VITE_APP_URL` + `VITE_API_URL` (production API). Auth env stays on the API service.
+**Deploy (Vercel):** Project Root Directory = `apps/web`. Set `VITE_APP_URL` + `VITE_API_URL` (API origin for the rewrite). On the API project set `BETTER_AUTH_URL` to the **web** URL. Auth secrets stay on the API service.
 
 **Relay (dashboard only):** `/_dashboard` is `ssr: false`. `beforeLoad` sets `githubLogin` + a **stable** Relay `Environment` on context. `/viewer` is the post-login entry and redirects to `/$user` with that login. Nested under `/$user`: profile index, `repos`, `stars`. Layout `loadQuery`; children `usePreloadedQuery`. Run `pnpm relay` after GraphQL edits.
 

@@ -36,14 +36,16 @@ Desktop sign-in **starts in the native app**. The webview only kicks off auth; t
 
 | Surface                | Where session lives                                      | How it talks to API                                                             |
 | ---------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| **Web** (`apps/web`)   | Browser cookies against `VITE_API_URL`                   | `authClient` + `credentials: "include"`                                         |
+| **Web** (`apps/web`)   | Browser cookies on the **web** origin (`/api` → API proxy) | `authClient` / `honoClient` → `VITE_APP_URL` + `credentials: "include"`       |
 | **Deno Desktop**       | Deno disk jar `~/.config/tangerine-desktop/session.json` | Preload `fetch` + `Authorization: Bearer` + `Origin: com.tigawanna.tangerine:/` |
 | **Electron**           | Main-process `@better-auth/electron` storage             | Official Electron client (sets Origin for you)                                  |
 | **Desktop UI webview** | None for auth — UI only                                  | `bindings.*` when present                                                       |
 
-Do **not** bake `GITHUB_CLIENT_SECRET` into web or desktop. GitHub callback is always:
+Do **not** bake `GITHUB_CLIENT_SECRET` into web or desktop. GitHub callback is always the **web** origin (Nitro/Vercel proxy `/api` → `apps/api`):
 
-`{BETTER_AUTH_URL}/api/auth/callback/github` → locally `http://localhost:5000/api/auth/callback/github`.
+`{BETTER_AUTH_URL}/api/auth/callback/github` → locally `http://localhost:3064/api/auth/callback/github`.
+
+`BETTER_AUTH_URL` must be the public web URL (`VITE_APP_URL`), not the raw API hostname — otherwise OAuth state cookies are third-party on split `*.vercel.app` hosts and fail with `state_security_mismatch`.
 
 ---
 
@@ -63,9 +65,9 @@ Desktop token exchange must hit **`:5000`**, never `:3070`.
 
 ### Web (browser)
 
-1. `authClient.signIn.social({ provider: "github", callbackURL })`
-2. `callbackURL` must be an **absolute** app URL (`VITE_APP_URL + path`). Relative paths resolve against the API base and land on `:5000/viewer`.
-3. Session cookies are on the API origin; CORS + `trustedOrigins` must include the web origin.
+1. `authClient.signIn.social({ provider: "github", callbackURL })` — client `baseURL` is `VITE_APP_URL`; Nitro/`vercel.json` proxies `/api/*` to `VITE_API_URL`.
+2. `callbackURL` must be an **absolute** app URL (`VITE_APP_URL + path`). Relative paths resolve against `BETTER_AUTH_URL` (web).
+3. Session cookies are first-party on the web origin; `trustedOrigins` must include that origin. Desktop/Electron still call the API host directly (Bearer / Electron plugin).
 
 ### Deno Desktop (system browser + loopback)
 
@@ -90,7 +92,7 @@ Use `@better-auth/electron` in main (`electronClient` + `storage()`). Same web `
 
 ### `apps/api`
 
-- `BETTER_AUTH_URL=http://localhost:5000`
+- `BETTER_AUTH_URL=http://localhost:3064` (public **web** origin; prod = web Vercel URL)
 - `BETTER_AUTH_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
 - `BETTER_AUTH_TRUSTED_ORIGINS` / list including:
   - `http://localhost:3064`, `http://localhost:3070`
@@ -99,8 +101,8 @@ Use `@better-auth/electron` in main (`electronClient` + `storage()`). Same web `
 
 ### `apps/web`
 
-- `VITE_APP_URL=http://localhost:3064`
-- `VITE_API_URL=http://localhost:5000`
+- `VITE_APP_URL=http://localhost:3064` (auth client + Hono client base)
+- `VITE_API_URL=http://localhost:5000` (proxy upstream only)
 - No GitHub secrets
 
 ### `apps/desktop`
@@ -115,9 +117,9 @@ Use `@better-auth/electron` in main (`electronClient` + `storage()`). Same web `
 
 ## Gotchas (learned the hard way)
 
-### 1. Relative `callbackURL` hits the API
+### 1. Relative `callbackURL` / wrong `BETTER_AUTH_URL`
 
-Better Auth resolves relative callback URLs against `baseURL` (`:5000`). After GitHub you bounce to `http://localhost:5000/viewer` instead of the app. Always pass absolute URLs from `VITE_APP_URL`.
+Better Auth resolves relative callback URLs against `BETTER_AUTH_URL`. That value must be the **web** origin (proxy), not `:5000` / the API Vercel host. Wrong host → `state_security_mismatch` or landing on the API `/?error=state_mismatch`. Always pass absolute post-login URLs from `VITE_APP_URL`.
 
 ### 2. Deno Desktop remaps loopback ports
 

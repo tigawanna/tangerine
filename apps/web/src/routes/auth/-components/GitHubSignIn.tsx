@@ -15,8 +15,8 @@ import { toast } from "sonner";
 const AWAITING_DESKTOP_HANDOFF_KEY = "tangerine:awaiting-desktop-handoff";
 
 /**
- * Better Auth resolves relative `callbackURL` against the API `baseURL`
- * (`:5000`), so post-login paths like `/viewer` must be absolute web URLs.
+ * Better Auth resolves relative `callbackURL` against `BETTER_AUTH_URL` (web).
+ * Pass absolute app URLs so post-login paths like `/viewer` stay on this origin.
  */
 function toAppCallbackURL(pathOrUrl: string): string {
   if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;

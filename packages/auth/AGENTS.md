@@ -20,11 +20,11 @@ GitHub OAuth only — no email/password. App-specific wiring (plugins, DB adapte
 
 ### Frontend → remote API (web / Deno Desktop UI)
 
-No Better Auth mount on the Start app. Same split as dishi `site`:
+No Better Auth handler in the Start app — web proxies `/api/*` to `apps/api`:
 
-1. `createAuthClient({ baseURL: VITE_API_URL, basePath: "/api/auth", fetchOptions: { credentials: "include" } })`
-2. Session via `authClient.getSession()` (and Electron/Deno proxy plugins as needed)
-3. OAuth secrets + `electron()` + Turso live only on `apps/api`
+1. Web: `createAuthClient({ baseURL: VITE_APP_URL, basePath: "/api/auth", fetchOptions: { credentials: "include" } })`
+2. Desktop UI / Deno: may still use `VITE_API_URL` directly with Bearer / Electron plugins
+3. OAuth secrets + `electron()` + Turso live only on `apps/api`; `BETTER_AUTH_URL` = public web origin
 
 ### Cookie session factory (optional / legacy)
 
