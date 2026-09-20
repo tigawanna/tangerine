@@ -9,13 +9,13 @@ import {
   getEmbedActivityStatus,
   patchEmbedActivity,
   resetEmbedActivity,
-} from "@/server/elysia/routes/enrich/starred/helpers/embed-activity.ts";
-import { getStarredRepos } from "@/server/elysia/routes/enrich/starred/helpers/fetchers.ts";
-import { ensureRepoEmbedWorker } from "@/server/elysia/routes/enrich/starred/helpers/process-repo.ts";
+} from "@/elysia/routes/enrich/starred/helpers/embed-activity.ts";
+import { getStarredRepos } from "@/elysia/routes/enrich/starred/helpers/fetchers.ts";
+import { ensureRepoEmbedWorker } from "@/elysia/routes/enrich/starred/helpers/process-repo.ts";
 import {
   DEFAULT_REPO_EMBED_LIMIT,
   enqueueRepoEmbedJobs,
-} from "@/server/elysia/routes/enrich/starred/helpers/repo-worker.ts";
+} from "@/elysia/routes/enrich/starred/helpers/repo-worker.ts";
 
 export const REPO_EMBED_LIST_QUEUE = "repo-embed-list";
 export const REPO_EMBED_LIST_JOB = "fetch-starred-page";

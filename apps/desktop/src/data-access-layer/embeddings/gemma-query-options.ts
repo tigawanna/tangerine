@@ -1,5 +1,5 @@
-import { getElysiaTreaty } from "@/server/elysia/treaty";
-import { treatyErrorMessage } from "@/server/elysia/treaty-error";
+import { getElysiaTreaty } from "@/elysia/treaty";
+import { treatyErrorMessage } from "@/elysia/treaty-error";
 import { queryOptions } from "@tanstack/react-query";
 
 export const gemmaQueryKeys = {

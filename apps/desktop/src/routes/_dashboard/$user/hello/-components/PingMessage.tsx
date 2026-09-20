@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import { treatyErrorMessage } from "@/server/elysia/treaty-error.ts";
-import { getElysiaTreaty } from "@/server/elysia/treaty.ts";
+import { treatyErrorMessage } from "@/elysia/treaty-error.ts";
+import { getElysiaTreaty } from "@/elysia/treaty.ts";
 import { useMutation } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
 import { useState } from "react";

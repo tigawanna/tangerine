@@ -1,8 +1,8 @@
 import { getEmbeddingBootstrapStatus } from "@/data-access-layer/embeddings/embedding-bootstrap";
 import { gemmaPrefsFilePath, readGemmaPrefs } from "@/data-access-layer/embeddings/gemma-prefs";
-import { bootstrapRoute } from "@/server/elysia/routes/models/bootstrap";
-import { embedRoute } from "@/server/elysia/routes/models/embed";
-import { modelsRoute } from "@/server/elysia/routes/models/models";
+import { bootstrapRoute } from "@/elysia/routes/models/bootstrap";
+import { embedRoute } from "@/elysia/routes/models/embed";
+import { modelsRoute } from "@/elysia/routes/models/models";
 import { Elysia } from "elysia";
 
 /**

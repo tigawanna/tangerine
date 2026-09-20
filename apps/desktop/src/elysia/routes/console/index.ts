@@ -1,5 +1,5 @@
 import { sleep } from "@/lib/sse";
-import { sampleProcessMetrics } from "@/server/elysia/routes/console/sample-metrics.ts";
+import { sampleProcessMetrics } from "@/elysia/routes/console/sample-metrics.ts";
 import { Elysia, sse } from "elysia";
 
 const SAMPLE_MS = 1000;

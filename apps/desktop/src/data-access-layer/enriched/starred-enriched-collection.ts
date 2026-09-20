@@ -1,7 +1,7 @@
 import { getQueryClient } from "@/lib/tanstack/query/queryclient";
-import type { ElysiaTreaty } from "@/server/elysia/treaty";
-import { getElysiaTreaty } from "@/server/elysia/treaty";
-import { treatyErrorMessage } from "@/server/elysia/treaty-error";
+import type { ElysiaTreaty } from "@/elysia/treaty";
+import { getElysiaTreaty } from "@/elysia/treaty";
+import { treatyErrorMessage } from "@/elysia/treaty-error";
 import { createCollection } from "@tanstack/db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 

@@ -7,8 +7,8 @@ import { subscribeSseJson } from "@/hooks/use-embedding-sse";
 import type {
   EmbedActivitySsePayload,
   EmbedActivityStatus,
-} from "@/server/elysia/routes/enrich/starred/helpers/embed-activity.ts";
-import { getElysiaTreaty } from "@/server/elysia/treaty";
+} from "@/elysia/routes/enrich/starred/helpers/embed-activity.ts";
+import { getElysiaTreaty } from "@/elysia/treaty";
 import { useEffect, useState } from "react";
 
 const LIST_REFRESH_MS = 60_000;

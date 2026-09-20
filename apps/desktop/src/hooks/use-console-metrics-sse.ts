@@ -1,6 +1,6 @@
 import { subscribeSseJson } from "@/hooks/use-embedding-sse";
-import type { ProcessMetricsSample } from "@/server/elysia/routes/console/sample-metrics.ts";
-import { getElysiaTreaty } from "@/server/elysia/treaty";
+import type { ProcessMetricsSample } from "@/elysia/routes/console/sample-metrics.ts";
+import { getElysiaTreaty } from "@/elysia/treaty";
 import { useEffect, useState } from "react";
 
 /** Keep ~90s of 1Hz samples for the sparkline. */

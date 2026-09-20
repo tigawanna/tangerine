@@ -1,7 +1,7 @@
 import { Queue } from "@conveyor/core";
 import { workerStore } from "@/lib/worker/store.ts";
 import { isGithubRateLimited } from "@repo/github";
-import { getMyRepos } from "@/server/elysia/routes/enrich/mine/helpers/fetcher.ts";
+import { getMyRepos } from "@/elysia/routes/enrich/mine/helpers/fetcher.ts";
 
 const MINE_REPOS_QUEUE = "mine-repos";
 const MINE_REPOS_JOB = "mine-repos";

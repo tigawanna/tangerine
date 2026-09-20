@@ -1,5 +1,5 @@
-import { enrichedMineRoute } from "@/server/elysia/routes/enrich/mine/index.ts";
-import { enrichedStarredRoute } from "@/server/elysia/routes/enrich/starred/index.ts";
+import { enrichedMineRoute } from "@/elysia/routes/enrich/mine/index.ts";
+import { enrichedStarredRoute } from "@/elysia/routes/enrich/starred/index.ts";
 import { Elysia } from "elysia";
 
 /**

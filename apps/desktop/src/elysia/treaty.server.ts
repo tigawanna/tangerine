@@ -1,5 +1,5 @@
-import type { ElysiaApp } from "@/server/elysia/app";
-import { elysiaApp } from "@/server/elysia/app";
+import type { ElysiaApp } from "@/elysia/app";
+import { elysiaApp } from "@/elysia/app";
 import { treaty, type Treaty } from "@elysiajs/eden";
 
 /**

@@ -1,5 +1,5 @@
 import { appendHelloMessage, helloCollection } from "@/data-access-layer/enriched/hello-collection.ts";
-import { getElysiaTreaty } from "@/server/elysia/treaty.ts";
+import { getElysiaTreaty } from "@/elysia/treaty.ts";
 import { useEffect } from "react";
 
 /** Stream POST /hello emits into the hello collection via SSE. */

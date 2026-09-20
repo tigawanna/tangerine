@@ -1,6 +1,6 @@
 import { clientEnv } from "@/lib/envs/client-env";
-import type { ElysiaApp } from "@/server/elysia/app";
-import { getServerElysiaTreaty } from "@/server/elysia/treaty.server";
+import type { ElysiaApp } from "@/elysia/app";
+import { getServerElysiaTreaty } from "@/elysia/treaty.server";
 import { treaty, type Treaty } from "@elysiajs/eden";
 import { createIsomorphicFn } from "@tanstack/react-start";
 

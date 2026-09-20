@@ -1,10 +1,10 @@
 import { sleep } from "@/lib/sse";
-import { consoleRoute } from "@/server/elysia/routes/console/index.ts";
-import { embeddingsRoute } from "@/server/elysia/routes/models/embedding-inventory.ts";
-import { workerRoute } from "@/server/elysia/routes/worker";
+import { consoleRoute } from "@/elysia/routes/console/index.ts";
+import { embeddingsRoute } from "@/elysia/routes/models/embedding-inventory.ts";
+import { workerRoute } from "@/elysia/routes/worker";
 import { Elysia, sse } from "elysia";
-import { enrichRoute } from "@/server/elysia/routes/enrich/index.ts";
-import { helloRoute } from "@/server/elysia/routes/hello/index.ts";
+import { enrichRoute } from "@/elysia/routes/enrich/index.ts";
+import { helloRoute } from "@/elysia/routes/hello/index.ts";
 
 /**
  * Embedded Elysia API for EmbeddingGemma + ORT (mounted at `/api/elysia/$`).

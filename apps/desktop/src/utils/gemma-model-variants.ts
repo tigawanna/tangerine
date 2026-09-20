@@ -1,4 +1,4 @@
-import type { GemmaModelSettingsResult } from "@/server/elysia/routes/models/embedding-types.ts";
+import type { GemmaModelSettingsResult } from "@/elysia/routes/models/embedding-types.ts";
 
 export type VariantRow = GemmaModelSettingsResult["cache"]["variants"][number];
 

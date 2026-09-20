@@ -3,7 +3,7 @@ import { getGithubToken } from "@/lib/github-token.server.ts";
 import {
   DEFAULT_REPO_EMBED_LIMIT,
   type RepoEmbedJob,
-} from "@/server/elysia/routes/enrich/starred/helpers/repo-worker.ts";
+} from "@/elysia/routes/enrich/starred/helpers/repo-worker.ts";
 
 export type GetStarredReposInput = {
   login: string;

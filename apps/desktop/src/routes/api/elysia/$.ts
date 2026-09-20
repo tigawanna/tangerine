@@ -1,4 +1,4 @@
-import { elysiaApp } from "@/server/elysia/app";
+import { elysiaApp } from "@/elysia/app";
 import { createFileRoute } from "@tanstack/react-router";
 
 /**
