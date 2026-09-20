@@ -9,6 +9,7 @@ import { auth } from "./lib/auth";
 import { viewerRoute } from "./routes/viewer/route";
 import { homeRoute } from "./routes/home/route";
 import { adminRoute } from "./routes/admin/route";
+import { debugRoute } from "./routes/debug/route";
 
 const isProd = envVariables.NODE_ENV === "production";
 
@@ -47,6 +48,7 @@ export const app = new Hono<EvlogVariables>()
   .route("/", homeRoute)
   .on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw))
   .route("/viewer", viewerRoute)
-  .route("/admin", adminRoute);
+  .route("/admin", adminRoute)
+  .route("/debug", debugRoute);
 
 export type AppType = typeof app;
