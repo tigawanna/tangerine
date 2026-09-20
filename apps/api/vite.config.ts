@@ -21,7 +21,10 @@ function writeBuildOutputApi(handler: string) {
         runtime: "nodejs22.x",
         handler,
         launcherType: "Nodejs",
-        shouldAddHelpers: true,
+        // Helpers parse `req.body` and consume the stream. Better Auth then
+        // hangs forever on `request.json()` for POST /api/auth/* (300s timeout,
+        // UI stuck on "Redirecting…"). GET still worked because it has no body.
+        shouldAddHelpers: false,
         shouldAddSourcemapSupport: true,
         supportsResponseStreaming: true,
       },
