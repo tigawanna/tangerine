@@ -3,7 +3,7 @@
  * Run: `pnpm exec tsx --env-file=.env ./scripts/smoke-live.ts`
  */
 import { eq } from "drizzle-orm";
-import { client, db, liveQuery, projectEnrichmentOutputs } from "../src/db/index.ts";
+import { client, db, liveQuery, projectEnrichmentOutputs } from "../src/pglite/index.ts";
 
 const SMOKE_ID = "smoke-live-1";
 
@@ -17,11 +17,16 @@ const statement = db
   .from(projectEnrichmentOutputs)
   .where(eq(projectEnrichmentOutputs.type, "starred"));
 
-const sawInsert = Promise.withResolvers<{ id: string; owner: string }[]>();
+type SmokeRow = { id: string; owner: string };
+
+let resolveInsert!: (rows: SmokeRow[]) => void;
+const sawInsert = new Promise<SmokeRow[]>((resolve) => {
+  resolveInsert = resolve;
+});
 
 const sub = await liveQuery(statement, (res) => {
-  if (res.rows.some((row) => row.id === SMOKE_ID)) {
-    sawInsert.resolve(res.rows);
+  if (res.rows.some((row: SmokeRow) => row.id === SMOKE_ID)) {
+    resolveInsert(res.rows);
   }
 });
 
@@ -40,8 +45,8 @@ const timeout = new Promise<never>((_, reject) => {
   setTimeout(() => reject(new Error("liveQuery did not emit within 3s after insert")), 3_000);
 });
 
-const rows = await Promise.race([sawInsert.promise, timeout]);
-const hit = rows.find((row) => row.id === SMOKE_ID);
+const rows = await Promise.race([sawInsert, timeout]);
+const hit = rows.find((row: SmokeRow) => row.id === SMOKE_ID);
 if (!hit) throw new Error("live emit missing smoke row");
 
 console.info("liveQuery emit on insert ok:", hit);

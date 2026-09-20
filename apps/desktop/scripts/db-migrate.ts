@@ -9,11 +9,11 @@
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { client, db } from "../src/db/client.ts";
+import { client, db } from "../src/pglite/client.ts";
 
 const migrationsFolder = resolve(
   fileURLToPath(new URL(".", import.meta.url)),
-  "../src/db/migrations",
+  "../src/pglite/migrations",
 );
 
 await migrate(db, { migrationsFolder });

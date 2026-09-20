@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   updateGithubRepoSettings,
   type UpdateRepoSettingsInput,
-} from "@/modules/github/repo-mutations";
+} from "@/lib/github/mutations";
 import { getRouteApi, useRouter } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, Settings2, X } from "lucide-react";

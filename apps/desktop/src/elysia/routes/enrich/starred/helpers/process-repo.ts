@@ -3,8 +3,8 @@ import { createGitHubClient, clipReadmeSummary } from "@repo/github";
 import { EMBED_TEXT_MAX_CHARS } from "@/data-access-layer/embeddings/embed-limits.ts";
 import { readGemmaPrefs } from "@/data-access-layer/embeddings/gemma-prefs.ts";
 import { ensureOrtReady } from "@/data-access-layer/embeddings/ort-runtime.ts";
-import { db } from "@/db/client.ts";
-import { projectEnrichmentOutputs } from "@/db/index.ts";
+import { db } from "@/pglite/client.ts";
+import { projectEnrichmentOutputs } from "@/pglite/index.ts";
 import { getGithubToken } from "@/lib/github-token.server.ts";
 import { workerStore } from "@/lib/worker/store.ts";
 

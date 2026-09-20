@@ -1,5 +1,5 @@
-import { db } from "@/db/client.ts";
-import { projectEnrichmentOutputs } from "@/db/index.ts";
+import { db } from "@/pglite/client.ts";
+import { projectEnrichmentOutputs } from "@/pglite/index.ts";
 import { pubSub } from "@/lib/pub-sub/client";
 import { PUB_SUB_TOPICS } from "@/lib/pub-sub/topics";
 import {

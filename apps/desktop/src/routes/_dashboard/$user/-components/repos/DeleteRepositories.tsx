@@ -9,7 +9,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { deleteGithubRepos } from "@/modules/github/repo-mutations";
+import { deleteGithubRepos } from "@/lib/github/mutations";
 import { useMutation } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { useRelayEnvironment } from "react-relay";

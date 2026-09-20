@@ -1,12 +1,22 @@
+import { getGithubToken } from "@/lib/github-token.server";
 import type { PinnedViewerReposResponse, RequestError } from "@/types/github";
+import { createGitHubClient } from "@repo/github";
 import { createServerFn } from "@tanstack/react-start";
+import { setResponseHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
-import { fetchPinnedReposFromGithub, fetchRecentReposFromGithub } from "./fetch-repos";
-import { setPublicGithubCacheHeaders } from "./public-cache-headers";
+
+/**
+ * CDN-safe cache headers for public GitHub repo payloads.
+ * Browser always revalidates; Vercel Edge may serve a cached copy for 1h.
+ */
+function setPublicGithubCacheHeaders() {
+  setResponseHeader("Cache-Control", "public, max-age=0, must-revalidate");
+  setResponseHeader("Vercel-CDN-Cache-Control", "public, max-age=3600, stale-while-revalidate=600");
+}
 
 export const getPinnedRepos = createServerFn({ method: "GET" }).handler(async () => {
   try {
-    const nodes = await fetchPinnedReposFromGithub();
+    const nodes = await createGitHubClient(await getGithubToken()).getPinnedRepos();
     setPublicGithubCacheHeaders();
     return {
       data: {
@@ -29,7 +39,7 @@ export const getRecentRepos = createServerFn({ method: "GET" })
   .inputValidator(recentReposInput)
   .handler(async ({ data }) => {
     try {
-      const result = await fetchRecentReposFromGithub({
+      const result = await createGitHubClient(await getGithubToken()).getRecentRepos({
         // `null` / omitted → all repos; `true`/`false` filters forks.
         isFork: data.isFork ?? undefined,
       });

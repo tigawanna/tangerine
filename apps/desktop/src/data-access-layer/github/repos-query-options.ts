@@ -1,4 +1,4 @@
-import { getPinnedRepos, getRecentRepos } from "@/modules/github/repos";
+import { getPinnedRepos, getRecentRepos } from "@/data-access-layer/github/repos";
 import { queryOptions } from "@tanstack/react-query";
 
 export const pinnedReposQueryOptions = queryOptions({

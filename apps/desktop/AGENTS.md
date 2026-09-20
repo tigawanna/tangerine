@@ -41,9 +41,9 @@ Embedded **Postgres** via [`@electric-sql/pglite`](https://pglite.dev/docs/) + D
 
 | Piece        | Path                                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------------------------- |
-| Client       | [`src/db/client.ts`](./src/db/client.ts) (`PGlite.create` + `live` + `vector`)                                      |
-| Schema       | [`src/db/schema/`](./src/db/schema/) (`project_repo_artifacts`, `project_enrichment_outputs` + `vector(n)`) |
-| Migrations   | [`src/db/migrations/`](./src/db/migrations/) (HNSW cosine index is a custom SQL migration)                           |
+| Client       | [`src/pglite/client.ts`](./src/pglite/client.ts) (`PGlite.create` + `live` + `vector`)                                      |
+| Schema       | [`src/pglite/schema/`](./src/pglite/schema/) (`project_repo_artifacts`, `project_enrichment_outputs` + `vector(n)`) |
+| Migrations   | [`src/pglite/migrations/`](./src/pglite/migrations/) (HNSW cosine index is a custom SQL migration)                           |
 | Default dir  | `DATABASE_URL` or `~/.config/tangerine-desktop/pgdata`                                                              |
 
 `pnpm db:migrate` (or `pnpm db:setup`). Auth session cookies stay in JSON under `~/.config/tangerine-desktop/`; API auth tables remain on `apps/api` (Turso).

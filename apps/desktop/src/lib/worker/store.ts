@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { SqliteStore } from "@conveyor/store-sqlite-node";
-import { resolveLocalPath } from "@/db/path";
+import { resolveLocalPath } from "@/pglite/path";
 
 const filename = resolveLocalPath(
   process.env.QUEUE_DATABASE_PATH ?? process.env.QUEUE_DATABASE_URL,

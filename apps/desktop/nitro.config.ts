@@ -13,7 +13,7 @@ export default defineConfig({
     asyncContext: true,
   },
   /** Desktop can always write local NDJSON — shared monorepo `.evlog/logs/`. */
-  plugins: ["./server/plugins/evlog-fs-drain.ts"],
+  plugins: ["./src/lib/evlog/fs-drain.ts"],
   modules: [
     evlog({
       env: { service: "tangerine-desktop" },

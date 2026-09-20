@@ -19,7 +19,7 @@ export default defineConfig({
     asyncContext: true,
   },
   /** Local FS drains are not available on Vercel Functions. */
-  plugins: isVercel || isProd ? [] : ["./server/plugins/evlog-fs-drain.ts"],
+  plugins: isVercel || isProd ? [] : ["./src/lib/evlog/fs-drain.ts"],
   modules: [
     evlog({
       env: { service: "tangerine-web" },
