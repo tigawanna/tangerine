@@ -1,13 +1,6 @@
 import { EMBEDDING_DIMENSIONS } from "@repo/gemma-embedding/constants";
-import {
-  integer,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  uniqueIndex,
-  vector,
-} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { integer, jsonb, pgTable, text, timestamp, uniqueIndex, vector } from "drizzle-orm/pg-core";
 
 /**
  * How the user relates to this repo.
@@ -27,7 +20,9 @@ export type EnrichedRepoType = "starred" | "mine" | "other";
 export const projectEnrichmentOutputs = pgTable(
   "project_enrichment_outputs",
   {
-    id: text("id").primaryKey(),
+    id: text("id")
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
     owner: text("owner").notNull(),
     name: text("name").notNull(),
     type: text("type").$type<EnrichedRepoType>(),
@@ -42,6 +37,10 @@ export const projectEnrichmentOutputs = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .notNull()
       .$defaultFn(() => new Date()),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .$defaultFn(() => new Date())
+      .$onUpdateFn(() => new Date()),
   },
   (table) => [
     uniqueIndex("project_enrichment_outputs_owner_name_uidx").on(table.owner, table.name),

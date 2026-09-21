@@ -15,6 +15,13 @@
       "when": 1789839060764,
       "tag": "0001_needy_swordsman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790006437667,
+      "tag": "0002_jazzy_george_stacy",
+      "breakpoints": true
     }
   ]
 }

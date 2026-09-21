@@ -20,6 +20,7 @@ import { Route as ApiElysiaSplatRouteImport } from './routes/api/elysia/$'
 import { Route as DashboardUserEnrichedIndexRouteImport } from './routes/_dashboard/$user/enriched/index'
 import { Route as DashboardUserHelloIndexRouteImport } from './routes/_dashboard/$user/hello/index'
 import { Route as DashboardUserReposIndexRouteImport } from './routes/_dashboard/$user/repos/index'
+import { Route as DashboardUserScratchpadIndexRouteImport } from './routes/_dashboard/$user/scratchpad/index'
 import { Route as DashboardUserSearchIndexRouteImport } from './routes/_dashboard/$user/search/index'
 import { Route as DashboardUserSettingsIndexRouteImport } from './routes/_dashboard/$user/settings/index'
 import { Route as DashboardUserStarsIndexRouteImport } from './routes/_dashboard/$user/stars/index'
@@ -80,6 +81,12 @@ const DashboardUserReposIndexRoute = DashboardUserReposIndexRouteImport.update({
   path: '/repos/',
   getParentRoute: () => DashboardUserLayoutRoute,
 } as any)
+const DashboardUserScratchpadIndexRoute =
+  DashboardUserScratchpadIndexRouteImport.update({
+    id: '/scratchpad/',
+    path: '/scratchpad/',
+    getParentRoute: () => DashboardUserLayoutRoute,
+  } as any)
 const DashboardUserSearchIndexRoute =
   DashboardUserSearchIndexRouteImport.update({
     id: '/search/',
@@ -115,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/$user/enriched/': typeof DashboardUserEnrichedIndexRoute
   '/$user/hello/': typeof DashboardUserHelloIndexRoute
   '/$user/repos/': typeof DashboardUserReposIndexRoute
+  '/$user/scratchpad/': typeof DashboardUserScratchpadIndexRoute
   '/$user/search/': typeof DashboardUserSearchIndexRoute
   '/$user/settings/': typeof DashboardUserSettingsIndexRoute
   '/$user/stars/': typeof DashboardUserStarsIndexRoute
@@ -130,6 +138,7 @@ export interface FileRoutesByTo {
   '/$user/enriched': typeof DashboardUserEnrichedIndexRoute
   '/$user/hello': typeof DashboardUserHelloIndexRoute
   '/$user/repos': typeof DashboardUserReposIndexRoute
+  '/$user/scratchpad': typeof DashboardUserScratchpadIndexRoute
   '/$user/search': typeof DashboardUserSearchIndexRoute
   '/$user/settings': typeof DashboardUserSettingsIndexRoute
   '/$user/stars': typeof DashboardUserStarsIndexRoute
@@ -148,6 +157,7 @@ export interface FileRoutesById {
   '/_dashboard/$user/enriched/': typeof DashboardUserEnrichedIndexRoute
   '/_dashboard/$user/hello/': typeof DashboardUserHelloIndexRoute
   '/_dashboard/$user/repos/': typeof DashboardUserReposIndexRoute
+  '/_dashboard/$user/scratchpad/': typeof DashboardUserScratchpadIndexRoute
   '/_dashboard/$user/search/': typeof DashboardUserSearchIndexRoute
   '/_dashboard/$user/settings/': typeof DashboardUserSettingsIndexRoute
   '/_dashboard/$user/stars/': typeof DashboardUserStarsIndexRoute
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/$user/enriched/'
     | '/$user/hello/'
     | '/$user/repos/'
+    | '/$user/scratchpad/'
     | '/$user/search/'
     | '/$user/settings/'
     | '/$user/stars/'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '/$user/enriched'
     | '/$user/hello'
     | '/$user/repos'
+    | '/$user/scratchpad'
     | '/$user/search'
     | '/$user/settings'
     | '/$user/stars'
@@ -198,6 +210,7 @@ export interface FileRouteTypes {
     | '/_dashboard/$user/enriched/'
     | '/_dashboard/$user/hello/'
     | '/_dashboard/$user/repos/'
+    | '/_dashboard/$user/scratchpad/'
     | '/_dashboard/$user/search/'
     | '/_dashboard/$user/settings/'
     | '/_dashboard/$user/stars/'
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUserReposIndexRouteImport
       parentRoute: typeof DashboardUserLayoutRoute
     }
+    '/_dashboard/$user/scratchpad/': {
+      id: '/_dashboard/$user/scratchpad/'
+      path: '/scratchpad'
+      fullPath: '/$user/scratchpad/'
+      preLoaderRoute: typeof DashboardUserScratchpadIndexRouteImport
+      parentRoute: typeof DashboardUserLayoutRoute
+    }
     '/_dashboard/$user/search/': {
       id: '/_dashboard/$user/search/'
       path: '/search'
@@ -327,6 +347,7 @@ interface DashboardUserLayoutRouteChildren {
   DashboardUserEnrichedIndexRoute: typeof DashboardUserEnrichedIndexRoute
   DashboardUserHelloIndexRoute: typeof DashboardUserHelloIndexRoute
   DashboardUserReposIndexRoute: typeof DashboardUserReposIndexRoute
+  DashboardUserScratchpadIndexRoute: typeof DashboardUserScratchpadIndexRoute
   DashboardUserSearchIndexRoute: typeof DashboardUserSearchIndexRoute
   DashboardUserSettingsIndexRoute: typeof DashboardUserSettingsIndexRoute
   DashboardUserStarsIndexRoute: typeof DashboardUserStarsIndexRoute
@@ -338,6 +359,7 @@ const DashboardUserLayoutRouteChildren: DashboardUserLayoutRouteChildren = {
   DashboardUserEnrichedIndexRoute: DashboardUserEnrichedIndexRoute,
   DashboardUserHelloIndexRoute: DashboardUserHelloIndexRoute,
   DashboardUserReposIndexRoute: DashboardUserReposIndexRoute,
+  DashboardUserScratchpadIndexRoute: DashboardUserScratchpadIndexRoute,
   DashboardUserSearchIndexRoute: DashboardUserSearchIndexRoute,
   DashboardUserSettingsIndexRoute: DashboardUserSettingsIndexRoute,
   DashboardUserStarsIndexRoute: DashboardUserStarsIndexRoute,

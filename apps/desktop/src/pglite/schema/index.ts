@@ -1,3 +1,4 @@
+export { chat } from "./extras";
 export {
   projectEnrichmentOutputs,
   type EnrichedRepoType,

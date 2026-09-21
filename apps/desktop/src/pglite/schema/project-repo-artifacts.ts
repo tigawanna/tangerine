@@ -1,4 +1,5 @@
 import type { SpelunkPayload } from "@repo/github";
+import { sql } from "drizzle-orm";
 import { integer, jsonb, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 /**
@@ -11,7 +12,7 @@ import { integer, jsonb, pgTable, text, timestamp, uniqueIndex } from "drizzle-o
 export const projectRepoArtifacts = pgTable(
   "project_repo_artifacts",
   {
-    id: text("id").primaryKey(),
+    id: text("id").primaryKey().default(sql`gen_random_uuid()`),
     owner: text("owner").notNull(),
     name: text("name").notNull(),
     description: text("description"),
@@ -23,6 +24,10 @@ export const projectRepoArtifacts = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .notNull()
       .$defaultFn(() => new Date()),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .$defaultFn(() => new Date())
+      .$onUpdateFn(() => new Date()),
   },
   (table) => [uniqueIndex("project_repo_artifacts_owner_name_uidx").on(table.owner, table.name)],
 );

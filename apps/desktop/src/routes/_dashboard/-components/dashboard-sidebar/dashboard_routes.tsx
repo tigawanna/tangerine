@@ -1,7 +1,7 @@
 import type { SidebarItem } from "@/components/sidebar/types";
 import { defaultGithubSearch } from "@/routes/_dashboard/-components/search/github-search";
 import { defaultUserSearch } from "@/routes/_dashboard/$user/layout";
-import { MessageCircle, Search, Settings, Sparkles, Star, User, Users } from "lucide-react";
+import { MessageCircle, Pencil, Search, Settings, Sparkles, Star, User, Users } from "lucide-react";
 
 /**
  * Sidebar links for the profile in the URL.
@@ -53,6 +53,12 @@ export function dashboardPrimaryRoutes(user: string): SidebarItem[] {
       href: "/$user/hello",
       params,
       icon: MessageCircle,
+    },
+    {
+      title: "Scratchpad",
+      href: "/$user/scratchpad",
+      params,
+      icon: Pencil,
     },
   ];
 }
