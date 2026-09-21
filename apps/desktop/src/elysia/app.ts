@@ -1,4 +1,5 @@
 import { sleep } from "@/lib/sse";
+import { chatRoute } from "@/elysia/routes/chat/index.ts";
 import { consoleRoute } from "@/elysia/routes/console/index.ts";
 import { embeddingsRoute } from "@/elysia/routes/models/embedding-inventory.ts";
 import { workerRoute } from "@/elysia/routes/worker";
@@ -31,6 +32,7 @@ export const elysiaApp = new Elysia({ prefix: "/api/elysia" })
   .use(embeddingsRoute)
   .use(workerRoute)
   .use(enrichRoute)
-  .use(helloRoute);
+  .use(helloRoute)
+  .use(chatRoute);
 
 export type ElysiaApp = typeof elysiaApp;
