@@ -3,7 +3,7 @@ import type {
   GemmaLoadStatusResult,
   GemmaModelSettingsResult,
 } from "@/elysia/routes/models/embedding-types.ts";
-import { gemmaQueryKeys } from "@/data-access-layer/embeddings/gemma-query-options";
+import { gemmaQueryKeys } from "@/lib/embedding-gemmma/gemma-query-options";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 

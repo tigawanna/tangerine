@@ -1,6 +1,7 @@
 import { starredRepoEmbedStore } from "@/elysia/routes/enrich/starred/helpers/store.ts";
 import { Queue } from "@conveyor/core";
-import { EmbedRepoShape } from "@/lib/embedding-gemmma/embed-repo.ts";
+import type { EmbedRepoShape } from "@/lib/embedding-gemmma/embed-repo.ts";
+
 
 /** Job name written to every repo-embed queue entry. */
 export const REPO_EMBED_JOB_NAME = "embed-repo";
@@ -25,6 +26,9 @@ export const enqueueStarredRepoEmbedJobs = async (jobs: StarredRepoEmbedJob[]) =
       data: job,
       opts: {
         deduplication: { key: `repo-embed:${job.id}` },
+        /** Retries after worker 429 pauses so deferred batch jobs come back. */
+        attempts: 5,
+        backoff: { type: "exponential", delay: 60_000 },
       },
     })),
   );

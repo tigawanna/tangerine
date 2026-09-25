@@ -1,6 +1,6 @@
-import { EMBED_TEXT_MAX_CHARS } from "@/data-access-layer/embeddings/embed-limits";
-import { readGemmaPrefs } from "@/data-access-layer/embeddings/gemma-prefs";
-import { ensureOrtReady } from "@/data-access-layer/embeddings/ort-runtime";
+import { EMBED_TEXT_MAX_CHARS } from "@/lib/embedding-gemmma/embed-limits";
+import { readGemmaPrefs } from "@/lib/embedding-gemmma/gemma-prefs";
+import { ensureOrtReady } from "@/lib/embedding-gemmma/ort-runtime";
 import { Elysia, t } from "elysia";
 
 const embedBody = t.Object({

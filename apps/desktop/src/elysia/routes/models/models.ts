@@ -1,5 +1,5 @@
-import { readGemmaPrefs, writeGemmaPrefs } from "@/data-access-layer/embeddings/gemma-prefs";
-import { ensureOrtReady, refreshOrtRuntimeSnapshot } from "@/data-access-layer/embeddings/ort-runtime";
+import { readGemmaPrefs, writeGemmaPrefs } from "@/lib/embedding-gemmma/gemma-prefs";
+import { ensureOrtReady, refreshOrtRuntimeSnapshot } from "@/lib/embedding-gemmma/ort-runtime";
 import { sleep } from "@/lib/sse";
 import { Elysia, sse, t } from "elysia";
 
@@ -148,7 +148,7 @@ export const modelsRoute = new Elysia({ prefix: "/models" })
   .post(
     "/open",
     async ({ body }) => {
-      const { openGemmaPathAt } = await import("@/data-access-layer/embeddings/open-gemma-path");
+      const { openGemmaPathAt } = await import("@/lib/embedding-gemmma/open-gemma-path");
       return openGemmaPathAt(body.path);
     },
     {

@@ -2,7 +2,7 @@ import { Progress } from "@/components/ui/progress";
 import {
   embeddingBootstrapQueryOptions,
   gemmaQueryKeys,
-} from "@/data-access-layer/embeddings/gemma-query-options";
+} from "@/lib/embedding-gemmma/gemma-query-options";
 import { useEmbeddingBootstrapSse } from "@/hooks/use-embedding-sse";
 import type { EmbeddingBootstrapStatus } from "@/elysia/routes/models/embedding-types.ts";
 import { getElysiaTreaty } from "@/elysia/treaty";

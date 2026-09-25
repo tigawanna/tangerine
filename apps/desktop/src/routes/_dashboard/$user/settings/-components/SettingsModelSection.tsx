@@ -5,7 +5,7 @@ import {
   gemmaLoadStatusQueryOptions,
   gemmaModelSettingsQueryOptions,
   gemmaQueryKeys,
-} from "@/data-access-layer/embeddings/gemma-query-options";
+} from "@/lib/embedding-gemmma/gemma-query-options";
 import { useEmbeddingBootstrapSse, useGemmaLoadSse } from "@/hooks/use-embedding-sse";
 import { cn } from "@/lib/utils";
 import type { GemmaDtypeId, GemmaModelSettingsResult } from "@/elysia/routes/models/embedding-types.ts";

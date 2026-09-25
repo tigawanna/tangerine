@@ -3,7 +3,7 @@ import {
   getEmbeddingBootstrapStatus,
   resumeEmbeddingBootstrap,
   startEmbeddingBootstrap,
-} from "@/data-access-layer/embeddings/embedding-bootstrap";
+} from "@/lib/embedding-gemmma/embedding-bootstrap";
 import { sleep } from "@/lib/sse";
 import { Elysia, sse } from "elysia";
 

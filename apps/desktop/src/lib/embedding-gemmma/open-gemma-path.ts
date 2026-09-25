@@ -1,5 +1,5 @@
-import { gemmaPrefsFilePath } from "@/data-access-layer/embeddings/gemma-prefs";
-import { ortInstallRoot } from "@/data-access-layer/embeddings/ort-runtime";
+import { gemmaPrefsFilePath } from "./gemma-prefs.ts";
+import { ortInstallRoot } from "./ort-runtime.ts";
 
 /**
  * Opens a local path in the OS file manager (folder, or parent if the file is missing).
