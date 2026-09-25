@@ -1,79 +1,101 @@
 import { Button } from "@/components/ui/button.tsx";
 import { getClientGithubAccessToken } from "@/lib/relay/github-access-token";
-import { createGitHubClient } from "@repo/github";
-import { useMutation } from "@tanstack/react-query";
+import {
+  enqueueStarredFn,
+  getRepoEmbedQueueStatusFn,
+} from "./two.functions.ts";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 import { Loader } from "lucide-react";
-import { z } from "zod";
+
+/** Display-only — keep the queue string here so the route stays client-safe. */
+const REPO_EMBED_QUEUE = "repo-embed";
 
 export const Route = createFileRoute("/_dashboard/$user/scratchpad/two")({
   component: RouteComponent,
 });
 
-/**
- * Scratchpad: pass the OAuth token in and use it directly.
- * Do not rely on rememberGithubTokenForWorkers — server-fn split can duplicate
- * that module, so getGithubToken() never sees the seeded value.
- */
-const testFn = createServerFn({ method: "POST" })
-  .validator(z.object({ token: z.string().min(1), login: z.string().min(1) }))
-  .handler(async ({ data }) => {
-    const client = createGitHubClient(data.token);
-    const viewer = await client.getViewer();
-    const page = await client.getUserStarredReposMinimal({
-      login: data.login,
-      first: 100,
-    });
+function RouteComponent() {
+  const { user: login } = Route.useParams();
 
-    if (!page) {
-      return {
-        ok: false as const,
-        viewer: viewer.login,
-        reason: "user/starredRepositories was null (bad login or GraphQL returned no user)",
-        login: data.login,
-      };
-    }
-
-    return {
-      ok: true as const,
-      viewer: viewer.login,
-      login: data.login,
-      totalCount: page.totalCount,
-      repos: page.edges.length,
-      sample: page.edges.slice(0, 5).map((e) => ({
-        name: e.node.name,
-        owner: e.node.owner.login,
-        description: e.node.description,
-        homepageUrl: e.node.homepageUrl,
-        tags: e.node.tags,
-      })),
-      hasNextPage: page.pageInfo.hasNextPage,
-    };
+  const enqueue = useMutation({
+    mutationFn: async (pages?: number) => {
+      const token = await getClientGithubAccessToken();
+      return enqueueStarredFn({ data: { token, login, pages } });
+    },
   });
 
-function RouteComponent() {
-  const { mutate, data, error, isPending, isError } = useMutation({
-    mutationFn: async () => {
-      const token = await getClientGithubAccessToken();
-      return testFn({ data: { token, login: "tigawanna" } });
-    },
+  const queueStatus = useQuery({
+    queryKey: ["scratchpad", "repo-embed-queue"],
+    queryFn: () => getRepoEmbedQueueStatusFn(),
+    refetchInterval: 5_000,
   });
 
   return (
     <div className="min-h-screen w-full h-full flex flex-col gap-2">
       <div className="flex flex-col h-full gap-6">
-        <h1 className="text-2xl font-bold">Test</h1>
-        {isPending && <Loader className="animate-spin" />}
-        {isError && (
+        <h1 className="text-2xl font-bold">Starred enqueue scratchpad</h1>
+        <p className="text-sm text-muted-foreground">
+          Enqueue starred repos for <code>{login}</code>, then watch{" "}
+          <code>{REPO_EMBED_QUEUE}</code> grow (polls every 5s).
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          <Button
+            data-test="scratchpad-enqueue-1-page"
+            disabled={enqueue.isPending}
+            onClick={() => enqueue.mutate(1)}
+          >
+            Enqueue 1 page
+          </Button>
+          <Button
+            data-test="scratchpad-enqueue-2-pages"
+            disabled={enqueue.isPending}
+            variant="secondary"
+            onClick={() => enqueue.mutate(2)}
+          >
+            Enqueue 2 pages
+          </Button>
+          <Button
+            data-test="scratchpad-enqueue-all"
+            disabled={enqueue.isPending}
+            variant="outline"
+            onClick={() => enqueue.mutate(undefined)}
+          >
+            Enqueue all
+          </Button>
+        </div>
+
+        {enqueue.isPending && <Loader className="animate-spin" />}
+        {enqueue.isError && (
           <pre className="text-destructive whitespace-pre-wrap">
-            {error instanceof Error ? error.message : String(error)}
+            {enqueue.error instanceof Error ? enqueue.error.message : String(enqueue.error)}
           </pre>
         )}
-        {data && <pre className="whitespace-pre-wrap">{JSON.stringify(data, null, 2)}</pre>}
-        <Button data-test="scratchpad-starred-test" onClick={() => mutate()}>
-          Test
-        </Button>
+        {enqueue.data && (
+          <pre className="whitespace-pre-wrap rounded-md border p-3 text-sm">
+            {JSON.stringify(enqueue.data, null, 2)}
+          </pre>
+        )}
+
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold">Queue status</h2>
+            {queueStatus.isFetching && <Loader className="size-4 animate-spin" />}
+          </div>
+          {queueStatus.isError && (
+            <pre className="text-destructive whitespace-pre-wrap">
+              {queueStatus.error instanceof Error
+                ? queueStatus.error.message
+                : String(queueStatus.error)}
+            </pre>
+          )}
+          {queueStatus.data && (
+            <pre className="whitespace-pre-wrap rounded-md border p-3 text-sm">
+              {JSON.stringify(queueStatus.data, null, 2)}
+            </pre>
+          )}
+        </div>
       </div>
     </div>
   );

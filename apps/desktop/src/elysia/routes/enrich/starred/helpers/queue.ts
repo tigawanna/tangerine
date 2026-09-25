@@ -7,7 +7,7 @@ export const REPO_EMBED_JOB_NAME = "embed-repo";
 export const REPO_EMBED_QUEUE = "repo-embed";
 
 /** Default page size when enqueueing the viewer's starred list. */
-
+export const DEFAULT_REPO_EMBED_LIMIT = 100;
 
 /** Inbound payload for one repo-embed job (`job.data`). */
 export type StarredRepoEmbedJob = {

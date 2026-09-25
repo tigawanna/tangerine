@@ -1,12 +1,19 @@
+import { createGitHubClient } from "@repo/github";
 import { db } from "@/pglite/client.ts";
 import { projectEnrichmentOutputs } from "@/pglite/index.ts";
+import {
+  getGithubToken,
+  rememberGithubTokenForWorkers,
+} from "@/lib/github-token.server.ts";
 import { pubSub } from "@/lib/pub-sub/client";
 import { PUB_SUB_TOPICS } from "@/lib/pub-sub/topics";
 import {
   getEmbedActivityStatus,
+  patchEmbedActivity,
+  resetEmbedActivity,
   type EmbedActivitySsePayload,
 } from "@/elysia/routes/enrich/starred/helpers/embed-activity.ts";
-import { enqueueRepoEmbedListJob } from "@/elysia/routes/enrich/starred/helpers/repo-list-worker.ts";
+import { enqueueAllStarredRepos } from "@/elysia/routes/enrich/starred/helpers/enqueue.ts";
 import { DEFAULT_REPO_EMBED_LIMIT } from "@/elysia/routes/enrich/starred/helpers/queue.ts";
 import { and, eq } from "drizzle-orm";
 import { Elysia, sse, t } from "elysia";
@@ -116,13 +123,64 @@ export const enrichedStarredRoute = new Elysia({ prefix: "/starred" })
   .post(
     "/enqueue",
     async ({ body }) => {
-      const result = await enqueueRepoEmbedListJob({
-        pageSize: body?.pageSize ?? body?.limit,
+      const token = await getGithubToken();
+      rememberGithubTokenForWorkers(token);
+
+      const viewer = await createGitHubClient(token).getViewer();
+      const pageSize = body?.pageSize ?? body?.limit ?? DEFAULT_REPO_EMBED_LIMIT;
+
+      resetEmbedActivity(viewer.login);
+
+      const result = await enqueueAllStarredRepos({
+        login: viewer.login,
+        token,
+        pageSize,
+        pages: body?.pages,
+        after: body?.after,
+      });
+
+      if (result.error === "429") {
+        patchEmbedActivity({
+          phase: "waiting",
+          list: { rateLimited: true },
+          message: "GitHub rate limited — starred list crawl stopped",
+        });
+        return {
+          ok: false,
+          message: `Rate limited while listing stars for ${viewer.login}`,
+          login: viewer.login,
+          pageSize,
+          ...result,
+          status: getEmbedActivityStatus(),
+        };
+      }
+
+      if (result.data === "crawl-done") {
+        patchEmbedActivity({
+          phase: "embedding",
+          message: "Starred list crawl finished — embedding queued repos",
+        });
+        return {
+          ok: true,
+          message: `Finished starred-list crawl for ${viewer.login}`,
+          login: viewer.login,
+          pageSize,
+          ...result,
+          status: getEmbedActivityStatus(),
+        };
+      }
+
+      patchEmbedActivity({
+        phase: "listing",
+        list: { after: result.data.nextCursor, rateLimited: false },
+        message: `Page budget reached — resume with after=${result.data.nextCursor}`,
       });
 
       return {
         ok: true,
-        message: `Started starred-list crawl for ${result.login}`,
+        message: `Paused starred-list crawl for ${viewer.login}`,
+        login: viewer.login,
+        pageSize,
         ...result,
         status: getEmbedActivityStatus(),
       };
@@ -146,13 +204,27 @@ export const enrichedStarredRoute = new Elysia({ prefix: "/starred" })
               description: "Alias for pageSize (deprecated).",
             }),
           ),
+          /** Max GraphQL pages this run; omit for a full crawl. */
+          pages: t.Optional(
+            t.Number({
+              minimum: 1,
+              maximum: 50,
+              description: "Max starred pages to fetch (omit = until complete).",
+            }),
+          ),
+          /** GraphQL `after` cursor to resume a prior crawl. */
+          after: t.Optional(
+            t.Union([t.String(), t.Null()], {
+              description: "Resume cursor from a previous page-budget pause.",
+            }),
+          ),
         }),
       ),
       detail: {
         summary: "Start starred-repo enrich crawl",
         description:
-          "Starts list + embed workers explicitly, enqueues the first starred page, " +
-          "and tracks progress on the shared pub/sub bus.",
+          "Lists the viewer's starred repos into the embed queue (optionally " +
+          "page-budgeted) and tracks progress on the shared pub/sub bus.",
         tags: ["enrich", "starred", "worker"],
       },
     },
