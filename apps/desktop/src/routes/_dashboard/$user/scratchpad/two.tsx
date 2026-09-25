@@ -3,6 +3,7 @@ import { getClientGithubAccessToken } from "@/lib/relay/github-access-token";
 import {
   enqueueStarredFn,
   getRepoEmbedQueueStatusFn,
+  startStarredRepoEmbedWorkerFn,
 } from "./two.functions.ts";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -23,6 +24,10 @@ function RouteComponent() {
       const token = await getClientGithubAccessToken();
       return enqueueStarredFn({ data: { token, login, pages } });
     },
+  });
+
+  const startWorker = useMutation({
+    mutationFn: () => startStarredRepoEmbedWorkerFn(),
   });
 
   const queueStatus = useQuery({
@@ -64,6 +69,14 @@ function RouteComponent() {
           >
             Enqueue all
           </Button>
+          <Button
+            data-test="scratchpad-start-worker"
+            disabled={startWorker.isPending}
+            variant="default"
+            onClick={() => startWorker.mutate()}
+          >
+            Start worker
+          </Button>
         </div>
 
         {enqueue.isPending && <Loader className="animate-spin" />}
@@ -75,6 +88,19 @@ function RouteComponent() {
         {enqueue.data && (
           <pre className="whitespace-pre-wrap rounded-md border p-3 text-sm">
             {JSON.stringify(enqueue.data, null, 2)}
+          </pre>
+        )}
+
+        {startWorker.isError && (
+          <pre className="text-destructive whitespace-pre-wrap">
+            {startWorker.error instanceof Error
+              ? startWorker.error.message
+              : String(startWorker.error)}
+          </pre>
+        )}
+        {startWorker.data && (
+          <pre className="whitespace-pre-wrap rounded-md border p-3 text-sm">
+            {JSON.stringify(startWorker.data, null, 2)}
           </pre>
         )}
 

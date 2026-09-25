@@ -12,3 +12,16 @@ mkdirSync(dirname(filename), { recursive: true });
 /** Shared Conveyor SQLite store (WAL + migrations on connect). */
 export const workerStore = new SqliteStore({ filename });
 await workerStore.connect();
+
+
+interface CreateWorkerStoreOptions {
+  name: string;
+}
+export function createWorkerStore(options: CreateWorkerStoreOptions) {
+  const filename = resolveLocalPath(
+    process.env.QUEUE_DATABASE_PATH ?? process.env.QUEUE_DATABASE_URL,
+    `queues/${options.name}.db`,
+  );
+  mkdirSync(dirname(filename), { recursive: true });
+  return new SqliteStore({ filename });
+}

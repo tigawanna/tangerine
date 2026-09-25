@@ -3,6 +3,7 @@ import {
   REPO_EMBED_QUEUE,
   starredRepoEmbedQueue,
 } from "@/elysia/routes/enrich/starred/helpers/queue.ts";
+import { starredRepoEmbedWorker } from "@/elysia/routes/enrich/starred/helpers/worker.ts";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -29,6 +30,18 @@ export const enqueueStarredFn = createServerFn({ method: "POST" })
       after: data.after,
     });
   });
+
+/** Start the `repo-embed` worker (no-op if already running). */
+export const startStarredRepoEmbedWorkerFn = createServerFn({ method: "POST" }).handler(
+  async () => {
+    starredRepoEmbedWorker.start();
+    return {
+      ok: true,
+      workerId: starredRepoEmbedWorker.id,
+      queue: REPO_EMBED_QUEUE,
+    };
+  },
+);
 
 /** Snapshot of `repo-embed` queue depth — polled every 5s from the client. */
 export const getRepoEmbedQueueStatusFn = createServerFn({ method: "GET" }).handler(async () => {

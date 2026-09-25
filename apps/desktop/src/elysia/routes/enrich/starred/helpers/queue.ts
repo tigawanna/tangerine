@@ -1,5 +1,6 @@
+import { starredRepoEmbedStore } from "@/elysia/routes/enrich/starred/helpers/store.ts";
 import { Queue } from "@conveyor/core";
-import { workerStore } from "@/lib/worker/store.ts";
+import { EmbedRepoShape } from "@/lib/embedding-gemmma/embed-repo.ts";
 
 /** Job name written to every repo-embed queue entry. */
 export const REPO_EMBED_JOB_NAME = "embed-repo";
@@ -10,20 +11,12 @@ export const REPO_EMBED_QUEUE = "repo-embed";
 export const DEFAULT_REPO_EMBED_LIMIT = 100;
 
 /** Inbound payload for one repo-embed job (`job.data`). */
-export type StarredRepoEmbedJob = {
-  id: string;
-  owner: string;
-  name: string;
-  description: string | null;
-  languages: string[];
-  tags: string[];
-};
+export type StarredRepoEmbedJob = EmbedRepoShape;
 
 /** Producer queue — import this to enqueue per-repo embed jobs. */
 export const starredRepoEmbedQueue = new Queue<StarredRepoEmbedJob>(REPO_EMBED_QUEUE, {
-  store: workerStore,
+  store: starredRepoEmbedStore,
 });
-
 
 export const enqueueStarredRepoEmbedJobs = async (jobs: StarredRepoEmbedJob[]) => {
   const created = await starredRepoEmbedQueue.addBulk(
