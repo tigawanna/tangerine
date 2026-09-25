@@ -1,16 +1,23 @@
 import { AppConfig } from "@/utils/system";
 import { createFileRoute } from "@tanstack/react-router";
 import { EnrichedPage } from "@/routes/_dashboard/$user/enriched/-components/EnrichedPage.tsx";
-import z from "zod";
+import { z } from "zod";
 import { enrichedTabs } from "@/routes/_dashboard/$user/enriched/-components/constants.ts";
 
-const searchParms = z.object({
-  search: z.string().optional(),
-  tab: z.enum(enrichedTabs).default("console"),
+/**
+ * Flat optional search — no Zod `.default()` (avoids validateSearch URL rewrite loops).
+ * Apply tab default in the page component.
+ */
+const enrichedSearchSchema = z.object({
+  q: z.string().optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  tab: z.enum(enrichedTabs).optional(),
 });
 
+export type EnrichedSearch = z.infer<typeof enrichedSearchSchema>;
+
 export const Route = createFileRoute("/_dashboard/$user/enriched/")({
-  validateSearch: searchParms,
+  validateSearch: (search) => enrichedSearchSchema.parse(search),
   component: EnrichedPage,
   head: ({ params }) => ({
     meta: [

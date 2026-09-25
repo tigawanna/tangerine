@@ -5,6 +5,7 @@ import { projectEnrichmentOutputs } from "@/pglite/index.ts";
 import { starredRepoEmbedStore } from "@/elysia/routes/enrich/starred/helpers/store.ts";
 import {
   getEmbedActivityStatus,
+  maybeMarkEmbedDone,
   patchEmbedActivity,
   type EmbedActivityRepoRow,
 } from "@/elysia/routes/enrich/starred/helpers/embed-activity.ts";
@@ -151,7 +152,16 @@ export const starredRepoEmbedWorker = new Worker<StarredRepoEmbedJob>(
       }
     }
 
+    await maybeMarkEmbedDone({ ignoreActive: true });
+    // Conveyor still counts this batch as active until we return — heal shortly after.
+    setTimeout(() => {
+      void maybeMarkEmbedDone();
+    }, 250);
     return results;
   },
   { store: starredRepoEmbedStore, batch: { size: 10 }, autoStart: false },
 );
+
+starredRepoEmbedWorker.on("drained", () => {
+  void maybeMarkEmbedDone();
+});

@@ -12,6 +12,8 @@ import { getElysiaTreaty } from "@/elysia/treaty";
 import { useEffect, useState } from "react";
 
 const LIST_REFRESH_MS = 60_000;
+/** While a run is live, poll activity so a missed SSE `done` cannot leave the spinner stuck. */
+const LIVE_ACTIVITY_POLL_MS = 2_000;
 
 function isLive(status: EmbedActivityStatus | null): boolean {
   return (
@@ -27,6 +29,7 @@ function isLive(status: EmbedActivityStatus | null): boolean {
  */
 export function useEmbedActivitySse() {
   const [status, setStatus] = useState<EmbedActivityStatus | null>(null);
+  const live = isLive(status);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,6 +63,27 @@ export function useEmbedActivitySse() {
     );
   }, []);
 
+  // Heal stuck "embedding" if the final SSE frame was missed (HMR, race on active counts).
+  useEffect(() => {
+    if (!live) return;
+
+    const id = window.setInterval(() => {
+      void getElysiaTreaty()
+        .enrich.starred.activity.get()
+        .then(({ data, error }) => {
+          if (error || !data) return;
+          setStatus(data);
+        })
+        .catch(() => {
+          // ignore transient poll failures
+        });
+    }, LIVE_ACTIVITY_POLL_MS);
+
+    return () => {
+      window.clearInterval(id);
+    };
+  }, [live]);
+
   useEffect(() => {
     const id = window.setInterval(() => {
       void invalidateEnrichedRepos();
@@ -69,5 +93,5 @@ export function useEmbedActivitySse() {
     };
   }, []);
 
-  return { status, live: isLive(status) };
+  return { status, live };
 }

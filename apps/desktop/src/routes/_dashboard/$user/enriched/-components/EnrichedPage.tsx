@@ -13,7 +13,8 @@ type EnrichedTab = (typeof enrichedTabs)[number];
 
 export function EnrichedPage() {
   const { useSearch, useNavigate } = getRouteApi(enrichedRouteID);
-  const { tab } = useSearch();
+  const search = useSearch();
+  const tab = (search.tab ?? "console") as EnrichedTab;
   const navigate = useNavigate();
 
   return (

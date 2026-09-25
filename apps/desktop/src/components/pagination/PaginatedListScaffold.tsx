@@ -15,6 +15,8 @@ type PaginatedListScaffoldProps = {
   filters?: ReactNode;
   children: ReactNode;
   dataTest?: string;
+  /** Override URL `q` debounce (ms). Default 400. */
+  searchDebounceMs?: number;
 };
 
 /**
@@ -31,8 +33,11 @@ export function PaginatedListScaffold({
   filters,
   children,
   dataTest,
+  searchDebounceMs,
 }: PaginatedListScaffoldProps) {
-  const { inputValue, onSearchChange, isDebouncing } = usePageSearchQuery(routeID);
+  const { inputValue, onSearchChange, isDebouncing } = usePageSearchQuery(routeID, {
+    wait: searchDebounceMs,
+  });
 
   return (
     <div className="flex min-h-full w-full flex-col gap-6" data-test={dataTest}>
