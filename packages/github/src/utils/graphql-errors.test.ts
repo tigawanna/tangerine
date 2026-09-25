@@ -56,6 +56,11 @@ describe("isGithubRateLimited", () => {
     ).toBe(true);
   });
 
+  it("detects soft result envelopes with error: \"429\"", () => {
+    expect(isGithubRateLimited({ data: null, error: "429" })).toBe(true);
+    expect(isGithubRateLimited({ data: { ok: true }, error: null })).toBe(false);
+  });
+
   it("returns false for unrelated errors", () => {
     expect(isGithubRateLimited(new Error("boom"))).toBe(false);
   });

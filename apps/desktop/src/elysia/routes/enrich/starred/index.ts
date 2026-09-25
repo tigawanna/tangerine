@@ -7,7 +7,7 @@ import {
   type EmbedActivitySsePayload,
 } from "@/elysia/routes/enrich/starred/helpers/embed-activity.ts";
 import { enqueueRepoEmbedListJob } from "@/elysia/routes/enrich/starred/helpers/repo-list-worker.ts";
-import { DEFAULT_REPO_EMBED_LIMIT } from "@/elysia/routes/enrich/starred/helpers/repo-worker.ts";
+import { DEFAULT_REPO_EMBED_LIMIT } from "@/elysia/routes/enrich/starred/helpers/queue.ts";
 import { and, eq } from "drizzle-orm";
 import { Elysia, sse, t } from "elysia";
 

@@ -1,6 +1,7 @@
 import { print } from "graphql";
 import type { GitHubClient } from "../client";
 import { graphql, readFragment, type ResultOf, type VariablesOf } from "../graphql";
+import { isGithubRateLimited } from "../utils/graphql-errors";
 import { RepoCardFragment } from "./fragments/repo-card";
 import { mapRepoMinimal, RepoMinimalFragment, type RepoMinimal } from "./fragments/repo-minimal";
 
@@ -132,6 +133,10 @@ export async function getUserStarredReposMinimal(
     USER_STARRED_REPOS_MINIMAL_QUERY,
     { variables },
   );
+  // GitHub may return HTTP 200 with `errors: [{ type: "RATE_LIMITED", ... }]`.
+  if (isGithubRateLimited(result)) {
+    throw result;
+  }
   const connection = result.user?.starredRepositories;
   if (!connection) {
     return null;

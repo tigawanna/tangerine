@@ -17,7 +17,8 @@ function looksLikeRateLimitMessage(message: string): boolean {
 
 /**
  * True when an Octokit/GraphQL failure is a primary or secondary rate limit
- * (HTTP 429/403, or GraphQL `RATE_LIMITED` / rate-limit message in the body).
+ * (HTTP 429/403, GraphQL `RATE_LIMITED` / rate-limit message in the body,
+ * or a caller result envelope `{ error: "429" }`).
  */
 export function isGithubRateLimited(error: unknown): boolean {
   if (error instanceof RequestError) {
@@ -25,15 +26,23 @@ export function isGithubRateLimited(error: unknown): boolean {
     if (error.status === 403 && looksLikeRateLimitMessage(error.message)) return true;
   }
 
-  if (error && typeof error === "object" && "errors" in error) {
-    const errors = (error as { errors?: unknown }).errors;
-    if (Array.isArray(errors)) {
-      for (const entry of errors) {
-        if (!entry || typeof entry !== "object") continue;
-        const row = entry as { type?: string; message?: string; extensions?: { code?: string } };
-        const code = (row.type ?? row.extensions?.code ?? "").toUpperCase();
-        if (code === "RATE_LIMITED" || code === "RATE_LIMIT") return true;
-        if (row.message && looksLikeRateLimitMessage(row.message)) return true;
+  if (error && typeof error === "object") {
+    // Soft result envelopes from app helpers: `{ data: null, error: "429" }`.
+    if ("error" in error && (error as { error?: unknown }).error === "429") {
+      return true;
+    }
+
+    // GraphQL success bodies that still carry `errors: [{ type: "RATE_LIMITED", ... }]`.
+    if ("errors" in error) {
+      const errors = (error as { errors?: unknown }).errors;
+      if (Array.isArray(errors)) {
+        for (const entry of errors) {
+          if (!entry || typeof entry !== "object") continue;
+          const row = entry as { type?: string; message?: string; extensions?: { code?: string } };
+          const code = (row.type ?? row.extensions?.code ?? "").toUpperCase();
+          if (code === "RATE_LIMITED" || code === "RATE_LIMIT") return true;
+          if (row.message && looksLikeRateLimitMessage(row.message)) return true;
+        }
       }
     }
   }
