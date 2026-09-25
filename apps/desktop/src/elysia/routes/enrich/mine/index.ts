@@ -1,7 +1,7 @@
 import { db } from "@/pglite/client.ts";
-import { liveQuery, projectEnrichmentOutputs, type LiveRowOf } from "@/pglite/index.ts";
+import { projectEnrichmentOutputs } from "@/pglite/index.ts";
 import { and, eq } from "drizzle-orm";
-import { Elysia, sse } from "elysia";
+import { Elysia } from "elysia";
 
 /** Enriched “mine” repos under `/api/elysia/enrich/mine/*`. */
 export const enrichedMineRoute = new Elysia({ prefix: "/mine" })
@@ -25,27 +25,6 @@ export const enrichedMineRoute = new Elysia({ prefix: "/mine" })
       },
     },
   )
-  .get("/realtime", async function*(){
-    const query = await db.query.projectEnrichmentOutputs.findMany({
-      columns: {
-        embedding: false,
-      },
-      where: eq(projectEnrichmentOutputs.type, "mine"),
-    });
-
-    // for (const row of query) {
-    //   yield sse(row);
-    // }
-    console.log("query===== >>>>>>>>>>>>>>>> ",query);
-    yield sse({data: query});
-
-  }, {
-    detail: {
-      summary: "Get realtime enriched mine repos",
-      description: "Get all enriched repos owned by the viewer (human-readable enrichment outputs).",
-      tags: ["enrich", "mine"],
-    },
-  })
   .delete(
     "/:owner/:name",
     async ({ params }) => {
@@ -88,6 +67,19 @@ export const enrichedMineRoute = new Elysia({ prefix: "/mine" })
       detail: {
         summary: "Delete an enriched mine repo",
         description: "Delete one enriched mine repo by owner/name.",
+        tags: ["enrich", "mine"],
+      },
+    },
+  )
+  .post(
+    "/start",
+    async ({ body }) => {
+      // return db.insert(projectEnrichmentOutputs).values(body);
+    },
+    {
+      detail: {
+        summary: "Start an enrichment worker for my repos",
+        description: "Start an enrichment worker for my repos.",
         tags: ["enrich", "mine"],
       },
     },

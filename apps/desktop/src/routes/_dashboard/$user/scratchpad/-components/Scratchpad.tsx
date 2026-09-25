@@ -3,6 +3,7 @@ import { useChatSse } from "@/hooks/use-chat-sse.ts";
 import { ChatInput } from "@/routes/_dashboard/$user/scratchpad/-components/ChatInput.tsx";
 import { ChatList } from "@/routes/_dashboard/$user/scratchpad/-components/ChatList.tsx";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { Loader, RefreshCcw } from "lucide-react";
 
 export function Scratchpad() {
@@ -21,6 +22,7 @@ export function Scratchpad() {
         <div>
           <h1 className="text-lg font-semibold">Scratchpad</h1>
           <p className="text-muted-foreground text-sm">Local chat messages stored in PGlite.</p>
+          <Link to="/$user/scratchpad/two" params={{ user: "tigawanna" }}>Two</Link>
         </div>
         <button
           type="button"

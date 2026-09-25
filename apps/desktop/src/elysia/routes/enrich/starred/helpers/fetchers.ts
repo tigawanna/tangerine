@@ -26,7 +26,7 @@ export type GetStarredReposResult =
   | { data: null; error: "429" };
 
 /**
- * Fetches one page of starred repos for `login`.
+ * Fetches one page of starred repos for `login` (minimal GraphQL payload).
  * On GitHub rate limit (HTTP or GraphQL body) → `{ data: null, error: "429" }`.
  */
 export async function getStarredRepos(
@@ -36,7 +36,7 @@ export async function getStarredRepos(
   const client = createGitHubClient(await getGithubToken());
 
   try {
-    const page = await client.getUserStarredRepos({
+    const page = await client.getUserStarredReposMinimal({
       login: input.login,
       first: pageSize,
       after: input.after ?? undefined,
@@ -53,11 +53,10 @@ export async function getStarredRepos(
       repoId: node.id,
       owner: node.owner.login,
       name: node.name,
-      description: node.description ?? null,
+      description: node.description,
       url: node.url,
-      languages: (node.languages?.edges ?? [])
-        .map((edge) => edge?.node?.name)
-        .filter((name): name is string => Boolean(name)),
+      // Embed text uses this list; topics are the lean stand-in for languages.
+      languages: node.tags,
     }));
 
     const hasNextPage = page.pageInfo.hasNextPage;

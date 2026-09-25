@@ -2,10 +2,10 @@ import { getGithubToken } from "@/lib/github-token.server.ts";
 import {
   createGitHubClient,
   isGithubRateLimited,
-  type UserReposVariables,
+  type UserReposMinimalVariables,
 } from "@repo/github";
 
-type GetMyReposProps = Omit<UserReposVariables, "login"> & {
+type GetMyReposProps = Omit<UserReposMinimalVariables, "login"> & {
   login?: string;
 };
 
@@ -20,7 +20,7 @@ export async function getMyRepos({
     const token = await getGithubToken();
     const client = createGitHubClient(token);
     const resolvedLogin = login ?? (await client.getViewer()).login;
-    const page = await client.getUserRepos({
+    const page = await client.getUserReposMinimal({
       login: resolvedLogin,
       after,
       first,

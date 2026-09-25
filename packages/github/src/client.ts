@@ -2,8 +2,8 @@ import { Octokit, RequestError } from "octokit";
 import type { GithubGraphqlError } from "./types";
 import { getUserProfile, getViewer } from "./queries/user";
 import { getUserFollowers, getUserFollowing } from "./queries/user-social";
-import { getUserRepos } from "./queries/user-repos";
-import { getUserStarredRepos } from "./queries/user-starred";
+import { getUserRepos, getUserReposMinimal } from "./queries/user-repos";
+import { getUserStarredRepos, getUserStarredReposMinimal } from "./queries/user-starred";
 import { followUser, unfollowUser } from "./queries/user-mutations";
 import { searchGithub } from "./queries/search";
 import {
@@ -70,7 +70,9 @@ export class GitHubClient {
   getUserFollowers = getUserFollowers;
   getUserFollowing = getUserFollowing;
   getUserRepos = getUserRepos;
+  getUserReposMinimal = getUserReposMinimal;
   getUserStarredRepos = getUserStarredRepos;
+  getUserStarredReposMinimal = getUserStarredReposMinimal;
   followUser = followUser;
   unfollowUser = unfollowUser;
   searchGithub = searchGithub;

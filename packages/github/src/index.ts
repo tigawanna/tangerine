@@ -16,6 +16,11 @@ export {
 export { UserCardFragment } from "./queries/fragments/user-card";
 export { RepoCardFragment } from "./queries/fragments/repo-card";
 export { RepoGeneralInfoFragment } from "./queries/fragments/repo-general-info";
+export {
+  RepoMinimalFragment,
+  mapRepoMinimal,
+  type RepoMinimal,
+} from "./queries/fragments/repo-minimal";
 export { SearchRepoFragment, SearchUserFragment } from "./queries/fragments/search-results";
 export {
   RecentReposQuery,
@@ -66,15 +71,25 @@ export {
 } from "./queries/repo-page";
 export {
   UserReposQuery,
+  UserReposMinimalQuery,
   USER_REPOS_QUERY,
+  USER_REPOS_MINIMAL_QUERY,
   type UserReposQueryResult,
   type UserReposVariables,
+  type UserReposMinimalQueryResult,
+  type UserReposMinimalVariables,
+  type UserReposMinimalPage,
 } from "./queries/user-repos";
 export {
   UserStarredReposQuery,
+  UserStarredReposMinimalQuery,
   USER_STARRED_REPOS_QUERY,
+  USER_STARRED_REPOS_MINIMAL_QUERY,
   type UserStarredReposQueryResult,
   type UserStarredReposVariables,
+  type UserStarredReposMinimalQueryResult,
+  type UserStarredReposMinimalVariables,
+  type UserStarredReposMinimalPage,
 } from "./queries/user-starred";
 export {
   UserFollowersQuery,
