@@ -1,5 +1,6 @@
 import { SettingsLogsSection } from "@/routes/_dashboard/$user/settings/-components/SettingsLogsSection.tsx";
-import { SettingsModelSection } from "@/routes/_dashboard/$user/settings/-components/SettingsModelSection.tsx";
+import { SettingsModelDetailSection } from "@/routes/_dashboard/$user/settings/-components/SettingsModelDetailSection.tsx";
+import { SettingsModelNavCard } from "@/routes/_dashboard/$user/settings/-components/SettingsModelNavCard.tsx";
 import { SettingsSystemResourcesSection } from "@/routes/_dashboard/$user/settings/-components/SettingsSystemResourcesSection.tsx";
 import { SettingsThemeSection } from "@/routes/_dashboard/$user/settings/-components/SettingsThemeSection.tsx";
 import {
@@ -16,7 +17,7 @@ type SettingsNavCardProps = {
   title: string;
   description: string;
   icon: typeof Activity;
-  section: SettingsSection;
+  section: Exclude<SettingsSection, "model">;
   testId: string;
 };
 
@@ -58,8 +59,9 @@ function SettingsHub() {
       </header>
 
       <section className="flex flex-col gap-2" data-test="settings-nav-list">
-        <h2 className="text-sm font-medium">System</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Local</h2>
         <div className="flex flex-col gap-2">
+          <SettingsModelNavCard />
           <SettingsNavCard
             testId="settings-nav-system"
             section="system"
@@ -80,10 +82,6 @@ function SettingsHub() {
       <div className="h-px bg-border" role="separator" />
 
       <SettingsThemeSection />
-
-      <div className="h-px bg-border" role="separator" />
-
-      <SettingsModelSection />
     </div>
   );
 }
@@ -91,11 +89,12 @@ function SettingsHub() {
 function settingsBody(section: SettingsSection | undefined): ReactNode {
   if (section === "system") return <SettingsSystemResourcesSection />;
   if (section === "logs") return <SettingsLogsSection />;
+  if (section === "model") return <SettingsModelDetailSection />;
   return <SettingsHub />;
 }
 
 /**
- * Desktop settings — hub list + nested system/logs panels via `?section=`.
+ * Desktop settings — hub list + nested panels via `?section=`.
  */
 export function SettingsPage() {
   const search = routeApi.useSearch();

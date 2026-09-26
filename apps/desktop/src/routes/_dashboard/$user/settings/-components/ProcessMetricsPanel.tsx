@@ -5,12 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/components/ui/chart";
+import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import {
   useConsoleMetricsSse,
   type ConsoleMetricsPoint,
@@ -123,14 +118,6 @@ function MetricsChart({ history }: { history: ConsoleMetricsPoint[] }) {
               axisLine={false}
               width={44}
               tickFormatter={(value: number) => `${value}`}
-            />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  indicator="line"
-                  labelFormatter={(label) => String(label)}
-                />
-              }
             />
             <Area
               yAxisId="cpu"
