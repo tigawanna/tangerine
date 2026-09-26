@@ -1,6 +1,7 @@
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
 import { AppConfig } from "@/utils/system";
 import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 
 export function LandingNav() {
   const Icon = AppConfig.icon;
@@ -25,10 +26,12 @@ export function LandingNav() {
           <Link
             to="/auth"
             search={{ returnTo: "/viewer" }}
-            className="landing-cta-primary landing-cta-compact"
+            className="landing-cta-primary landing-cta-icon"
+            aria-label="Sign in with GitHub"
+            title="Sign in with GitHub"
             data-test="landing-nav-get-started"
           >
-            Sign in with GitHub
+            <ArrowRight className="size-4" aria-hidden />
           </Link>
         </div>
       </div>

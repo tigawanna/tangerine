@@ -173,7 +173,7 @@ function RepoCardSurface({
       data-test={`repo-card-${view.name}`}
       data-selected={selection.selected ? "true" : undefined}
     >
-      <div className="bg-base-300 relative aspect-video overflow-hidden">
+      <div className="bg-base-300 relative aspect-2/1 w-full overflow-hidden">
         <img
           src={view.openGraphImageUrl || undefined}
           alt=""
@@ -241,14 +241,14 @@ function RepoCardSurface({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-4 pt-3">
+      <div className="flex flex-1 flex-col gap-3 p-4 pt-3 lg:gap-2 lg:p-3">
         <div className="min-w-0 space-y-1.5">
           <div className="flex items-start gap-2">
             <Link
               to="/$user/repos/$repo"
               params={detailParams}
               preload="intent"
-              className="group-hover:text-primary min-w-0 flex-1 truncate text-base font-semibold tracking-tight transition-colors"
+              className="group-hover:text-primary min-w-0 flex-1 truncate text-base font-semibold tracking-tight transition-colors lg:text-sm"
               onClick={(event) => {
                 if (selection.editing) {
                   event.preventDefault();
@@ -275,7 +275,7 @@ function RepoCardSurface({
           {view.ownerLogin ? (
             <p className="text-base-content/45 truncate text-xs">@{view.ownerLogin}</p>
           ) : null}
-          <p className="text-base-content/65 line-clamp-2 min-h-10 text-sm leading-5">
+          <p className="text-base-content/65 line-clamp-2 min-h-10 text-sm leading-5 lg:min-h-0 lg:text-xs lg:leading-4">
             {view.description ?? "No description"}
           </p>
         </div>

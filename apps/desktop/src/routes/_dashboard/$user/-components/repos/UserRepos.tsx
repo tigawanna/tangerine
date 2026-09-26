@@ -62,7 +62,7 @@ export function UserRepos({
 
   return (
     <div className="space-y-4" data-test="user-repos">
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <ul className="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-3">
         {edges.map((edge) => {
           if (!edge?.node) return null;
           const node = edge.node;

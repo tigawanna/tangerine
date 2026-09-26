@@ -48,7 +48,7 @@ function SearchRepoResults({ queryRef }: { queryRef: PreloadedQuery<SearchReposQ
       <p className="text-base-content/50 font-mono text-xs">
         {data.search.repositoryCount.toLocaleString()} repositories
       </p>
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <ul className="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-3">
         {hits.map((hit) => (
           <li key={hit.cursor} className="min-w-0">
             <RepoCard repository={hit.repository} />
@@ -157,7 +157,7 @@ export function SearchResultsFallback({ searchType }: { searchType: GithubSearch
 
   return (
     <ul
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+      className="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-3"
       data-test="github-search-pending"
     >
       {Array.from({ length: 6 }).map((_, index) => (

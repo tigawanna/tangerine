@@ -19,12 +19,16 @@ import {
   signOut,
   type DesktopAuthUser,
 } from "./auth.ts";
+import { installApplicationMenu } from "./menu.ts";
 
 const win = new Deno.BrowserWindow({
   title: "Tangerine",
   width: 1280,
   height: 840,
+  resizable: true,
 });
+
+installApplicationMenu(win);
 
 function notifyRenderer(channel: string, payload: unknown): void {
   // Best-effort: push events into the webview via a custom DOM event.

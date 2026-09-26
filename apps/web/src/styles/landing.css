@@ -232,6 +232,20 @@
   box-shadow: none;
 }
 
+.landing-cta-primary.landing-cta-icon {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  box-shadow: none;
+}
+
+.landing-cta-primary.landing-cta-icon {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  box-shadow: none;
+}
+
 .landing-cta-ghost.landing-cta-compact,
 .landing-cta-secondary.landing-cta-compact {
   padding: 0.5rem 1rem;
