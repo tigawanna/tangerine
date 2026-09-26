@@ -1,0 +1,156 @@
+# Push a tag (desktop-v* or v*) — or run `pnpm --filter desktop release` — to
+# build binaries and publish them to a GitHub Release.
+# Pushing to main without a tag does not build.
+name: Desktop build
+
+on:
+  workflow_dispatch:
+  push:
+    # Tags only — pushing to main without a tag does not build.
+    tags:
+      - "desktop-v*"
+      - "v*"
+  pull_request:
+    paths:
+      - "apps/desktop/**"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - ".github/workflows/desktop-build.yml"
+
+concurrency:
+  group: desktop-build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            output: ./dist-desktop/tangerine
+            bundle_name: tangerine
+          - name: macos-arm64
+            os: macos-latest
+            target: aarch64-apple-darwin
+            output: ./dist-desktop/Tangerine.app
+            bundle_name: Tangerine.app
+          - name: windows-x64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            output: ./dist-desktop/Tangerine
+            bundle_name: Tangerine
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.27.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.6
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Write desktop env
+        working-directory: apps/desktop
+        env:
+          VITE_APP_URL: ${{ vars.DESKTOP_VITE_APP_URL || 'http://localhost:3070' }}
+          VITE_API_URL: ${{ vars.DESKTOP_VITE_API_URL || 'http://localhost:5000' }}
+          VITE_SIGN_IN_URL: ${{ vars.DESKTOP_VITE_SIGN_IN_URL || 'http://localhost:3064/auth' }}
+        run: |
+          printf '%s\n' \
+            "VITE_APP_URL=${VITE_APP_URL}" \
+            "VITE_API_URL=${VITE_API_URL}" \
+            "BETTER_AUTH_URL=${VITE_API_URL}" \
+            "VITE_SIGN_IN_URL=${VITE_SIGN_IN_URL}" \
+            "DATABASE_URL=./pgdata" \
+            > .env
+          cat .env
+
+      - name: Build web assets
+        working-directory: apps/desktop
+        run: pnpm run build
+
+      - name: Package desktop app
+        working-directory: apps/desktop
+        run: >
+          deno desktop
+          --preload ./deno/window.ts
+          --env-file=.env
+          --target ${{ matrix.target }}
+          --no-check
+          --node-modules-dir=none
+          --exclude-unused-npm
+          --exclude ./.output/server/node_modules/onnxruntime-node
+          --compress
+          -A
+          -o ${{ matrix.output }}
+          .
+
+      - name: Archive bundle
+        working-directory: apps/desktop/dist-desktop
+        run: |
+          archive="tangerine-desktop-${{ matrix.name }}.tar.gz"
+          tar -czf "$archive" "${{ matrix.bundle_name }}"
+          ls -lh "$archive"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tangerine-desktop-${{ matrix.name }}
+          path: apps/desktop/dist-desktop/tangerine-desktop-${{ matrix.name }}.tar.gz
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: tangerine-desktop-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: List release assets
+        run: ls -lh release-assets
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

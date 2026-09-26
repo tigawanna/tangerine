@@ -8,6 +8,7 @@
     "desktop:dev": "pnpm run dev",
     "desktop:run": "NODE_OPTIONS='--dns-result-order=ipv4first --no-network-family-autoselection' DENO_DESKTOP_DEVTOOLS=1 deno desktop --preload ./deno/window.ts --env-file=.env -A .",
     "desktop:build": "pnpm run build && deno desktop --preload ./deno/window.ts --env-file=.env --no-check --node-modules-dir=none --exclude-unused-npm --exclude ./.output/server/node_modules/onnxruntime-node --compress -A -o ./dist-desktop/tangerine .",
+    "release": "bash ./scripts/release-desktop.sh",
     "build": "vp build",
     "preview": "vp preview",
     "deploy": "vercel --prod",

@@ -35,7 +35,7 @@
       "@better-auth/utils": "0.4.2",
       "vite": "catalog:",
       "vitest": "catalog:",
-      "@voidzero-dev/vite-plus-core": "0.3.0",
+      "@voidzero-dev/vite-plus-core": "0.3.3",
       "onnxruntime-node": "1.24.3",
       "onnxruntime-common": "1.24.3"
     },
@@ -47,12 +47,11 @@
       }
     },
     "onlyBuiltDependencies": [
-      "@clerk/shared",
       "core-js",
-      "electron",
       "es5-ext",
       "esbuild",
       "futurescript",
+      "onnxruntime-node",
       "protobufjs",
       "sharp",
       "workerd"
