@@ -5,10 +5,10 @@ import { db } from "@/pglite/client.ts";
 import { projectEnrichmentOutputs } from "@/pglite/index.ts";
 import { and, cosineDistance, eq, isNotNull, sql } from "drizzle-orm";
 
-/** Max nearest neighbors returned for a semantic starred search. */
-export const STARRED_SEARCH_LIMIT = 50;
+/** Max nearest neighbors returned for a semantic user-repos search. */
+export const USER_REPOS_SEARCH_LIMIT = 50;
 
-export type StarredSearchHit = {
+export type UserReposSearchHit = {
   id: string;
   owner: string;
   name: string;
@@ -22,14 +22,13 @@ export type StarredSearchHit = {
   embeddedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  /** Cosine distance to the query vector (lower = closer). */
   distance: number;
 };
 
 /**
- * Embed `q` with EmbeddingGemma (query mode) and rank starred rows by cosine distance.
+ * Embed `q` with EmbeddingGemma (query mode) and rank `type=repos` rows by cosine distance.
  */
-export async function searchStarredByQuery(q: string): Promise<StarredSearchHit[]> {
+export async function searchUserReposByQuery(q: string): Promise<UserReposSearchHit[]> {
   const text = q.trim().slice(0, EMBED_TEXT_MAX_CHARS);
   if (!text) return [];
 
@@ -61,12 +60,12 @@ export async function searchStarredByQuery(q: string): Promise<StarredSearchHit[
     .from(projectEnrichmentOutputs)
     .where(
       and(
-        eq(projectEnrichmentOutputs.type, "starred"),
+        eq(projectEnrichmentOutputs.type, "repos"),
         isNotNull(projectEnrichmentOutputs.embedding),
       ),
     )
     .orderBy(distance)
-    .limit(STARRED_SEARCH_LIMIT);
+    .limit(USER_REPOS_SEARCH_LIMIT);
 
   return rows;
 }

@@ -1,12 +1,12 @@
-import { enrichedMineRoute } from "@/elysia/routes/enrich/mine/index.ts";
+import { enrichedReposRoute } from "@/elysia/routes/enrich/repos/index.ts";
 import { enrichedStarredRoute } from "@/elysia/routes/enrich/starred/index.ts";
 import { Elysia } from "elysia";
 
 /**
  * Enrichment API under `/api/elysia/enrich/*`:
- * - `/mine/*` — list / delete (mine crawl TBD)
- * - `/starred/*` — list / delete + crawl status, SSE, enqueue
+ * - `/repos/*` — any GitHub user’s owned repos (login from client / `$user`)
+ * - `/starred/*` — viewer starred list crawl + embed
  */
 export const enrichRoute = new Elysia({ prefix: "/enrich" })
-  .use(enrichedMineRoute)
+  .use(enrichedReposRoute)
   .use(enrichedStarredRoute);

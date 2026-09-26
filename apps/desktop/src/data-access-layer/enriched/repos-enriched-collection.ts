@@ -7,30 +7,32 @@ import { queryCollectionOptions } from "@tanstack/query-db-collection";
 
 type AwaitedData<T> = NonNullable<Awaited<T> extends { data: infer D } ? D : never>;
 
-/** One row from `GET /api/elysia/enrich/mine/list` (enrichment output / repo SoT). */
-export type EnrichedRepoRow = AwaitedData<ReturnType<ElysiaTreaty["enrich"]["mine"]["list"]["get"]>>[number];
+/** One row from `GET /api/elysia/enrich/repos/list` (enrichment output / repo SoT). */
+export type EnrichedUserRepoRow = AwaitedData<
+  ReturnType<ElysiaTreaty["enrich"]["repos"]["list"]["get"]>
+>[number];
 
-export const enrichedReposQueryKey = ["enriched-repos"] as const;
+export const enrichedUserReposQueryKey = ["enriched-user-repos"] as const;
 
 /**
- * TanStack DB collection of enriched repos (one row per owner/name).
- * Snapshot from `/enrich/mine/list`; SSE upserts + 1m invalidate keep it fresh.
+ * TanStack DB collection of enriched user-owned repos (one row per owner/name).
+ * Snapshot from `/enrich/repos/list`; SSE upserts + 1m invalidate keep it fresh.
  */
-export const enrichStarredReposCollection = createCollection(
+export const enrichUserReposCollection = createCollection(
   queryCollectionOptions({
-    id: "enriched-repos",
-    queryKey: enrichedReposQueryKey,
+    id: "enriched-user-repos",
+    queryKey: enrichedUserReposQueryKey,
     queryClient: getQueryClient(),
-    getKey: (item: EnrichedRepoRow) => item.id,
+    getKey: (item: EnrichedUserRepoRow) => item.id,
     queryFn: async () => {
-      const { data, error } = await getElysiaTreaty().enrich.mine.list.get();
+      const { data, error } = await getElysiaTreaty().enrich.repos.list.get();
       if (error) throw new Error(treatyErrorMessage(error));
       return data ?? [];
     },
     onDelete: async ({ transaction }) => {
       for (const mutation of transaction.mutations) {
         const { owner, name } = mutation.original;
-        const { error } = await getElysiaTreaty().enrich.mine({ owner })({ name }).delete();
+        const { error } = await getElysiaTreaty().enrich.repos({ owner })({ name }).delete();
         if (error) throw new Error(treatyErrorMessage(error));
       }
     },
@@ -38,12 +40,12 @@ export const enrichStarredReposCollection = createCollection(
 );
 
 /** Upsert one enriched row from SSE (no embedding vector). */
-export function upsertEnrichedRepo(row: EnrichedRepoRow) {
+export function upsertEnrichedUserRepo(row: EnrichedUserRepoRow) {
   const write = () => {
     try {
-      enrichStarredReposCollection.utils.writeUpsert(row);
+      enrichUserReposCollection.utils.writeUpsert(row);
     } catch {
-      getQueryClient().setQueryData<EnrichedRepoRow[]>(enrichedReposQueryKey, (prev) => {
+      getQueryClient().setQueryData<EnrichedUserRepoRow[]>(enrichedUserReposQueryKey, (prev) => {
         const list = prev ?? [];
         const index = list.findIndex((item) => item.id === row.id);
         if (index === -1) return [...list, row];
@@ -54,15 +56,15 @@ export function upsertEnrichedRepo(row: EnrichedRepoRow) {
     }
   };
 
-  if (enrichStarredReposCollection.isReady()) {
+  if (enrichUserReposCollection.isReady()) {
     write();
     return;
   }
 
-  enrichStarredReposCollection.onFirstReady(write);
+  enrichUserReposCollection.onFirstReady(write);
 }
 
 /** Full list refetch (also used on a 1-minute timer). */
-export function invalidateEnrichedRepos() {
-  return getQueryClient().invalidateQueries({ queryKey: enrichedReposQueryKey });
+export function invalidateEnrichedUserRepos() {
+  return getQueryClient().invalidateQueries({ queryKey: enrichedUserReposQueryKey });
 }

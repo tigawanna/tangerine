@@ -6,7 +6,7 @@ import { integer, jsonb, pgTable, text, timestamp, uniqueIndex, vector } from "d
  * How the user relates to this repo.
  * Primary query path filters `type = 'starred'`; other/null values are fine.
  */
-export type EnrichedRepoType = "starred" | "mine" | "other";
+export type EnrichedRepoType = "starred" | "repos" | "other";
 
 /**
  * One enriched repo (human-readable list SoT).
