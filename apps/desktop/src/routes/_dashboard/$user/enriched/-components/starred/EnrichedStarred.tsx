@@ -182,7 +182,7 @@ export function EnrichedStarred() {
         routeID={enrichedRouteID}
         title="Starred"
         description="Local corpus of starred repos with embeddings"
-        searchPlaceholder="Semantic search enriched…"
+        searchPlaceholder="Try natural language — e.g. graph databases in Rust…"
         actions={actions}
         totalPages={isLoading ? 0 : pagination.totalPages}
         searchDebounceMs={600}

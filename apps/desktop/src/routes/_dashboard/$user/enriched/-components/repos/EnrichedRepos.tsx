@@ -188,7 +188,7 @@ export function EnrichedRepos() {
         routeID={enrichedRouteID}
         title={`Repos · ${login}`}
         description={`Local corpus of @${login}’s owned repos with embeddings`}
-        searchPlaceholder="Semantic search repos…"
+        searchPlaceholder="Try natural language — e.g. react native camera…"
         actions={actions}
         totalPages={isLoading ? 0 : pagination.totalPages}
         searchDebounceMs={600}
