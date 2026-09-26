@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Dialog,
@@ -7,12 +8,29 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select.tsx";
 import type { UserRepoEmbedActivityStatus } from "@/elysia/routes/enrich/repos/helpers/embed-activity.ts";
 import { getElysiaTreaty } from "@/elysia/treaty";
 import { treatyErrorMessage } from "@/elysia/treaty-error";
 import { getClientGithubAccessToken } from "@/lib/relay/github-access-token";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import {
+  InfinityIcon,
+  Layers,
+  Loader2,
+  Play,
+  RotateCcw,
+  Sparkles,
+  Square,
+  Trophy,
+} from "lucide-react";
 
 type ReposEmbedDialogProps = {
   open: boolean;
@@ -25,6 +43,54 @@ type ReposEmbedDialogProps = {
 
 type RunPages = 1 | 2 | undefined;
 
+type EmbedScope = "top-100" | "two-pages" | "all" | "redo-top-100";
+
+const WORKING_ON_MAX_CHARS = 15;
+
+/** Caps `owner/name` so long repo slugs cannot stretch the dialog. */
+function truncateRepoRef(owner: string, name: string): string {
+  const full = `${owner}/${name}`;
+  if (full.length <= WORKING_ON_MAX_CHARS) return full;
+  return `${full.slice(0, WORKING_ON_MAX_CHARS)}…`;
+}
+
+const SCOPE_OPTIONS = [
+  {
+    value: "top-100",
+    label: "Top 100",
+    description: "One GitHub page",
+    pages: 1 as RunPages,
+    Icon: Trophy,
+  },
+  {
+    value: "two-pages",
+    label: "2 pages",
+    description: "Up to 200 repos",
+    pages: 2 as RunPages,
+    Icon: Layers,
+  },
+  {
+    value: "all",
+    label: "All repos",
+    description: "Full owned list",
+    pages: undefined as RunPages,
+    Icon: InfinityIcon,
+  },
+  {
+    value: "redo-top-100",
+    label: "Redo top 100",
+    description: "Re-embed the first page",
+    pages: 1 as RunPages,
+    Icon: RotateCcw,
+  },
+] as const satisfies ReadonlyArray<{
+  value: EmbedScope;
+  label: string;
+  description: string;
+  pages: RunPages;
+  Icon: typeof Trophy;
+}>;
+
 /**
  * Controls user-repos list crawl + embed worker. Progress comes from activity SSE.
  * Default “top 100” is one page of 100 (PUSHED_AT DESC).
@@ -36,6 +102,8 @@ export function ReposEmbedDialog({
   status,
   live,
 }: ReposEmbedDialogProps) {
+  const [scope, setScope] = useState<EmbedScope>("top-100");
+
   const run = useMutation({
     mutationFn: async (pages: RunPages) => {
       const token = await getClientGithubAccessToken();
@@ -73,6 +141,8 @@ export function ReposEmbedDialog({
   const current = status?.embed.current;
   const phase = status?.phase ?? "idle";
   const waiting = phase === "waiting";
+  const selected = SCOPE_OPTIONS.find((option) => option.value === scope) ?? SCOPE_OPTIONS[0];
+  const PrimaryIcon = selected.value === "redo-top-100" ? RotateCcw : Sparkles;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -80,12 +150,11 @@ export function ReposEmbedDialog({
         <DialogHeader>
           <DialogTitle>Embed repos for {login}</DialogTitle>
           <DialogDescription>
-            Crawls @{login}’s owned repos (most starred first) and embeds each locally. “Top
-            100” is one GitHub page.
+            Crawls @{login}’s owned repos (most starred first) and embeds each locally.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-3 rounded-md border border-border p-3 text-sm">
+        <div className="flex flex-col gap-2.5 rounded-lg border border-border bg-muted/30 p-3 text-sm">
           <div className="flex items-center justify-between gap-2">
             <span className="text-muted-foreground">Phase</span>
             <span className="font-medium capitalize" data-test="repos-embed-phase">
@@ -96,14 +165,18 @@ export function ReposEmbedDialog({
             </span>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground">Working on</span>
-            <span className="font-mono text-xs" data-test="repos-embed-current">
-              {current ? `${current.owner}/${current.name}` : "—"}
+            <span className="text-muted-foreground shrink-0">Working on</span>
+            <span
+              className="font-mono text-xs"
+              data-test="repos-embed-current"
+              title={current ? `${current.owner}/${current.name}` : undefined}
+            >
+              {current ? truncateRepoRef(current.owner, current.name) : "—"}
             </span>
           </div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-muted-foreground">Done / failed</span>
-            <span className="font-mono text-xs">
+            <span className="font-mono text-xs tabular-nums">
               {status?.embed.completed ?? 0} / {status?.embed.failed ?? 0}
             </span>
           </div>
@@ -119,75 +192,86 @@ export function ReposEmbedDialog({
           ) : null}
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            data-test="repos-embed-top-100"
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="repos-embed-scope" className="text-muted-foreground text-xs font-medium">
+            Scope
+          </Label>
+          <Select
+            value={scope}
+            onValueChange={(value) => setScope(value as EmbedScope)}
             disabled={busy}
-            onClick={() => run.mutate(1)}
           >
-            Top 100
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            data-test="repos-embed-2-pages"
-            disabled={busy}
-            onClick={() => run.mutate(2)}
-          >
-            Do 2 pages
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            data-test="repos-embed-all"
-            disabled={busy}
-            onClick={() => run.mutate(undefined)}
-          >
-            Do all
-          </Button>
+            <SelectTrigger
+              id="repos-embed-scope"
+              className="h-10 w-full"
+              data-test="repos-embed-scope"
+            >
+              <SelectValue placeholder="Choose scope">
+                <span className="flex items-center gap-2">
+                  <selected.Icon className="size-4 text-muted-foreground" />
+                  {selected.label}
+                </span>
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent
+              position="popper"
+              align="start"
+              className="w-(--radix-select-trigger-width)"
+            >
+              {SCOPE_OPTIONS.map(({ value, label, description, Icon }) => (
+                <SelectItem
+                  key={value}
+                  value={value}
+                  className="items-start py-2"
+                  data-test={`repos-embed-scope-${value}`}
+                >
+                  <span className="flex items-start gap-2">
+                    <Icon className="mt-0.5 size-4 text-muted-foreground" />
+                    <span className="flex flex-col gap-0.5">
+                      <span>{label}</span>
+                      <span className="text-muted-foreground text-xs font-normal">
+                        {description}
+                      </span>
+                    </span>
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <DialogFooter className="gap-2 sm:justify-between">
-          <div className="flex flex-wrap gap-2">
-            {waiting ? (
-              <Button
-                type="button"
-                variant="secondary"
-                data-test="repos-embed-resume"
-                disabled={busy}
-                onClick={() => resume.mutate()}
-              >
-                Resume
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="destructive"
-                data-test="repos-embed-cancel"
-                disabled={busy || !live}
-                onClick={() => pause.mutate()}
-              >
-                Cancel
-              </Button>
-            )}
+          {waiting ? (
             <Button
               type="button"
-              variant="outline"
-              data-test="repos-embed-redo"
+              variant="secondary"
+              data-test="repos-embed-resume"
               disabled={busy}
-              onClick={() => run.mutate(1)}
+              onClick={() => resume.mutate()}
             >
-              Redo top 100
+              <Play />
+              Resume
             </Button>
-          </div>
+          ) : (
+            <Button
+              type="button"
+              variant="destructive"
+              data-test="repos-embed-cancel"
+              disabled={busy || !live}
+              onClick={() => pause.mutate()}
+            >
+              <Square />
+              Cancel
+            </Button>
+          )}
           <Button
             type="button"
-            variant="ghost"
-            data-test="repos-embed-close"
-            onClick={() => onOpenChange(false)}
+            data-test="repos-embed-run"
+            disabled={busy}
+            onClick={() => run.mutate(selected.pages)}
           >
-            Close
+            {run.isPending ? <Loader2 className="animate-spin" /> : <PrimaryIcon />}
+            {selected.label}
           </Button>
         </DialogFooter>
       </DialogContent>

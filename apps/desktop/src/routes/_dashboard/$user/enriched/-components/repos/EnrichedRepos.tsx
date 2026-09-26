@@ -11,17 +11,15 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty.tsx";
 import {
-  enrichUserReposCollection,
   type EnrichedUserRepoRow,
 } from "@/data-access-layer/enriched/repos-enriched-collection.ts";
+import type { UserRepoEmbedActivityStatus } from "@/elysia/routes/enrich/repos/helpers/embed-activity.ts";
 import { getElysiaTreaty } from "@/elysia/treaty";
 import { treatyErrorMessage } from "@/elysia/treaty-error";
-import { useUserReposEmbedActivitySse } from "@/hooks/use-user-repos-embed-activity-sse.ts";
 import { enrichedRouteID } from "@/routes/_dashboard/$user/enriched/-components/constants.ts";
 import { ReposEmbedDialog } from "@/routes/_dashboard/$user/enriched/-components/repos/ReposEmbedDialog.tsx";
-import { useLiveQuery } from "@tanstack/react-db";
 import { useQuery } from "@tanstack/react-query";
-import { getRouteApi } from "@tanstack/react-router";
+import { getRouteApi, Link } from "@tanstack/react-router";
 import { FolderGit2, Loader, Sparkles } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
@@ -77,12 +75,19 @@ function EnrichedReposList({ items }: { items: EnrichedUserRepoRow[] }) {
     >
       {items.map((item) => (
         <li key={item.id} className="hover:bg-muted/50 transition-colors">
-          <div className="flex flex-col gap-1 p-4">
+          <Link
+            to="/$user/repos/$repo"
+            params={{ user: item.owner, repo: item.name }}
+            preload="intent"
+            className="flex flex-col gap-1 p-4"
+            aria-label={`Open ${item.owner}/${item.name} details`}
+            data-test={`enriched-repo-${item.owner}-${item.name}`}
+          >
             <p className="text-sm font-medium">{`${item.owner}/${item.name}`}</p>
             {item.description ? (
               <p className="line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
             ) : null}
-          </div>
+          </Link>
         </li>
       ))}
     </ul>
@@ -130,19 +135,23 @@ function ReposListBody(props: {
   return <EnrichedReposList items={props.items} />;
 }
 
-export function EnrichedRepos() {
+export function EnrichedRepos({
+  status,
+  live,
+  allRows,
+  listLoading,
+}: {
+  status: UserRepoEmbedActivityStatus | null;
+  live: boolean;
+  allRows: EnrichedUserRepoRow[];
+  listLoading: boolean;
+}) {
   const params = routeApi.useParams();
   const search = routeApi.useSearch();
   const login = params.user;
   const q = (search.q ?? "").trim();
   const page = search.page ?? 1;
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  const { status, live } = useUserReposEmbedActivitySse();
-
-  const { data: allRows, isLoading: listLoading } = useLiveQuery((query) =>
-    query.from({ enriched: enrichUserReposCollection }),
-  );
 
   const semantic = useQuery({
     queryKey: ["enriched-repos-search", q],
@@ -158,7 +167,7 @@ export function EnrichedRepos() {
   });
 
   const searching = q.length > 0;
-  const rows = searching ? (semantic.data ?? []) : (allRows ?? []);
+  const rows = searching ? (semantic.data ?? []) : allRows;
   const isLoading = searching ? semantic.isLoading && !semantic.data : listLoading;
   const { items, pagination } = paginateItems(rows, page, ADMIN_LIST_PER_PAGE);
 
@@ -199,7 +208,7 @@ export function EnrichedRepos() {
           searching={searching}
           q={q}
           isLoading={isLoading}
-          listEmpty={(allRows?.length ?? 0) === 0}
+          listEmpty={allRows.length === 0}
           searchError={
             searching && semantic.isError
               ? semantic.error instanceof Error

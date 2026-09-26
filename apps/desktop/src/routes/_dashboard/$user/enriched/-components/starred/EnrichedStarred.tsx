@@ -11,17 +11,15 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty.tsx";
 import {
-  enrichStarredReposCollection,
   type EnrichedRepoRow,
 } from "@/data-access-layer/enriched/starred-enriched-collection.ts";
+import type { EmbedActivityStatus } from "@/elysia/routes/enrich/starred/helpers/embed-activity.ts";
 import { getElysiaTreaty } from "@/elysia/treaty";
 import { treatyErrorMessage } from "@/elysia/treaty-error";
-import { useEmbedActivitySse } from "@/hooks/use-embed-activity-sse.ts";
 import { enrichedRouteID } from "@/routes/_dashboard/$user/enriched/-components/constants.ts";
 import { StarredEmbedDialog } from "@/routes/_dashboard/$user/enriched/-components/starred/StarredEmbedDialog.tsx";
-import { useLiveQuery } from "@tanstack/react-db";
 import { useQuery } from "@tanstack/react-query";
-import { getRouteApi } from "@tanstack/react-router";
+import { getRouteApi, Link } from "@tanstack/react-router";
 import { Loader, Sparkles, Star } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
@@ -70,12 +68,19 @@ function EnrichedStarredList({ items }: { items: EnrichedRepoRow[] }) {
     >
       {items.map((item) => (
         <li key={item.id} className="hover:bg-muted/50 transition-colors">
-          <div className="flex flex-col gap-1 p-4">
+          <Link
+            to="/$user/repos/$repo"
+            params={{ user: item.owner, repo: item.name }}
+            preload="intent"
+            className="flex flex-col gap-1 p-4"
+            aria-label={`Open ${item.owner}/${item.name} details`}
+            data-test={`enriched-starred-${item.owner}-${item.name}`}
+          >
             <p className="text-sm font-medium">{`${item.owner}/${item.name}`}</p>
             {item.description ? (
               <p className="line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
             ) : null}
-          </div>
+          </Link>
         </li>
       ))}
     </ul>
@@ -122,18 +127,21 @@ function StarredListBody(props: {
   return <EnrichedStarredList items={props.items} />;
 }
 
-export function EnrichedStarred() {
+export function EnrichedStarred({
+  status,
+  live,
+  allRows,
+  listLoading,
+}: {
+  status: EmbedActivityStatus | null;
+  live: boolean;
+  allRows: EnrichedRepoRow[];
+  listLoading: boolean;
+}) {
   const search = routeApi.useSearch();
   const q = (search.q ?? "").trim();
   const page = search.page ?? 1;
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  // Keep SSE + collection upserts alive while this tab is mounted.
-  const { status, live } = useEmbedActivitySse();
-
-  const { data: allRows, isLoading: listLoading } = useLiveQuery((query) =>
-    query.from({ enriched: enrichStarredReposCollection }),
-  );
 
   const semantic = useQuery({
     queryKey: ["enriched-starred-search", q],
@@ -149,11 +157,9 @@ export function EnrichedStarred() {
   });
 
   const searching = q.length > 0;
-  const rows = searching ? (semantic.data ?? []) : (allRows ?? []);
+  const rows = searching ? (semantic.data ?? []) : allRows;
   // Keep showing prior results while a new embed-search is in flight (avoids remount thrash).
-  const isLoading = searching
-    ? semantic.isLoading && !semantic.data
-    : listLoading;
+  const isLoading = searching ? semantic.isLoading && !semantic.data : listLoading;
   const { items, pagination } = paginateItems(rows, page, ADMIN_LIST_PER_PAGE);
 
   const actions = (
@@ -192,7 +198,7 @@ export function EnrichedStarred() {
           searching={searching}
           q={q}
           isLoading={isLoading}
-          listEmpty={(allRows?.length ?? 0) === 0}
+          listEmpty={allRows.length === 0}
           searchError={
             searching && semantic.isError
               ? semantic.error instanceof Error
