@@ -94,7 +94,9 @@ function MetricsChart({ history }: { history: ConsoleMetricsPoint[] }) {
     <Card className="gap-4 py-4" data-test="console-metrics-chart">
       <CardHeader className="px-4">
         <CardTitle className="text-sm font-medium">CPU & RSS</CardTitle>
-        <CardDescription>Last ~{rows.length}s — spikes show up here during enrich / model load</CardDescription>
+        <CardDescription>
+          Last ~{rows.length}s — spikes show up here during enrich / model load
+        </CardDescription>
       </CardHeader>
       <CardContent className="px-2 pb-2 sm:px-4">
         <ChartContainer config={chartConfig} className="aspect-auto h-48 w-full">
@@ -157,8 +159,11 @@ function MetricsChart({ history }: { history: ConsoleMetricsPoint[] }) {
   );
 }
 
-export function EnrichedConsole() {
-  const { latest, history, error } = useConsoleMetricsSse(true);
+/**
+ * Live process CPU / RSS / host memory + short history chart.
+ */
+export function ProcessMetricsPanel({ enabled = true }: { enabled?: boolean }) {
+  const { latest, history, error } = useConsoleMetricsSse(enabled);
 
   const heapHint = latest
     ? `heap ${formatBytes(latest.heapUsed)} / ${formatBytes(latest.heapTotal)}`
@@ -168,14 +173,7 @@ export function EnrichedConsole() {
     : undefined;
 
   return (
-    <div className="flex w-full flex-col gap-4 p-4 md:p-6" data-test="enriched-console">
-      <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold tracking-tight">Console</h2>
-        <p className="text-sm text-muted-foreground">
-          Live load for this app process — useful for spotting enrich / embedding spikes.
-        </p>
-      </div>
-
+    <div className="flex w-full flex-col gap-4" data-test="process-metrics-panel">
       {error ? (
         <p className="text-sm text-destructive" data-test="console-metrics-error" role="alert">
           {error}

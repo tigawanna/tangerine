@@ -75,9 +75,6 @@ function EnrichedStarredList({ items }: { items: EnrichedRepoRow[] }) {
             {item.description ? (
               <p className="line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
             ) : null}
-            {item.summary ? (
-              <p className="line-clamp-2 text-xs text-muted-foreground/80">{item.summary}</p>
-            ) : null}
           </div>
         </li>
       ))}

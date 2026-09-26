@@ -1,5 +1,4 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EnrichedConsole } from "@/routes/_dashboard/$user/enriched/-components/console/EnrichedConsole.tsx";
 import {
   enrichedRouteID,
   enrichedTabs,
@@ -14,7 +13,7 @@ type EnrichedTab = (typeof enrichedTabs)[number];
 export function EnrichedPage() {
   const { useSearch, useNavigate } = getRouteApi(enrichedRouteID);
   const search = useSearch();
-  const tab = (search.tab ?? "console") as EnrichedTab;
+  const tab = (search.tab ?? "starred") as EnrichedTab;
   const navigate = useNavigate();
 
   return (
@@ -40,9 +39,6 @@ export function EnrichedPage() {
           </TabsTrigger>
         ))}
       </TabsList>
-      <Activity mode={tab === "console" ? "visible" : "hidden"}>
-        <EnrichedConsole />
-      </Activity>
       <Activity mode={tab === "starred" ? "visible" : "hidden"}>
         <EnrichedStarred />
       </Activity>

@@ -2,6 +2,7 @@ import { sleep } from "@/lib/sse";
 import { chatRoute } from "@/elysia/routes/chat/index.ts";
 import { consoleRoute } from "@/elysia/routes/console/index.ts";
 import { embeddingsRoute } from "@/elysia/routes/models/embedding-inventory.ts";
+import { systemRoute } from "@/elysia/routes/system/index.ts";
 import { workerRoute } from "@/elysia/routes/worker";
 import { Elysia, sse } from "elysia";
 import { enrichRoute } from "@/elysia/routes/enrich/index.ts";
@@ -29,6 +30,7 @@ export const elysiaApp = new Elysia({ prefix: "/api/elysia" })
     }
   })
   .use(consoleRoute)
+  .use(systemRoute)
   .use(embeddingsRoute)
   .use(workerRoute)
   .use(enrichRoute)

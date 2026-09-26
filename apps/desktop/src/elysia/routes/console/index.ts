@@ -4,13 +4,13 @@ import { Elysia, sse } from "elysia";
 
 const SAMPLE_MS = 1000;
 
-/** Process metrics under `/api/elysia/console/*` for the enriched console. */
+/** Process metrics under `/api/elysia/console/*` (Settings → System resources). */
 export const consoleRoute = new Elysia({ prefix: "/console" })
   .get("/", () => sampleProcessMetrics(), {
     detail: {
       summary: "Process metrics snapshot",
       description: "One-shot RSS / heap / CPU sample for the app server process.",
-      tags: ["console"],
+      tags: ["system", "resources"],
     },
   })
   .get(
@@ -40,7 +40,7 @@ export const consoleRoute = new Elysia({ prefix: "/console" })
         summary: "Process metrics SSE",
         description:
           "Streams process RSS, heap, and CPU % about once per second while the client is connected.",
-        tags: ["console"],
+        tags: ["system", "resources"],
       },
     },
   );
