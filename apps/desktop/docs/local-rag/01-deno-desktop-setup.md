@@ -89,7 +89,7 @@ The `desktop` block in [`deno.json`](../../deno.json) holds all the desktop-spec
   }
 }
 ```
-
+****
 A few things are not obvious:
 
 - **`nodeModulesDir: "manual"`**: pnpm owns `node_modules`. Deno reads it and never installs into it.
@@ -392,7 +392,7 @@ This is the product the rest of the series builds toward:
 - **Local RAG pipeline**: fetch → embed → store → retrieve.
   - **Fetch**: README and metadata for each starred repo via the user's GitHub token, paced under API rate limits.
   - **Embed**: [EmbeddingGemma](https://ai.google.dev/gemma/docs/embeddinggemma) via ONNX Runtime (`onnxruntime-node`), on-device.
-  - **Store**: vectors in PGlite with [pgvector](https://github.com/pgvector/pgvector) and an HNSW cosine index ([`src/pglite/client.ts`](../../src/pglite/client.ts)).
+  - **Store**: vectors in PGlite with [pgvector](https://github.com/pgvector/pgvector), ranked by cosine distance ([`src/pglite/client.ts`](../../src/pglite/client.ts)).
   - **Retrieve**: vector similarity search, with the matching repos shown in the UI.
 - **Stay on-device.** Your stars, READMEs, and vectors never leave the machine. There's no hosted RAG SaaS or vector DB in the loop. The only network calls are to GitHub (the source of truth) and to `apps/api` for sign-in.
 - **Visible progress.** Indexing takes minutes on purpose, so the UI shows live activity over SSE instead of a spinner.

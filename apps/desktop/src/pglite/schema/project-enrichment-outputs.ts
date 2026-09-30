@@ -14,7 +14,7 @@ export type EnrichedRepoType = "starred" | "repos" | "other";
  * Display fields are copied from artifacts at enrich time so list cards do not
  * join `project_repo_artifacts`. Embedding is one vector per repo (short
  * summary/description text — no chunk table). Null until embed wiring runs.
- * ANN index: custom migration `0002_project_enrichment_outputs_embedding_hnsw`
+ * Search is an exact cosine scan; an HNSW index would need a custom migration
  * (drizzle-kit cannot emit `USING hnsw`).
  */
 export const projectEnrichmentOutputs = pgTable(
