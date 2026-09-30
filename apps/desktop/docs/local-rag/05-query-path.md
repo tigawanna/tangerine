@@ -293,7 +293,7 @@ Natural next steps, roughly in order of payoff:
 4. **An HNSW index** once the corpus outgrows an exact scan.
 5. **Optional local generation**: pass the top hits to a small local LLM for a one-paragraph answer that cites them.
 
-## Sign-off: about binary size
+## With all that said
 
 I tried hard to keep the shipped binary small:
 
