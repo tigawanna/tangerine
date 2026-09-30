@@ -1,4 +1,4 @@
-# Chapter 5: Query path + local RAG UX
+# Chapter 5: Setting up vector search for github starred repos
 
 [Series index](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/README.md) · Prev: [Chapter 4](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/04-live-activity-bus.md)
 

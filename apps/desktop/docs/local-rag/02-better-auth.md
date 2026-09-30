@@ -1,4 +1,4 @@
-# Chapter 2: Better Auth
+# Chapter 2: Deo desktop Better Auth intergration
 
 [Series index](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/README.md) · Prev: [Chapter 1](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/01-deno-desktop-setup.md) · Next: [Chapter 3: Worker engine](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/03-worker-engine.md)
 

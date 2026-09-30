@@ -1,4 +1,4 @@
-# Chapter 3: Worker / processing engine
+# Chapter 3: Workflows with conveyor
 
 [Series index](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/README.md) · Prev: [Chapter 2](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/02-better-auth.md) · Next: [Chapter 4: Live activity bus](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/04-live-activity-bus.md)
 

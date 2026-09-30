@@ -4,7 +4,7 @@
 
 ## Why
 
-The chapter 3 worker runs for minutes. The UI should show "embedding facebook/react", "42 done, 1 failed", and new rows appearing in the list as they land, without polling.
+The workers we use run for minutes. The UI should show "embedding facebook/react", "42 done, 1 failed", and new rows appearing in the list as they land, without polling.
 
 The shape is plain pub/sub: something **publishes** an event, and every open browser connection **listens** over [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events). A small in-process bus sits in the middle.
 
