@@ -1,22 +1,71 @@
-# Chapter 1: Deno Desktop + TanStack Start setup
+# Bulding a local RAG tool with Deno Desktop 
 
-[Series index](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/README.md) · Next: [Chapter 2: Better Auth](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/02-better-auth.md)
 
-## Goal
+## Deno desktop
 
-Stand up the desktop shell and define what the local RAG product is before auth, workers, or embeddings.
+[Deno Desktop](https://docs.deno.com/runtime/desktop/) (`deno desktop`, Deno ≥ 2.9) packages a web app together with the Deno runtime and a rendering engine into one binary per platform.
 
-## Why Deno Desktop + TanStack Start for a local tool
+Point it at a project directory and it [auto-detects the framework](https://docs.deno.com/runtime/desktop/frameworks/): Next.js, Astro, Nuxt, SvelteKit, SolidStart, TanStack Start, and several more. It embeds the build output and runs the framework's own production server (or its dev server under `--hmr`), with the webview pointed at it:
 
-[Deno Desktop](https://docs.deno.com/runtime/desktop/) (`deno desktop`, Deno ≥ 2.9) packages a web app together with the Deno runtime and a rendering engine into one binary per platform. Point it at a project directory and it [auto-detects the framework](https://docs.deno.com/runtime/desktop/frameworks/): Next.js, Astro, Nuxt, SvelteKit, SolidStart, TanStack Start, and several more. It then embeds the build output and runs the framework's own production server (or its dev server under `--hmr`), with the webview pointed at it.
+```bash
+deno desktop --hmr .             # dev: framework dev server + native window
+deno desktop -o ./dist/myapp .   # package: one binary for this platform
+```
 
-A sweet feature is how **server-side code runs in the Deno runtime automatically, with no IPC**. In Electron you split code into "main" and "renderer" and wire `ipcMain` / `ipcRenderer` channels between them. With `deno desktop`, the framework server _is_ the backend: Next.js server actions and server components, or TanStack Start [server functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions) and [server routes](https://tanstack.com/start/latest/docs/framework/react/guide/server-routes), just work. They have full Node compat, so `node:fs`, `node:child_process`, native npm modules like `onnxruntime-node`, and embedded Postgres ([PGlite](https://pglite.dev/docs/)) all run right next to your UI code.
+### Server code just runs, no IPC
 
-For a local RAG tool that matters a lot. Fetching from GitHub, running an ONNX embedding model, and writing to a vector index are all "server" work. We want that work in plain TypeScript next to the routes that trigger it, not behind a hand-rolled message bus.
+A sweet feature is how **server-side code runs in the Deno runtime automatically, with no IPC**. In Electron you split code into "main" and "renderer" and wire channels between them:
 
-For the handful of things that really are native (window, menus, the OS browser for OAuth), Deno Desktop has [bindings](https://docs.deno.com/runtime/desktop/bindings/): `win.bind(name, fn)` on the Deno side becomes `bindings.name()` in the webview. Those calls also go through in-process channels, not socket IPC.
+```ts
+// Electron: main process
+ipcMain.handle("read-notes", () => fs.readFile(notesPath, "utf8"));
 
-TanStack Start scratches this specific itch because it builds with Nitro into `.output/server/index.*`, which is exactly the entry `deno desktop` looks for. Everything else is a normal TanStack Start app, so the same code also runs in a browser tab (`pnpm dev:vite`) for fast UI iteration.
+// Electron: preload, to expose it safely
+contextBridge.exposeInMainWorld("api", { readNotes: () => ipcRenderer.invoke("read-notes") });
+
+// Electron: renderer
+const notes = await window.api.readNotes();
+```
+
+With `deno desktop`, the framework server _is_ the backend. A TanStack Start [server function](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions) (or a Next.js server action) does the same job in one place:
+
+```ts
+// Deno Desktop + TanStack Start: runs in the Deno runtime, called from React like a function
+export const readNotes = createServerFn().handler(() => fs.readFile(notesPath, "utf8"));
+
+const notes = await readNotes();
+```
+
+[Server routes](https://tanstack.com/start/latest/docs/framework/react/guide/server-routes) work the same way. With full Node compat, `node:fs`, `node:child_process`, native npm modules like `onnxruntime-node`, and embedded Postgres ([PGlite](https://pglite.dev/docs/)) all run right next to your UI code.
+
+For a local RAG tool that matters a lot. Fetching from GitHub, running an ONNX embedding model, and writing to a vector index are all "server" work, and we want it in plain TypeScript next to the routes that trigger it.
+
+### Bindings for the truly native bits
+
+For the handful of things that really are native (window, menus, the OS browser for OAuth), Deno Desktop has [bindings](https://docs.deno.com/runtime/desktop/bindings/). A function bound on the Deno side shows up on a global `bindings` object in the webview, through in-process channels rather than socket IPC:
+
+```ts
+// Deno side (preload)
+win.bind("openExternal", (url: string) => openInSystemBrowser(url));
+
+// webview side
+await bindings.openExternal("https://github.com/login");
+```
+
+The real versions are in [the preload section](#the-preload-native-window--bindings) below.
+
+### Why TanStack Start fits
+
+TanStack Start builds with Nitro into `.output/server/index.*`, which is exactly the entry `deno desktop` looks for:
+
+```text
+vp build
+  └── .output/
+      ├── public/          static assets
+      └── server/index.mjs  <- deno desktop finds and runs this
+```
+
+Everything else is a normal TanStack Start app, so the same code also runs in a browser tab (`pnpm dev:vite`) for fast UI iteration.
 
 ## Monorepo layout
 
