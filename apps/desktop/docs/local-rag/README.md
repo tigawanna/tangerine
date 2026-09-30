@@ -6,8 +6,8 @@ Each chapter is one slice of the stack. Fill these in as the series lands.
 
 | Chapter | File | Status |
 | --- | --- | --- |
-| 1 | [Deno Desktop + TanStack Start setup](./01-deno-desktop-setup.md) | Skeleton |
-| 2 | [Better Auth](./02-better-auth.md) | Skeleton |
+| 1 | [Deno Desktop + TanStack Start setup](./01-deno-desktop-setup.md) | Draft |
+| 2 | [Better Auth](./02-better-auth.md) | Draft |
 | 3 | [Worker / processing engine](./03-worker-engine.md) | Skeleton |
 | 4 | [Live activity bus (Elysia SSE)](./04-live-activity-bus.md) | Draft |
 | 5 | [Query path + local RAG UX](./05-query-path.md) | Skeleton |
