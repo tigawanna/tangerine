@@ -1,6 +1,6 @@
 # Chapter 1: Deno Desktop + TanStack Start setup
 
-[Series index](./README.md) · Next: [Chapter 2: Better Auth](./02-better-auth.md)
+[Series index](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/README.md) · Next: [Chapter 2: Better Auth](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/02-better-auth.md)
 
 ## Goal
 
@@ -55,7 +55,7 @@ The local data lives in the user's config directory, not in the repo: PGlite dat
 
 ## `deno.json`: identity, backend, output
 
-The `desktop` block in [`deno.json`](../../deno.json) holds all the desktop-specific config ([docs](https://docs.deno.com/runtime/desktop/configuration/)):
+The `desktop` block in [`deno.json`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/deno.json) holds all the desktop-specific config ([docs](https://docs.deno.com/runtime/desktop/configuration/)):
 
 ```json
 {
@@ -100,7 +100,7 @@ A few things are not obvious:
 
 ## Dev loop: HMR, ports, env
 
-The scripts in [`package.json`](../../package.json):
+The scripts in [`package.json`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/package.json):
 
 ```json
 {
@@ -128,7 +128,7 @@ What the flags do:
 - **`DENO_DESKTOP_DEVTOOLS=1`**: the preload opens DevTools when this is set.
 - **Packaging flags** (`--exclude-unused-npm`, `--exclude …onnxruntime-node`, `--compress`) keep the binary small. `deno desktop` does **not** run your framework build, which is why `desktop:build` runs `pnpm run build` first.
 
-Env basics (see [`.env.example`](../../.env.example)):
+Env basics (see [`.env.example`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/.env.example)):
 
 ```bash
 VITE_APP_URL=http://localhost:3070          # the desktop UI itself
@@ -141,7 +141,7 @@ No GitHub client secrets ever go in this file. They stay on `apps/api`.
 
 ## The preload: native window + bindings
 
-[`deno/window.ts`](../../deno/window.ts) is the only "main process"-style code we write. It takes over the startup window, installs the menu, and exposes a small set of functions to the webview:
+[`deno/window.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/deno/window.ts) is the only "main process"-style code we write. It takes over the startup window, installs the menu, and exposes a small set of functions to the webview:
 
 ```ts
 /// <reference lib="deno.ns" />
@@ -172,7 +172,7 @@ if (Deno.env.get("DENO_DESKTOP_DEVTOOLS") === "1") {
 }
 ```
 
-On the React side, [`src/lib/desktop-bindings.ts`](../../src/lib/desktop-bindings.ts) types the `bindings` proxy. Deno gives you no type bridge between the two realms, so we declare one ourselves. We also feature-detect it so the same UI still works in a plain browser tab:
+On the React side, [`src/lib/desktop-bindings.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/desktop-bindings.ts) types the `bindings` proxy. Deno gives you no type bridge between the two realms, so we declare one ourselves. We also feature-detect it so the same UI still works in a plain browser tab:
 
 ```ts
 declare global {
@@ -192,7 +192,7 @@ Related docs: [Windows](https://docs.deno.com/runtime/desktop/windows/) · [Menu
 
 ## Server functions just work
 
-Because the Nitro server runs inside the Deno runtime, a TanStack Start server function can use Node APIs, the local database, or the GitHub token directly. From [`src/data-access-layer/github/repos.ts`](../../src/data-access-layer/github/repos.ts):
+Because the Nitro server runs inside the Deno runtime, a TanStack Start server function can use Node APIs, the local database, or the GitHub token directly. From [`src/data-access-layer/github/repos.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/data-access-layer/github/repos.ts):
 
 ```ts
 export const getPinnedRepos = createServerFn({ method: "GET" }).handler(async () => {
@@ -218,7 +218,7 @@ There's no preload channel and no IPC: the client calls `getPinnedRepos()` and T
 
 Server functions work well for request/response calls. A RAG indexer, though, needs **long-lived streams**: "fetched repo X", "embedded chunk 40/200", "upserted into the vector index". Those should be pushed to the UI as they happen, not polled.
 
-TanStack Start server routes can return a raw `Response`, so you _can_ stream SSE by hand. But then you build the `ReadableStream`, encode `data:` frames, set `text/event-stream` / `no-cache` / `X-Accel-Buffering` headers, and wire up abort handling yourself. [`src/lib/sse.ts`](../../src/lib/sse.ts) shows what that looks like. Doing it per endpoint gets old fast.
+TanStack Start server routes can return a raw `Response`, so you _can_ stream SSE by hand. But then you build the `ReadableStream`, encode `data:` frames, set `text/event-stream` / `no-cache` / `X-Accel-Buffering` headers, and wire up abort handling yourself. [`src/lib/sse.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/sse.ts) shows what that looks like. Doing it per endpoint gets old fast.
 
 So this project mounts [Elysia](https://elysiajs.com/) **inside** TanStack Start, following the official [TanStack Start integration](https://elysiajs.com/integrations/tanstack-start). Elysia gives us:
 
@@ -231,7 +231,7 @@ It all runs in the same Nitro process as the UI, on the same port, and inside th
 
 ### 1. Mount Elysia as a catch-all server route
 
-[`src/routes/api/elysia/$.ts`](../../src/routes/api/elysia/$.ts) forwards every method under `/api/elysia/*` to Elysia's `fetch`:
+[`src/routes/api/elysia/$.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/routes/api/elysia/$.ts) forwards every method under `/api/elysia/*` to Elysia's `fetch`:
 
 ```ts
 import { elysiaApp } from "@/elysia/app";
@@ -260,7 +260,7 @@ With pnpm, add Elysia's peer deps explicitly (`pnpm add @sinclair/typebox openap
 
 ### 2. Compose the app
 
-[`src/elysia/app.ts`](../../src/elysia/app.ts) owns the prefix and composes the feature routes. The `/tick` route is the smallest possible SSE stream: one event per second until the client disconnects.
+[`src/elysia/app.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/app.ts) owns the prefix and composes the feature routes. The `/tick` route is the smallest possible SSE stream: one event per second until the client disconnects.
 
 ```ts
 import { sleep } from "@/lib/sse";
@@ -296,7 +296,7 @@ export type ElysiaApp = typeof elysiaApp;
 
 ### 3. A publish/subscribe example: `/hello`
 
-[`src/elysia/routes/hello/index.ts`](../../src/elysia/routes/hello/index.ts) is the toy version of the live activity bus from [chapter 4](./04-live-activity-bus.md). `POST /hello` publishes a message, and every open `GET /hello/sse` connection receives it:
+[`src/elysia/routes/hello/index.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/routes/hello/index.ts) is the toy version of the live activity bus from [chapter 4](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/04-live-activity-bus.md). `POST /hello` publishes a message, and every open `GET /hello/sse` connection receives it:
 
 ```ts
 import { pubSub } from "@/lib/pub-sub/client";
@@ -323,7 +323,7 @@ export const helloRoute = new Elysia({ prefix: "/hello" })
   );
 ```
 
-The bus in [`src/lib/pub-sub/client.ts`](../../src/lib/pub-sub/client.ts) is a process-wide `EventEmitter`. It's pinned on `globalThis` so Vite HMR re-evaluating the module doesn't give routes and workers two different emitters:
+The bus in [`src/lib/pub-sub/client.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/pub-sub/client.ts) is a process-wide `EventEmitter`. It's pinned on `globalThis` so Vite HMR re-evaluating the module doesn't give routes and workers two different emitters:
 
 ```ts
 export const pubSub: PubSub = (() => {
@@ -335,7 +335,7 @@ export const pubSub: PubSub = (() => {
 
 ### 4. A typed Eden client on both sides
 
-[`src/elysia/treaty.ts`](../../src/elysia/treaty.ts) uses TanStack Start's `createIsomorphicFn`. On the server (SSR, loaders, server functions) Eden calls the Elysia app **in-process with no HTTP**. In the browser it makes HTTP calls to the same origin:
+[`src/elysia/treaty.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/treaty.ts) uses TanStack Start's `createIsomorphicFn`. On the server (SSR, loaders, server functions) Eden calls the Elysia app **in-process with no HTTP**. In the browser it makes HTTP calls to the same origin:
 
 ```ts
 export const getElysiaTreaty = createIsomorphicFn()
@@ -348,12 +348,12 @@ export const getElysiaTreaty = createIsomorphicFn()
 
 Two project-specific tweaks on top of the Elysia docs:
 
-- **The server half lives in [`treaty.server.ts`](../../src/elysia/treaty.server.ts)**, so the client bundle never imports `app.ts` (and with it every route, worker, and Node-only module). This also avoids a circular import with the route tree.
+- **The server half lives in [`treaty.server.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/treaty.server.ts)**, so the client bundle never imports `app.ts` (and with it every route, worker, and Node-only module). This also avoids a circular import with the route tree.
 - **Types come from `ElysiaApp["~Routes"]`**, not `treaty<typeof app>()`. Deno and Vite can resolve two copies of the `elysia` types, and `typeof app` then fails to line up. Pulling out the route map sidesteps that.
 
 ### 5. Call it from React
 
-A plain mutation, fully typed from the route's TypeBox schema ([`PingMessage.tsx`](../../src/routes/_dashboard/$user/hello/-components/PingMessage.tsx)):
+A plain mutation, fully typed from the route's TypeBox schema ([`PingMessage.tsx`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/routes/_dashboard/$user/hello/-components/PingMessage.tsx)):
 
 ```tsx
 const { mutate, isPending } = useMutation({
@@ -367,7 +367,7 @@ const { mutate, isPending } = useMutation({
 });
 ```
 
-And the SSE side ([`src/hooks/use-hello-sse.ts`](../../src/hooks/use-hello-sse.ts)). Eden's `~path` gives us the URL without hardcoding it, and a native `EventSource` handles reconnects:
+And the SSE side ([`src/hooks/use-hello-sse.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/hooks/use-hello-sse.ts)). Eden's `~path` gives us the URL without hardcoding it, and a native `EventSource` handles reconnects:
 
 ```ts
 const connect = () => {
@@ -382,7 +382,7 @@ const connect = () => {
 };
 ```
 
-`appendHelloMessage` writes into a TanStack DB collection ([`hello-collection.ts`](../../src/data-access-layer/enriched/hello-collection.ts)). The collection is seeded from `GET /hello`, and live SSE rows are appended on top. Chapters 3–4 use the same pattern for embedding progress.
+`appendHelloMessage` writes into a TanStack DB collection ([`hello-collection.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/data-access-layer/enriched/hello-collection.ts)). The collection is seeded from `GET /hello`, and live SSE rows are appended on top. Chapters 3–4 use the same pattern for embedding progress.
 
 ## Product objectives
 
@@ -392,7 +392,7 @@ This is the product the rest of the series builds toward:
 - **Local RAG pipeline**: fetch → embed → store → retrieve.
   - **Fetch**: README and metadata for each starred repo via the user's GitHub token, paced under API rate limits.
   - **Embed**: [EmbeddingGemma](https://ai.google.dev/gemma/docs/embeddinggemma) via ONNX Runtime (`onnxruntime-node`), on-device.
-  - **Store**: vectors in PGlite with [pgvector](https://github.com/pgvector/pgvector), ranked by cosine distance ([`src/pglite/client.ts`](../../src/pglite/client.ts)).
+  - **Store**: vectors in PGlite with [pgvector](https://github.com/pgvector/pgvector), ranked by cosine distance ([`src/pglite/client.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/pglite/client.ts)).
   - **Retrieve**: vector similarity search, with the matching repos shown in the UI.
 - **Stay on-device.** Your stars, READMEs, and vectors never leave the machine. There's no hosted RAG SaaS or vector DB in the loop. The only network calls are to GitHub (the source of truth) and to `apps/api` for sign-in.
 - **Visible progress.** Indexing takes minutes on purpose, so the UI shows live activity over SSE instead of a spinner.
@@ -407,7 +407,7 @@ This is the product the rest of the series builds toward:
 
 ## How later chapters fit
 
-1. **[Chapter 2: Better Auth](./02-better-auth.md)**: sign in with GitHub through the system browser, PKCE, and a loopback server in the preload, so the app gets a user token without shipping secrets.
-2. **[Chapter 3: Worker engine](./03-worker-engine.md)**: a durable job queue that crawls stars, stays under rate limits, and embeds repos in batches.
-3. **[Chapter 4: Live activity bus](./04-live-activity-bus.md)**: the `/hello` pub/sub pattern above, reused as typed progress events from the worker to the UI.
-4. **[Chapter 5: Query path](./05-query-path.md)**: embed the question, run a pgvector search, and render results.
+1. **[Chapter 2: Better Auth](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/02-better-auth.md)**: sign in with GitHub through the system browser, PKCE, and a loopback server in the preload, so the app gets a user token without shipping secrets.
+2. **[Chapter 3: Worker engine](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/03-worker-engine.md)**: a durable job queue that crawls stars, stays under rate limits, and embeds repos in batches.
+3. **[Chapter 4: Live activity bus](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/04-live-activity-bus.md)**: the `/hello` pub/sub pattern above, reused as typed progress events from the worker to the UI.
+4. **[Chapter 5: Query path](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/05-query-path.md)**: embed the question, run a pgvector search, and render results.

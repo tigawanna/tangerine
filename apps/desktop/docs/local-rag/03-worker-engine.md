@@ -1,6 +1,6 @@
 # Chapter 3: Worker / processing engine
 
-[Series index](./README.md) · Prev: [Chapter 2](./02-better-auth.md) · Next: [Chapter 4: Live activity bus](./04-live-activity-bus.md)
+[Series index](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/README.md) · Prev: [Chapter 2](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/02-better-auth.md) · Next: [Chapter 4: Live activity bus](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/04-live-activity-bus.md)
 
 ## Goal
 
@@ -34,7 +34,7 @@ We use [Conveyor](https://jsr.io/@conveyor/core), a job queue with a BullMQ-styl
 
 That fits the app: one Deno process on one machine. There's no Redis to run, jobs survive restarts because they're on disk, and the whole engine lives in the same process as the UI server and the model.
 
-Each queue gets its own SQLite file ([`src/lib/worker/store.ts`](../../src/lib/worker/store.ts)):
+Each queue gets its own SQLite file ([`src/lib/worker/store.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/worker/store.ts)):
 
 ```ts
 export function createWorkerStore(options: { name: string }) {
@@ -55,7 +55,7 @@ await starredRepoEmbedStore.connect();
 
 ## Stage 1: the queue and its jobs
 
-One job per repo. The payload is just what we already got from the stars list, so the worker doesn't need to re-fetch metadata ([`queue.ts`](../../src/elysia/routes/enrich/starred/helpers/queue.ts)):
+One job per repo. The payload is just what we already got from the stars list, so the worker doesn't need to re-fetch metadata ([`queue.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/routes/enrich/starred/helpers/queue.ts)):
 
 ```ts
 export interface EmbedRepoShape {
@@ -92,7 +92,7 @@ export const enqueueStarredRepoEmbedJobs = async (jobs: StarredRepoEmbedJob[]) =
 
 ## Stage 2: page through the stars
 
-[`enqueue.ts`](../../src/elysia/routes/enrich/starred/helpers/enqueue.ts) fetches one GraphQL page (up to 100 stars), hands it to the queue, and moves on to the next cursor. It never holds the whole star list in memory, because the queue owns the payload from here on:
+[`enqueue.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/routes/enrich/starred/helpers/enqueue.ts) fetches one GraphQL page (up to 100 stars), hands it to the queue, and moves on to the next cursor. It never holds the whole star list in memory, because the queue owns the payload from here on:
 
 ```ts
 const page = await client.getUserStarredReposMinimal({ login, first: pageSize, after });
@@ -136,7 +136,7 @@ If GitHub rate-limits the list call itself, the same page is retried with expone
 
 ## Stage 3: build the document and embed it
 
-For each repo, [`src/lib/embedding-gemmma/embed-repo.ts`](../../src/lib/embedding-gemmma/embed-repo.ts) fetches the README, keeps the first 20 lines, and builds one short text document:
+For each repo, [`src/lib/embedding-gemmma/embed-repo.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/embedding-gemmma/embed-repo.ts) fetches the README, keeps the first 20 lines, and builds one short text document:
 
 ```ts
 export function buildRepoEmbedDocument(repo: EmbedRepoShape, readmeSummary: string | null): string {
@@ -177,7 +177,7 @@ A repo with no README still gets embedded from its name, description, and topics
 
 ## Stage 4: the worker
 
-[`worker.ts`](../../src/elysia/routes/enrich/starred/helpers/worker.ts) pulls **batches of 10** and handles each job on its own, so one bad repo doesn't fail the batch:
+[`worker.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/routes/enrich/starred/helpers/worker.ts) pulls **batches of 10** and handles each job on its own, so one bad repo doesn't fail the batch:
 
 ```ts
 export const starredRepoEmbedWorker = new Worker<StarredRepoEmbedJob>(
@@ -244,7 +244,7 @@ Those failed jobs aren't lost. Each has `attempts: 5` with exponential backoff f
 
 ## A GitHub token outside the request
 
-Workers run after the HTTP request that started them has ended, so there are no request headers to read a session from. The kickoff route stores the token for the process ([`src/lib/github-token.server.ts`](../../src/lib/github-token.server.ts)):
+Workers run after the HTTP request that started them has ended, so there are no request headers to read a session from. The kickoff route stores the token for the process ([`src/lib/github-token.server.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/github-token.server.ts)):
 
 ```ts
 let workerGithubToken: string | null = null;

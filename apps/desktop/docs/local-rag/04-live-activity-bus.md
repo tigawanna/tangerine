@@ -1,6 +1,6 @@
 # Chapter 4: Live activity bus (Elysia SSE + pub/sub powered by nodejs event emitter)
 
-[Series index](./README.md) · Prev: [Chapter 3](./03-worker-engine.md) · Next: [Chapter 5: Query path](./05-query-path.md)
+[Series index](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/README.md) · Prev: [Chapter 3](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/03-worker-engine.md) · Next: [Chapter 5: Query path](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/05-query-path.md)
 
 ## Why
 
@@ -26,7 +26,7 @@ The shape is plain pub/sub: something **publishes** an event, and every open bro
 
 ## The bus
 
-[`src/lib/pub-sub/client.ts`](../../src/lib/pub-sub/client.ts) wraps a Node `EventEmitter`. The useful part is `listen()`: Node's [`events.on()`](https://nodejs.org/api/events.html#eventsonemitter-eventname-options) turns an emitter into an async iterable, and passing an `AbortSignal` ends the loop and removes the listener.
+[`src/lib/pub-sub/client.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/pub-sub/client.ts) wraps a Node `EventEmitter`. The useful part is `listen()`: Node's [`events.on()`](https://nodejs.org/api/events.html#eventsonemitter-eventname-options) turns an emitter into an async iterable, and passing an `AbortSignal` ends the loop and removes the listener.
 
 ```ts
 export class PubSub {
@@ -54,7 +54,7 @@ export const pubSub: PubSub = (() => {
 })();
 ```
 
-Topics are a const map, so a typo is a type error ([`topics.ts`](../../src/lib/pub-sub/topics.ts)):
+Topics are a const map, so a typo is a type error ([`topics.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/pub-sub/topics.ts)):
 
 ```ts
 export const PUB_SUB_TOPICS = {
@@ -71,7 +71,7 @@ The scratchpad chat is the smallest complete version of the pattern: a list you 
 
 ### 1. The event type
 
-One discriminated union describes everything the stream can send ([`src/data-access-layer/chat/chat.ts`](../../src/data-access-layer/chat/chat.ts)). The row type is inferred from the route through Eden, so it can't drift:
+One discriminated union describes everything the stream can send ([`src/data-access-layer/chat/chat.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/data-access-layer/chat/chat.ts)). The row type is inferred from the route through Eden, so it can't drift:
 
 ```ts
 export type ChatRow = AwaitedData<ReturnType<ElysiaTreaty["chat"]["get"]>>[number];
@@ -83,7 +83,7 @@ export type ChatSseEvent =
 
 ### 2. The route: write, then publish
 
-[`src/elysia/routes/chat/index.ts`](../../src/elysia/routes/chat/index.ts). Mutations write to PGlite first and publish only what actually happened:
+[`src/elysia/routes/chat/index.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/routes/chat/index.ts). Mutations write to PGlite first and publish only what actually happened:
 
 ```ts
 export const chatRoute = new Elysia({ prefix: "/chat" })
@@ -126,7 +126,7 @@ That's the entire server side of live updates: no socket bookkeeping and no subs
 
 ### 4. The client: EventSource → query cache
 
-A tiny generic helper parses JSON frames and returns an unsubscribe function ([`use-embedding-sse.ts`](../../src/hooks/use-embedding-sse.ts)):
+A tiny generic helper parses JSON frames and returns an unsubscribe function ([`use-embedding-sse.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/hooks/use-embedding-sse.ts)):
 
 ```ts
 export function subscribeSseJson<T>(url: string, handlers: { onMessage: (data: T) => void }): () => void {
@@ -139,7 +139,7 @@ export function subscribeSseJson<T>(url: string, handlers: { onMessage: (data: T
 }
 ```
 
-The chat hook ([`use-chat-sse.ts`](../../src/hooks/use-chat-sse.ts)) applies each event straight to the TanStack Query cache, so the list re-renders without a refetch. The route path comes from Eden (`~path`), not a hardcoded string.
+The chat hook ([`use-chat-sse.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/hooks/use-chat-sse.ts)) applies each event straight to the TanStack Query cache, so the list re-renders without a refetch. The route path comes from Eden (`~path`), not a hardcoded string.
 
 ```ts
 function applyChatSseEvent(event: ChatSseEvent) {
@@ -163,7 +163,7 @@ The `some(...)` check matters: the window that sent the message also receives it
 
 ### 5. The component
 
-The initial list comes from a normal query, and live changes come from the hook ([`Scratchpad.tsx`](../../src/routes/_dashboard/$user/scratchpad/-components/Scratchpad.tsx)):
+The initial list comes from a normal query, and live changes come from the hook ([`Scratchpad.tsx`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/routes/_dashboard/$user/scratchpad/-components/Scratchpad.tsx)):
 
 ```tsx
 export function Scratchpad() {
@@ -177,7 +177,7 @@ The input's mutation just calls `createChat(message)`. It doesn't touch the cach
 
 ## The same pattern for embedding progress
 
-The chapter 3 worker publishes `{ status, row }` on `REPO_EMBED_PROGRESS` from `patchEmbedActivity()`. The stream route adds one thing: it **sends the current snapshot first**, so a window that opens mid-run starts from the real state instead of waiting for the next event ([`enrich/starred/index.ts`](../../src/elysia/routes/enrich/starred/index.ts)):
+The chapter 3 worker publishes `{ status, row }` on `REPO_EMBED_PROGRESS` from `patchEmbedActivity()`. The stream route adds one thing: it **sends the current snapshot first**, so a window that opens mid-run starts from the real state instead of waiting for the next event ([`enrich/starred/index.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/routes/enrich/starred/index.ts)):
 
 ```ts
 .get("/activity/events", async function* ({ request }) {
@@ -192,7 +192,7 @@ The chapter 3 worker publishes `{ status, row }` on `REPO_EMBED_PROGRESS` from `
 })
 ```
 
-On the client ([`use-embed-activity-sse.ts`](../../src/hooks/use-embed-activity-sse.ts)), each frame updates the status pill, and any row gets upserted into the enriched-repos collection, so newly embedded repos appear in the list while the run continues:
+On the client ([`use-embed-activity-sse.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/hooks/use-embed-activity-sse.ts)), each frame updates the status pill, and any row gets upserted into the enriched-repos collection, so newly embedded repos appear in the list while the run continues:
 
 ```ts
 useEffect(() => {

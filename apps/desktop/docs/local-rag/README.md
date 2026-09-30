@@ -6,11 +6,11 @@ Each chapter is one slice of the stack.
 
 | Chapter | File | Status |
 | --- | --- | --- |
-| 1 | [Deno Desktop + TanStack Start setup](./01-deno-desktop-setup.md) | Draft |
-| 2 | [Better Auth](./02-better-auth.md) | Draft |
-| 3 | [Worker / processing engine](./03-worker-engine.md) | Draft |
-| 4 | [Live activity bus (Elysia SSE)](./04-live-activity-bus.md) | Draft |
-| 5 | [Query path + local RAG UX](./05-query-path.md) | Draft |
+| 1 | [Deno Desktop + TanStack Start setup](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/01-deno-desktop-setup.md) | Draft |
+| 2 | [Better Auth](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/02-better-auth.md) | Draft |
+| 3 | [Worker / processing engine](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/03-worker-engine.md) | Draft |
+| 4 | [Live activity bus (Elysia SSE)](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/04-live-activity-bus.md) | Draft |
+| 5 | [Query path + local RAG UX](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/05-query-path.md) | Draft |
 
 ## Product in one line
 

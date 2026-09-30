@@ -1,6 +1,6 @@
 # Chapter 2: Better Auth
 
-[Series index](./README.md) · Prev: [Chapter 1](./01-deno-desktop-setup.md) · Next: [Chapter 3: Worker engine](./03-worker-engine.md)
+[Series index](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/README.md) · Prev: [Chapter 1](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/01-deno-desktop-setup.md) · Next: [Chapter 3: Worker engine](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/03-worker-engine.md)
 
 ## Goal
 
@@ -119,7 +119,7 @@ Three apps take part: `apps/api` (`:5000`) owns Better Auth and the GitHub secre
 
 ### 1. Server: `electron()` + `bearer()` on the API
 
-[`apps/api/src/lib/auth.ts`](../../../api/src/lib/auth.ts) is the only Better Auth instance. The desktop-relevant bits are the two plugins and the trusted origin:
+[`apps/api/src/lib/auth.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/api/src/lib/auth.ts) is the only Better Auth instance. The desktop-relevant bits are the two plugins and the trusted origin:
 
 ```ts
 betterAuth({
@@ -140,11 +140,11 @@ betterAuth({
 
 - `electron()` gives us `/electron/token` (PKCE exchange) and `transferUser` for free.
 - `bearer()` lets the preload authenticate with `Authorization: Bearer <token>` instead of rebuilding a signed cookie jar (see lesson 4 below).
-- `ELECTRON_TRUSTED_ORIGIN` comes from [`packages/auth/src/electron.ts`](../../../../packages/auth/src/electron.ts), so the API, web, and desktop all agree on the scheme.
+- `ELECTRON_TRUSTED_ORIGIN` comes from [`packages/auth/src/electron.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/packages/auth/src/electron.ts), so the API, web, and desktop all agree on the scheme.
 
 ### 2. UI: ask the preload to start
 
-The desktop sign-in button ([`src/routes/auth/-components/GitHubSignIn.tsx`](../../src/routes/auth/-components/GitHubSignIn.tsx)) doesn't touch OAuth. It calls a binding and waits:
+The desktop sign-in button ([`src/routes/auth/-components/GitHubSignIn.tsx`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/routes/auth/-components/GitHubSignIn.tsx)) doesn't touch OAuth. It calls a binding and waits:
 
 ```ts
 const desktopSignIn = useMutation({
@@ -158,7 +158,7 @@ const desktopSignIn = useMutation({
 
 ### 3. Preload: PKCE, loopback, open the browser
 
-[`deno/auth/request-auth.ts`](../../deno/auth/request-auth.ts) does what `electronClient().requestAuth()` would do in Electron main:
+[`deno/auth/request-auth.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/deno/auth/request-auth.ts) does what `electronClient().requestAuth()` would do in Electron main:
 
 ```ts
 export async function requestAuth() {
@@ -185,7 +185,7 @@ The query params are exactly what `electronProxyClient` expects. `loopback` is o
 
 ### 4. Preload: the loopback server
 
-[`deno/auth/loopback.ts`](../../deno/auth/loopback.ts) is a tiny `Deno.serve` on `127.0.0.1` that stands in for the deep link. It starts at app boot (from `deno/window.ts`), not on click, so the port is ready before the browser needs it:
+[`deno/auth/loopback.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/deno/auth/loopback.ts) is a tiny `Deno.serve` on `127.0.0.1` that stands in for the deep link. It starts at app boot (from `deno/window.ts`), not on click, so the port is ready before the browser needs it:
 
 ```ts
 const server = Deno.serve(
@@ -217,7 +217,7 @@ This whole step is the part that goes away once Deno delivers `open-url`. At tha
 
 ### 5. Web: sign in, then hand the code to the loopback
 
-The browser half ([`apps/web/src/routes/auth/-components/GitHubSignIn.tsx`](../../../web/src/routes/auth/-components/GitHubSignIn.tsx)) uses the official proxy client ([`apps/web/src/lib/auth-client.ts`](../../../web/src/lib/auth-client.ts)):
+The browser half ([`apps/web/src/routes/auth/-components/GitHubSignIn.tsx`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/web/src/routes/auth/-components/GitHubSignIn.tsx)) uses the official proxy client ([`apps/web/src/lib/auth-client.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/web/src/lib/auth-client.ts)):
 
 ```ts
 export const authClient = createAuthClient({
@@ -257,7 +257,7 @@ It uses `fetch` rather than navigating to the loopback URL, so if the listener i
 
 ### 6. Preload: exchange the code for a session
 
-[`deno/auth/authenticate.ts`](../../deno/auth/authenticate.ts) decodes the token, finds the matching PKCE verifier by `state`, and calls the `electron()` plugin's exchange endpoint:
+[`deno/auth/authenticate.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/deno/auth/authenticate.ts) decodes the token, finds the matching PKCE verifier by `state`, and calls the `electron()` plugin's exchange endpoint:
 
 ```ts
 const { identifier, state } = decodeRedirectToken(input.token);
@@ -288,7 +288,7 @@ The session is a JSON file in the Deno runtime, never in the webview:
 └── pkce.json      # in-flight state → verifier (last 20), survives restarts/HMR
 ```
 
-Every call from the preload to the API goes through one helper ([`deno/auth/cookies.ts`](../../deno/auth/cookies.ts)):
+Every call from the preload to the API goes through one helper ([`deno/auth/cookies.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/deno/auth/cookies.ts)):
 
 ```ts
 export function apiHeaders(stored: StoredSession, extra?: HeadersInit): Headers {
@@ -308,7 +308,7 @@ Plain JSON is a tradeoff: Deno Desktop doesn't have a secure-storage API yet. Wh
 
 ### 8. Tell the UI, and guard routes with bindings
 
-After `onAuthenticated`, the preload ([`deno/window.ts`](../../deno/window.ts)) pushes an event into the webview **and** navigates, because `executeJs` events can get dropped:
+After `onAuthenticated`, the preload ([`deno/window.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/deno/window.ts)) pushes an event into the webview **and** navigates, because `executeJs` events can get dropped:
 
 ```ts
 setAuthListeners({
@@ -320,7 +320,7 @@ setAuthListeners({
 });
 ```
 
-Route guards ask the preload, not cookies ([`src/routes/_dashboard/layout.tsx`](../../src/routes/_dashboard/layout.tsx)). The same code still works in a plain browser tab via the normal Better Auth session:
+Route guards ask the preload, not cookies ([`src/routes/_dashboard/layout.tsx`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/routes/_dashboard/layout.tsx)). The same code still works in a plain browser tab via the normal Better Auth session:
 
 ```ts
 if (hasDesktopBindings() && globalThis.bindings) {
@@ -336,7 +336,7 @@ if (hasDesktopBindings() && globalThis.bindings) {
 
 ### 9. The payoff: a GitHub token for the RAG corpus
 
-The whole point is a real user token for GitHub. It lets us list starred repos and pull READMEs and metadata at the authenticated rate limit instead of the anonymous one. [`deno/auth/session.ts`](../../deno/auth/session.ts) exposes it as `bindings.getGithubAccessToken()`:
+The whole point is a real user token for GitHub. It lets us list starred repos and pull READMEs and metadata at the authenticated rate limit instead of the anonymous one. [`deno/auth/session.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/deno/auth/session.ts) exposes it as `bindings.getGithubAccessToken()`:
 
 ```ts
 // Better Auth wants the account *row* id, not GitHub's user id
@@ -352,7 +352,7 @@ Better Auth keeps the GitHub OAuth token on the API side, and the desktop fetche
 
 ## Lessons learned
 
-Most of these cost an evening each. The full list with debugging tips is in [`docs/auth.md`](../../../../docs/auth.md#gotchas-learned-the-hard-way).
+Most of these cost an evening each. The full list with debugging tips is in [`docs/auth.md`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/docs/auth.md#gotchas-learned-the-hard-way).
 
 1. **Deno Desktop can remap your loopback port.** Ask for `17832`, but always advertise the port from `onListen`. Start the loopback at boot and keep a strong reference to the server, or the browser ends up posting to a dead port.
 
@@ -442,4 +442,4 @@ Most of the code in `deno/auth/` works around something the runtime doesn't do y
 
 7. **Hot reload for the preload.** `--preload` and `--env-file` are read once at startup, so every auth change means fully quitting the app. HMR for `deno/*` (or at least a "reload preload" command) would make iterating on this flow far less painful.
 8. **Predictable `Deno.serve` ports.** A way to opt out of port remapping when an explicit port is requested, or a documented rule for when it happens. Half of lesson 1 exists because the port you ask for isn't always the port you get.
-9. **Typed bindings.** A shared type between `win.bind(...)` and `bindings.*`. Today we keep [`src/lib/desktop-bindings.ts`](../../src/lib/desktop-bindings.ts) in sync with `deno/window.ts` by hand, and the [docs](https://docs.deno.com/runtime/desktop/bindings/#type-safety) suggest the same.
+9. **Typed bindings.** A shared type between `win.bind(...)` and `bindings.*`. Today we keep [`src/lib/desktop-bindings.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/desktop-bindings.ts) in sync with `deno/window.ts` by hand, and the [docs](https://docs.deno.com/runtime/desktop/bindings/#type-safety) suggest the same.

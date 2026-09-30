@@ -1,6 +1,6 @@
 # Chapter 5: Query path + local RAG UX
 
-[Series index](./README.md) · Prev: [Chapter 4](./04-live-activity-bus.md)
+[Series index](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/README.md) · Prev: [Chapter 4](https://github.com/tigawanna/tangerine/blob/main/apps/desktop/docs/local-rag/04-live-activity-bus.md)
 
 ## Goal
 
@@ -45,7 +45,7 @@ Everything below the Elysia route runs inside the desktop app's Deno process. No
 - **Small when quantized.** Google quotes under 200 MB of RAM with quantization.
 - **Fully offline** once the weights are on disk.
 
-We run the [`onnx-community/embeddinggemma-300m-ONNX`](https://huggingface.co/onnx-community/embeddinggemma-300m-ONNX) export through [`@kessler/gemma-embedding`](https://github.com/kessler/gemma-embedding), a small wrapper over Transformers.js that uses native `onnxruntime-node` in Node-compatible runtimes. Our own package, [`packages/gemma-embedding`](../../../../packages/gemma-embedding/src/node.ts), adds a shared instance, quantization switching, download progress, and cache inspection on top.
+We run the [`onnx-community/embeddinggemma-300m-ONNX`](https://huggingface.co/onnx-community/embeddinggemma-300m-ONNX) export through [`@kessler/gemma-embedding`](https://github.com/kessler/gemma-embedding), a small wrapper over Transformers.js that uses native `onnxruntime-node` in Node-compatible runtimes. Our own package, [`packages/gemma-embedding`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/packages/gemma-embedding/src/node.ts), adds a shared instance, quantization switching, download progress, and cache inspection on top.
 
 ### Documents and queries are embedded differently
 
@@ -58,7 +58,7 @@ const prefixed =
     : `title: none | text: ${text}`;
 ```
 
-So the worker embeds repos with `embedDocument()` and search embeds the user's sentence with `embedQuery()`. Mixing the two up still returns results, just noticeably worse ones. That's why both are exported as separate named functions rather than a `mode` flag callers could forget ([`instance.ts`](../../../../packages/gemma-embedding/src/node-runtime/instance.ts)):
+So the worker embeds repos with `embedDocument()` and search embeds the user's sentence with `embedQuery()`. Mixing the two up still returns results, just noticeably worse ones. That's why both are exported as separate named functions rather than a `mode` flag callers could forget ([`instance.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/packages/gemma-embedding/src/node-runtime/instance.ts)):
 
 ```ts
 export async function embedDocument(text: string) {
@@ -102,7 +102,7 @@ The worker and the search route share this instance, so indexing and searching a
 
 ### Quantization
 
-The ONNX export ships several weight files. Settings lets the user pick one ([`catalog.ts`](../../../../packages/gemma-embedding/src/catalog.ts)):
+The ONNX export ships several weight files. Settings lets the user pick one ([`catalog.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/packages/gemma-embedding/src/catalog.ts)):
 
 | Variant | Download | Notes                                       |
 | ------- | -------- | ------------------------------------------- |
@@ -121,7 +121,7 @@ All variants run on the CPU (`device: "cpu"`). `GEMMA_DTYPE` and `GEMMA_MODEL_PA
 "desktop:build": "... deno desktop ... --exclude-unused-npm --exclude ./.output/server/node_modules/onnxruntime-node --compress ..."
 ```
 
-At runtime, [`ort-runtime.ts`](../../src/lib/embedding-gemmma/ort-runtime.ts) resolves ORT in two steps. In dev, the normal `node_modules` copy just works. In a packaged build, it uses a copy downloaded on first run into the config dir:
+At runtime, [`ort-runtime.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/embedding-gemmma/ort-runtime.ts) resolves ORT in two steps. In dev, the normal `node_modules` copy just works. In a packaged build, it uses a copy downloaded on first run into the config dir:
 
 ```ts
 export async function ensureOrtReady(): Promise<void> {
@@ -144,7 +144,7 @@ Every embed call goes through `ensureOrtReady()` before importing the model pack
 
 A fresh install has neither ORT nor model weights. The first time the app opens, it fetches both in the background with a progress toast. It's modelled on an IDE's first-run downloads and is cancellable from the toast.
 
-The server side ([`embedding-bootstrap.ts`](../../src/lib/embedding-gemmma/embedding-bootstrap.ts)) runs the two downloads in order:
+The server side ([`embedding-bootstrap.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/lib/embedding-gemmma/embedding-bootstrap.ts)) runs the two downloads in order:
 
 ```ts
 void (async () => {
@@ -158,7 +158,7 @@ void (async () => {
 })();
 ```
 
-Progress is streamed with the chapter 4 SSE pattern. This source is a status snapshot rather than an event bus, so the generator polls once a second, only sends when something changed, and closes itself when the downloads finish ([`models/bootstrap.ts`](../../src/elysia/routes/models/bootstrap.ts)):
+Progress is streamed with the chapter 4 SSE pattern. This source is a status snapshot rather than an event bus, so the generator polls once a second, only sends when something changed, and closes itself when the downloads finish ([`models/bootstrap.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/routes/models/bootstrap.ts)):
 
 ```ts
 .get("/events", async function* ({ request }) {
@@ -176,11 +176,11 @@ Progress is streamed with the chapter 4 SSE pattern. This source is a status sna
 })
 ```
 
-On the client, [`EmbeddingBootstrapHost`](../../src/components/embeddings/EmbeddingBootstrapHost.tsx) is mounted once. It calls `POST /embedding/bootstrap/start` when the server says `shouldAutoStart`, and renders the toast with a progress bar and a Cancel button.
+On the client, [`EmbeddingBootstrapHost`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/components/embeddings/EmbeddingBootstrapHost.tsx) is mounted once. It calls `POST /embedding/bootstrap/start` when the server says `shouldAutoStart`, and renders the toast with a progress bar and a Cancel button.
 
 ## Storage: pgvector in PGlite
 
-Vectors live next to the repo rows in embedded Postgres ([PGlite](https://pglite.dev/docs/) with the [pgvector](https://github.com/pgvector/pgvector) extension). The column width comes from the same constant the model package exports, so the two can't drift apart ([`project-enrichment-outputs.ts`](../../src/pglite/schema/project-enrichment-outputs.ts)):
+Vectors live next to the repo rows in embedded Postgres ([PGlite](https://pglite.dev/docs/) with the [pgvector](https://github.com/pgvector/pgvector) extension). The column width comes from the same constant the model package exports, so the two can't drift apart ([`project-enrichment-outputs.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/pglite/schema/project-enrichment-outputs.ts)):
 
 ```ts
 // packages/gemma-embedding/src/constants.ts
@@ -208,7 +208,7 @@ Storing `payload.text` and `modelId` makes the index easy to reason about later.
 
 ## Search
 
-The whole retrieval step is one function ([`search.ts`](../../src/elysia/routes/enrich/starred/helpers/search.ts)): embed the query, then let Postgres sort by cosine distance using Drizzle's `cosineDistance` (pgvector's `<=>` operator):
+The whole retrieval step is one function ([`search.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/routes/enrich/starred/helpers/search.ts)): embed the query, then let Postgres sort by cosine distance using Drizzle's `cosineDistance` (pgvector's `<=>` operator):
 
 ```ts
 export async function searchStarredByQuery(q: string): Promise<StarredSearchHit[]> {
@@ -240,7 +240,7 @@ CREATE INDEX project_enrichment_outputs_embedding_hnsw
   ON project_enrichment_outputs USING hnsw (embedding vector_cosine_ops);
 ```
 
-The route exposes the search with validation and OpenAPI docs ([`enrich/starred/index.ts`](../../src/elysia/routes/enrich/starred/index.ts)):
+The route exposes the search with validation and OpenAPI docs ([`enrich/starred/index.ts`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/elysia/routes/enrich/starred/index.ts)):
 
 ```ts
 .get("/search", ({ query }) => searchStarredByQuery(query.q), {
@@ -252,7 +252,7 @@ The route exposes the search with validation and OpenAPI docs ([`enrich/starred/
 
 ## The UI
 
-The starred page ([`EnrichedStarred.tsx`](../../src/routes/_dashboard/$user/enriched/-components/starred/EnrichedStarred.tsx)) reuses the app's normal list scaffold. The search box writes `?q=` to the URL after a 600 ms debounce, and a query hook calls the typed Eden client:
+The starred page ([`EnrichedStarred.tsx`](https://github.com/tigawanna/tangerine/blob/cac981aca4b365f2ee1293fbf5248da5548c3b5a/apps/desktop/src/routes/_dashboard/$user/enriched/-components/starred/EnrichedStarred.tsx)) reuses the app's normal list scaffold. The search box writes `?q=` to the URL after a 600 ms debounce, and a query hook calls the typed Eden client:
 
 ```tsx
 const q = (routeApi.useSearch().q ?? "").trim();
