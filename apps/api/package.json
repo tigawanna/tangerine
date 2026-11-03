@@ -36,7 +36,7 @@
     "drizzle-orm": "^0.45.1",
     "evlog": "^2.28.0",
     "hono": "^4.11.3",
-    "zod": "^4.5.4"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
