@@ -3,7 +3,30 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "extends": false
+      "extends": false,
+      "env": [
+        "NODE_ENV",
+        "VITE_API_URL",
+        "VITE_APP_URL",
+        "VITE_SIGN_IN_URL",
+        "VITE_POSTHOG_KEY",
+        "VITE_POSTHOG_HOST",
+        "GH_PAT",
+        "LOG_DEBUG",
+        "DATABASE_URL",
+        "DATABASE_AUTH_TOKEN",
+        "BETTER_AUTH_SECRET",
+        "BETTER_AUTH_URL",
+        "BETTER_AUTH_TRUSTED_ORIGINS",
+        "GITHUB_CLIENT_ID",
+        "GITHUB_CLIENT_SECRET",
+        "ADMIN_EMAIL",
+        "FRONTEND_URL",
+        "CRON_SECRET",
+        "OPENAI_API_KEY",
+        "OPENROUTER_API_KEY",
+        "EVLOG_FS_DIR"
+      ]
     }
   }
 }
