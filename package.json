@@ -1,5 +1,5 @@
 {
-  "name": "tigawanna",
+  "name": "tangerine",
   "private": true,
   "scripts": {
     "build": "turbo run build --filter=web",
@@ -48,10 +48,10 @@
     },
     "onlyBuiltDependencies": [
       "core-js",
+      "electron",
       "es5-ext",
       "esbuild",
       "futurescript",
-      "onnxruntime-node",
       "protobufjs",
       "sharp",
       "workerd"
